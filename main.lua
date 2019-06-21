@@ -1,11 +1,10 @@
 --[[
-  Exercise 2:
-    We can implement a fixed delta time loop by setting dt to always be some value, in this case, 1/60.
-    If the game runs at exactly 60 frames per second, this loop will be 100% accurate, and the simulation will run as expected.
+  Exercise 3:
+    We return back to the original love.run() function which implements variable timestep.
+    In other words, we simply simulate as much state as the time passed since the last frame. 
     
-    However, this means that the game runs faster or slower depending on how many frames per second our computer can output.
-    Faster than 60fps? Too fast - we simulate too much state for each frame. 
-    Slower than 60fps? Too slow - we haven't simulated enough state for each frame.
+    There are some side-effects though: we are susceptible to extremely large changes of state if we are lagging really badly, which is not good, since our
+    dt will be massive. This can cause physics simulations to blow up.
 --]]
 function love.run()
 	if love.load then love.load(love.arg.parseGameArguments(arg), arg) end
@@ -13,7 +12,7 @@ function love.run()
 	-- We don't want the first frame's dt to include time taken by love.load.
 	if love.timer then love.timer.step() end
  
-	local dt = 1/60
+	local dt = 0
  
 	-- Main loop time.
 	return function()
@@ -29,6 +28,9 @@ function love.run()
 				love.handlers[name](a,b,c,d,e,f)
 			end
 		end
+ 
+		-- Update dt, as we'll be passing it to update
+		if love.timer then dt = love.timer.step() end
  
 		-- Call update and draw
 		if love.update then love.update(dt) end -- will pass 0 if love.timer is disabled
