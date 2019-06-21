@@ -1,21 +1,39 @@
 --[[
-  Exercise 4:
-    Since we know that large dt can blow up our game, we want to cap it to some maximum.
-    This can give us the best of both worlds - allowing us to run at the correct speed on different machines while not being susceptible to blowing up.
+  Exercise 5:
+    One problem we might run into with semi-fixed framerate is the fact that floats have limited precision. In other words, by splitting up our simulation into
+    multiple time chunks of dt or less, we've already introduced some floating point error - when we add these chunks back up, we won't necessarily get the same
+    result as if we were to simulate the whole big chunk!
+  
+    This is bad if we want exact reproducibility - which we might want for debugging and networking purposes, since our simulation might behave slightly differently
+    from each run to the next. The only solution for this is to use a fixed frame rate, which brings us back to the start.
+
+    So we need to decouple our simulation and rendering framerates. In other words, we advance our simulation by a fixed framerate, while also making sure that 
+    it is keeping up with the renderer.
     
-    How should we do this? If our dt is bigger than our desired frame rate (i.e 1/60), we split it into chunks that are max as big as our desired frame rate,
-    and simulate those chunks instead of simulating one huge chunk all at once.
+    As Gaffer on Games puts it, if our display framerate is 50fps, and our physics simulation is 100fps, we would have to take 2 physics steps per display update.
+    If our display framerate is 200fps, and our physics simulation is 100fps, we would need to take 0.5 physics steps per display update - except we can only move in
+    whole steps of dt, so we have to take 1 physics steps per 2 display updates.
     
-    Here's the problem - we're now simulating multiple physics steps per display update. If our physics simulation is the most expensive part of rendering our frame,
-    we will run into the "spiral of death" problem.
+    Of course, the whole thing gets way too complicated if our display and our physics framerates aren't nice multiples like these. So Gaffer on Games prefers to think 
+    of it this way. The renderer produces time, and the simulation consumes in it discrete sized dt chunks.
     
-    What is this problem and how is it caused exactly? Well, the CPU only has a certain amount of time to simulate the physics before the next frame. What happens if we
-    tell the CPU to simulate so many steps that it doesn't even have enough time to simulate all of them before the next frame? Thus the simulation falls behind.
-    We run into the "spiral of death" here because the CPU has to simulate more frames to catch up, which causes it to fall further behind, causing it to
-    simulate more frames, and so on.
+    This is in fact the only way that this makes any sense to me - the renderer "accumulates" enough time by updating enough times, which then allows the simulation
+    to proceed forwards by 1 step, thus getting the effect we want above of calculating how many physics steps we take per display update.
     
-    Some suggestions to avoid this: make sure your simulation runs very very fast, so it can handle temporary lag spikes where it needs to simulate a lot of frames,
-    or, cap the number of simulation steps per frame. The simulation will appear to slow down (we haven't simulated enough state!) but at least it will not die.
+    Of course, be sure to note that we may have some unsimulated time left over after integrating - which is fine, since this is accumulated in the accumulator.
+    This time is passed onto the next frame and is not thrown away, ensuring that our simulation does not fall behind by mistakenly throwing away time we should
+    be simulating.
+    
+    One thing to be aware of though is that typically when rendering frames, we usually have some small amount of unsimulated time in the accumulator that is less than dt.
+    This is of course reasonable to expect since there is no way that we would always get perfectly-sized chunks of dt to simulate. If this is the case however, this means
+    that we are actually slightly behind when rendering our frames - we are simulating a state that is some value slightly less than dt behind.
+    
+    This causes temporal aliasing, which is a "subtle but visually unpleasant stuttering of the physics animation", as Gaffer on Games puts it. If we want to smooth this
+    out, we can interpolate between the previous and current physics state based on how much time is left in the accumulator.
+    
+    Technically we'll be "1 frame behind" if we use this method (since we needed to see in the future to obtain our "next" frame) but this is fine since rendering
+    is really just relative. As long as the frames shown on the screen are accurate with respect to eachother, no one will know that we technically have the full
+    simulated state of our current frame to show.
 --]]
 function love.run()
 	if love.load then love.load(love.arg.parseGameArguments(arg), arg) end
@@ -23,8 +41,9 @@ function love.run()
 	-- We don't want the first frame's dt to include time taken by love.load.
 	if love.timer then love.timer.step() end
  
-  local cap = 1/60
+  local accumulator = 0
 	local dt = 0
+  local fixed = 1/60
  
 	-- Main loop time.
 	return function()
@@ -43,12 +62,13 @@ function love.run()
  
 		-- Update dt, as we'll be passing it to update
 		if love.timer then dt = love.timer.step() end 
+    accumulator = accumulator + dt
+    
 		-- Call update and draw
 		if love.update then 
-      while (dt > 0.0) do
-        local deltaTime = min(cap, dt)
-        love.update(deltaTime)
-        dt = dt - deltaTime
+      while (accumulator - fixed > 0.0) do
+        love.update(fixed)
+        accumulator = accumulator - fixed
       end
     end -- will pass 0 if love.timer is disabled
  
