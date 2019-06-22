@@ -1,8 +1,7 @@
 --[[
-  Exercise 11:
-    No. Functions are first-class values in Lua, meaning they can be passed around and assigned just like regular data types for variables.
-    If a class has a method with the name of "someMethod", we're essentially just assigning a function to the key "someMethod".
-    We can't have an attribute with the same name since we would just be overriding whatever is assigned to the key "someMethod", in this case, the function.
+  Exercise 12:
+    In Lua, everything is stored in a table, including global objects and functions. If you do not use local or declare your variable to be part of another table,
+    it is implicitly assigned to the global table that Lua maintains, under the name "_G".
 ]]--
 
 Object = require 'libraries/classic/classic'
