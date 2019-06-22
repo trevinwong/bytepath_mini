@@ -1,18 +1,19 @@
---[[
-  Exercise 9:
-    The value will be 2. The increment function receives an argument called "self", because we want to pass the instance of the object that we are calling the function on.
-    Otherwise, we won't be able to modify it's members.
-    
-    This argument can indeed be named something else. But you would then need to consistently use and define this argument, as opposed to using Lua's colon operator,
-    which implicitly defines and adds the argument "self" for you.
-    
-    In this case, "self" represents the variable "counter_table".
-]]--
+function exercise10()
+  return {
+    a = 1,
+    b = 2,
+    c = 3,
+    sum = function(self) self.c = self.a + self.b + self.c end
+  }
+end
 
 Object = require 'libraries/classic/classic'
 
 function love.load()
   requireAllInFolder('objects')
+  exercise10Table = exercise10()
+  exercise10Table:sum()
+  print(exercise10Table.c)
 end
 
 function love.update(dt)
