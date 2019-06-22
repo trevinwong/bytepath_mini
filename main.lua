@@ -11,6 +11,8 @@ end
 function love.draw()
   local c = Circle(400, 300, 50)
   c:draw()
+  local h = HyperCircle(400, 300, 50, 10, 120)
+  h:draw()
 end
 
 function requireAllInFolder(folder)
