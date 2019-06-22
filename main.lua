@@ -1,3 +1,10 @@
+--[[
+  Exercise 8:
+    The : operator implicitly passes the first argument to the function, while the . operator does not. By default, this first argument is called "self".
+    
+    We use this in OOP, for example, by passing the instance of the object we've created to it's own function so it can use it's own members and functions.
+]]--
+
 Object = require 'libraries/classic/classic'
 
 function love.load()
