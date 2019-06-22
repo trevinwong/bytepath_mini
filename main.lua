@@ -1,19 +1,14 @@
-function exercise10()
-  return {
-    a = 1,
-    b = 2,
-    c = 3,
-    sum = function(self) self.c = self.a + self.b + self.c end
-  }
-end
+--[[
+  Exercise 11:
+    No. Functions are first-class values in Lua, meaning they can be passed around and assigned just like regular data types for variables.
+    If a class has a method with the name of "someMethod", we're essentially just assigning a function to the key "someMethod".
+    We can't have an attribute with the same name since we would just be overriding whatever is assigned to the key "someMethod", in this case, the function.
+]]--
 
 Object = require 'libraries/classic/classic'
 
 function love.load()
   requireAllInFolder('objects')
-  exercise10Table = exercise10()
-  exercise10Table:sum()
-  print(exercise10Table.c)
 end
 
 function love.update(dt)
