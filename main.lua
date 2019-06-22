@@ -1,13 +1,7 @@
 --[[
-  Exercise 13:
-    Sadly, there is no guarantee. The official LOVE2D documentation for "getDirectoryItems" states that the items in the folder are returned in no order.
-    Meaning, we could process "SomeClass" before "ParentClass".
-    
-    What we could do is include the proper requires for all the class' dependencies in the file itself. Unfortunately, this is a little redundant, since 
-    we would have to do this for every single class, as opposed to just writing out our requires in the proper order in main.
-    
-    Another idea is to construct a dependency graph to ensure that we are loading the right files beforehand, but that may be something a little farther in the future
-    for me to look into.
+  Exercise 14:
+    This is a little hacky, but you could assign the corresponding key in the global table. For example, if we would set _G[Circle] = require(objects/Circle.lua).
+    You would get the name through a substring.
 ]]--
 Object = require 'libraries/classic/classic'
 
