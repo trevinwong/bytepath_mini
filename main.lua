@@ -1,9 +1,14 @@
 --[[
-  Exercise 12:
-    In Lua, everything is stored in a table, including global objects and functions. If you do not use local or declare your variable to be part of another table,
-    it is implicitly assigned to the global table that Lua maintains, under the name "_G".
+  Exercise 13:
+    Sadly, there is no guarantee. The official LOVE2D documentation for "getDirectoryItems" states that the items in the folder are returned in no order.
+    Meaning, we could process "SomeClass" before "ParentClass".
+    
+    What we could do is include the proper requires for all the class' dependencies in the file itself. Unfortunately, this is a little redundant, since 
+    we would have to do this for every single class, as opposed to just writing out our requires in the proper order in main.
+    
+    Another idea is to construct a dependency graph to ensure that we are loading the right files beforehand, but that may be something a little farther in the future
+    for me to look into.
 ]]--
-
 Object = require 'libraries/classic/classic'
 
 function love.load()

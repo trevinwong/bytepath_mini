@@ -1,3 +1,5 @@
+require "objects/Circle"
+
 HyperCircle = Circle:extend()
 
 function HyperCircle:new(x, y, radius, line_width, outer_radius)
