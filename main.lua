@@ -1,12 +1,15 @@
---[[
-  Exercise 14:
-    This is a little hacky, but you could assign the corresponding key in the global table. For example, if we would set _G[Circle] = require(objects/Circle.lua).
-    You would get the name through a substring.
-]]--
+io.stdout:setvbuf("no")
 Object = require 'libraries/classic/classic'
+Input = require 'libraries/boipushy/Input'
 
 function love.load()
   requireAllInFolder('objects')
+    --[[
+    Exercise 15:
+      Binding a key to an anonymous function calls the function by default only when it is pressed down.
+  ]]--
+  input = Input()
+  input:bind('mouse1', function() print(love.math.random()) end)
 end
 
 function love.update(dt)

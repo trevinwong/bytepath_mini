@@ -1,3 +1,6 @@
 [submodule "libraries/classic"]
 	path = libraries/classic
 	url = git@github.com:rxi/classic.git
+[submodule "libraries/boipushy"]
+	path = libraries/boipushy
+	url = git@github.com:adnzzzzZ/boipushy.git
