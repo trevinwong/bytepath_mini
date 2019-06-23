@@ -5,15 +5,19 @@ Input = require 'libraries/boipushy/Input'
 function love.load()
   requireAllInFolder('objects')
     --[[
-    Exercise 15:
-      Binding a key to an anonymous function calls the function by default only when it is pressed down.
+    Exercise 16:
+      I don't have a keypad on my laptop so I used mouse1 instead.
   ]]--
   input = Input()
-  input:bind('mouse1', function() print(love.math.random()) end)
+  input:bind('mouse1', 'add')
+  sum = 0
 end
 
 function love.update(dt)
-
+  if input:down('add', 0.25) then 
+    sum = sum + 1
+    print(sum)
+  end
 end
 
 function love.draw()
