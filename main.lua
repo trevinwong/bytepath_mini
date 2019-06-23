@@ -4,27 +4,15 @@ Input = require 'libraries/boipushy/Input'
 
 function love.load()
   requireAllInFolder('objects')
-    --[[
-    Exercise 17:
-      Multiple keys can indeed be bound to the same action. The whole point of actions is to act as an alias for these inputs - so we don't have to care where
-      the input is coming from.
-      
-      Multiple actions can indeed be bound to the same key. I imagine how this is done is that each action registered to the key simply gets a "yes, I'm being triggered"
-      input.
+  --[[
+    Exercise 18-20: 
+      I have no gamepad, sorry.
   ]]--
   input = Input()
-  input:bind('mouse1', 'add')
-  input:bind('mouse1', 'cry')
-  input:bind('mouse2', 'add')
-  sum = 0
 end
 
 function love.update(dt)
-  if input:down('add', 0.25) then 
-    sum = sum + 1
-    print(sum)
-  end
-  if input:pressed('cry') then print('cry') end
+  
 end
 
 function love.draw()
