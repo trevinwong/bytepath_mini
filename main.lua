@@ -8,22 +8,23 @@ function love.load()
   input = Input()
   timer = Timer()
   
-  --[[
-    Exercise 25:
-      If you use the "chrono" library mentioned in the tutorial, for some reason, the method of simulating "every" with "after" does not work.
-      I had to switch over to the hump/EnhancedTimer alternative as a result.
-  ]]--
   circle = {radius = 24}
-  timer:after(0, function(f)
-      timer:tween(2, circle, {radius = 96}, 'in-out-cubic', function()
-          timer:tween(2, circle, {radius = 24}, 'in-out-cubic')
-      end)
-      timer:after(4, f)
-  end)
+  input:bind('e', 'expand')
+  input:bind('s', 'shrink')
 end
 
 function love.update(dt)
   timer:update(dt)
+  if input:pressed('expand') then 
+    if (expandHandle) then timer:cancel(expandHandle) end
+    if (shrinkHandle) then timer:cancel(shrinkHandle) end
+    expandHandle = timer:tween(1, circle, {radius = 96}, 'in-out-cubic') 
+  end
+  if input:pressed('shrink') then 
+    if (expandHandle) then timer:cancel(expandHandle) end
+    if (shrinkHandle) then timer:cancel(shrinkHandle) end
+    shrinkHandle = timer:tween(1, circle, {radius = 24}, 'in-out-cubic') 
+  end
 end
 
 function love.draw()
