@@ -1,18 +1,20 @@
 io.stdout:setvbuf("no")
 Object = require 'libraries/classic/classic'
 Input = require 'libraries/boipushy/Input'
+Timer = require 'libraries/chrono/Timer'
 
 function love.load()
   requireAllInFolder('objects')
-  --[[
-    Exercise 18-20: 
-      I have no gamepad, sorry.
-  ]]--
   input = Input()
+  timer = Timer()
+  
+  for i = 1, 10 do
+    timer:after(i * 0.5, function() print(love.math.random()) end)
+  end
 end
 
 function love.update(dt)
-  
+  timer:update(dt)
 end
 
 function love.draw()

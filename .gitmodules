@@ -4,3 +4,6 @@
 [submodule "libraries/boipushy"]
 	path = libraries/boipushy
 	url = git@github.com:adnzzzzZ/boipushy.git
+[submodule "libraries/chrono"]
+	path = libraries/chrono
+	url = git@github.com:adnzzzzZ/chrono.git
