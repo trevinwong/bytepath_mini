@@ -14,8 +14,13 @@ function love.load()
   c = {'1', '2', '3', 4, 5, 6}
   d = {1, 4, 3, 4, 5, 6}
   
-  d = M.map(d, function(v) return v+1 end)
-  M.each(d, print)
+  a = M.map(a, function(v, k) 
+      if (type(v) == 'number') then return v * 2 end
+      if (type(v) == 'string') then return v .. 'xD' end
+      if (type(v) == 'boolean') then return not v end
+      if (type(v) == 'table') then return end
+    end)
+  M.each(a, print)
 end
 
 function love.update(dt)
