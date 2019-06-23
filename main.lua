@@ -14,13 +14,8 @@ function love.load()
   c = {'1', '2', '3', 4, 5, 6}
   d = {1, 4, 3, 4, 5, 6}
   
-  a = M.map(a, function(v, k) 
-      if (type(v) == 'number') then return v * 2 end
-      if (type(v) == 'string') then return v .. 'xD' end
-      if (type(v) == 'boolean') then return not v end
-      if (type(v) == 'table') then return end
-    end)
-  M.each(a, print)
+  sum = M.sum(d)
+  print(sum)
 end
 
 function love.update(dt)
