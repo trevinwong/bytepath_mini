@@ -8,27 +8,23 @@ function love.load()
   input = Input()
   timer = Timer()
   
-  circle = {radius = 24}
-  input:bind('e', 'expand')
-  input:bind('s', 'shrink')
+  --[[
+    Exercise 27:
+      This is a neat little exercise that takes advantage of the fact that all global variables are put in a global table.
+      Why does this work? The "tween" function looks in the source table and attempts to tween all values that match in the target table.
+      
+      In this case, we simply pass the global table as the source table. "a" matches in the target table, so it tweens "a".
+  ]]--
+  a = 10
+  timer:tween(1, _G, {a = 20}, 'linear')
 end
 
 function love.update(dt)
   timer:update(dt)
-  if input:pressed('expand') then 
-    if (expandHandle) then timer:cancel(expandHandle) end
-    if (shrinkHandle) then timer:cancel(shrinkHandle) end
-    expandHandle = timer:tween(1, circle, {radius = 96}, 'in-out-cubic') 
-  end
-  if input:pressed('shrink') then 
-    if (expandHandle) then timer:cancel(expandHandle) end
-    if (shrinkHandle) then timer:cancel(shrinkHandle) end
-    shrinkHandle = timer:tween(1, circle, {radius = 24}, 'in-out-cubic') 
-  end
+  print(a)
 end
 
 function love.draw()
-  love.graphics.circle('fill', 400, 300, circle.radius)
 end
 
 function requireAllInFolder(folder)
