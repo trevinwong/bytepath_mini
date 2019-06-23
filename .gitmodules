@@ -13,3 +13,6 @@
 [submodule "libraries/hump"]
 	path = libraries/hump
 	url = git@github.com:vrld/hump.git
+[submodule "libraries/Moses"]
+	path = libraries/Moses
+	url = git@github.com:Yonaba/Moses.git

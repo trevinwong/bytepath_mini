@@ -2,26 +2,23 @@ io.stdout:setvbuf("no")
 Object = require 'libraries/classic/classic'
 Input = require 'libraries/boipushy/Input'
 Timer = require 'libraries/EnhancedTimer/EnhancedTimer'
+M = require 'libraries/Moses/moses'
 
 function love.load()
   requireAllInFolder('objects')
   input = Input()
   timer = Timer()
   
-  --[[
-    Exercise 27:
-      This is a neat little exercise that takes advantage of the fact that all global variables are put in a global table.
-      Why does this work? The "tween" function looks in the source table and attempts to tween all values that match in the target table.
-      
-      In this case, we simply pass the global table as the source table. "a" matches in the target table, so it tweens "a".
-  ]]--
-  a = 10
-  timer:tween(1, _G, {a = 20}, 'linear')
+  a = {1, 2, '3', 4, '5', 6, 7, true, 9, 10, 11, a = 1, b = 2, c = 3, {1, 2, 3}}
+  b = {1, 1, 3, 4, 5, 6, 7, false}
+  c = {'1', '2', '3', 4, 5, 6}
+  d = {1, 4, 3, 4, 5, 6}
+  
+  M.each(a, print)
 end
 
 function love.update(dt)
   timer:update(dt)
-  print(a)
 end
 
 function love.draw()
