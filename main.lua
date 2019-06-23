@@ -14,8 +14,9 @@ function love.load()
   c = {'1', '2', '3', 4, 5, 6}
   d = {1, 4, 3, 4, 5, 6}
   
-  sum = M.sum(d)
-  print(sum)
+  if M.include(b, 9) then
+      print('table contains the value 9')
+  end
 end
 
 function love.update(dt)
