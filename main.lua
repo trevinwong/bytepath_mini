@@ -1,18 +1,24 @@
 io.stdout:setvbuf("no")
 Object = require 'libraries/classic/classic'
 Input = require 'libraries/boipushy/Input'
-Timer = require 'libraries/chrono/Timer'
+Timer = require 'libraries/EnhancedTimer/EnhancedTimer'
 
 function love.load()
   requireAllInFolder('objects')
   input = Input()
   timer = Timer()
   
+  --[[
+    Exercise 25:
+      If you use the "chrono" library mentioned in the tutorial, for some reason, the method of simulating "every" with "after" does not work.
+      I had to switch over to the hump/EnhancedTimer alternative as a result.
+  ]]--
   circle = {radius = 24}
-  timer:every(4, function()
+  timer:after(0, function(f)
       timer:tween(2, circle, {radius = 96}, 'in-out-cubic', function()
           timer:tween(2, circle, {radius = 24}, 'in-out-cubic')
       end)
+      timer:after(4, f)
   end)
 end
 
