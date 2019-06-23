@@ -14,7 +14,7 @@ function love.load()
   c = {'1', '2', '3', 4, 5, 6}
   d = {1, 4, 3, 4, 5, 6}
   
-  M.each(M.select(d, function(v) return v < 5 end), print)
+  M.each(M.select(c, function(v) return type(v) == 'string' end), print)
 end
 
 function love.update(dt)
