@@ -12,8 +12,12 @@ function love.load()
   current_room = nil  
   
   --[[
-    Exercise 44:
-      F# keys don't work on my laptop. :(
+    Exercise 45:
+      Unity has Scenes.
+      Godot also has Scenes.
+      HaxeFlixel has FlxStates.
+      Construct 2 has Layouts.
+      Phaser has States.
   ]]--
   input:bind('1', function() gotoRoom('CircleRoom') end)
   input:bind('2', function() gotoRoom('RectangleRoom') end)
