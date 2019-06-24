@@ -12,12 +12,18 @@ function love.load()
   current_room = nil  
   
   --[[
-    Exercise 45:
-      Unity has Scenes.
-      Godot also has Scenes.
-      HaxeFlixel has FlxStates.
-      Construct 2 has Layouts.
-      Phaser has States.
+    Exercise 46:
+      Paper Cut has a few "rooms", which I called states:
+        - Main Menu
+        - Shop
+        - Achievements
+        - Difficulty Select
+        - Instructions
+        - Game
+        - Game Over
+      Player data was saved through a global Player construct. In retrospect, it might have been better to simply overlay these rooms on top of eachother like a stack
+      so as to avoid re-creating them needlessly (for example, pushing the "Shop" state on top of the "Main Menu" state) but I think the states were low-cost enough
+      that it didn't matter.
   ]]--
   input:bind('1', function() gotoRoom('CircleRoom') end)
   input:bind('2', function() gotoRoom('RectangleRoom') end)
