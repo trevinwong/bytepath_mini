@@ -14,8 +14,7 @@ function love.load()
   c = {'1', '2', '3', 4, 5, 6}
   d = {1, 4, 3, 4, 5, 6}
   
-  d = M.union(c, d)
-  d = M.union(b, d)
+  d = M.intersection(b, d)
   M.each(d, print)
 end
 
