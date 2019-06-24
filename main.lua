@@ -14,7 +14,7 @@ function love.load()
   c = {'1', '2', '3', 4, 5, 6}
   d = {1, 4, 3, 4, 5, 6}
   
-  M.each(M.reverse(d), print)
+  M.each(M.pull(d,1,4), print)
 end
 
 function love.update(dt)
