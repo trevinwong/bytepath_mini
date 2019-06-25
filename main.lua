@@ -12,18 +12,23 @@ function love.load()
   current_room = nil  
   
   --[[
-    Exercise 46:
-      Paper Cut has a few "rooms", which I called states:
-        - Main Menu
-        - Shop
-        - Achievements
-        - Difficulty Select
-        - Instructions
-        - Game
-        - Game Over
-      Player data was saved through a global Player construct. In retrospect, it might have been better to simply overlay these rooms on top of eachother like a stack
-      so as to avoid re-creating them needlessly (for example, pushing the "Shop" state on top of the "Main Menu" state) but I think the states were low-cost enough
-      that it didn't matter.
+    Exercise 47:
+      The garbage collector works by occasionally collecting all dead objects - in other words, objects that are no longer accessible. It does this through a
+      mark-and-sweep algorithm, which is as simple as it's name suggests. The first phase, "mark", simply marks all objects that are no longer accessible using
+      an ordinary graph traversal algorithm. The second phase, "sweep", does the same thing, but simply reclaims the memory that the objects are occupying.
+      
+      As of Lua 5.1, the garbage collector is now incremental, that is, it now interleaves its collection time with the program execution. This is better since
+      programs will now no longer freeze for a substantial amount of time due to the garbage collector.
+      
+      There are two parameters you can use to control the garbage collector in Lua, they are:
+      
+      1. The garbage-collector pause.
+      
+      This parameter controls how long the collector waits before starting a new cycle. Larger values make the collector less aggressive.
+      
+      2. The garbage-collector step multiplier.
+      
+      This parameter controls the relative speed of the collector relative to memory allocation. Larger values make the collector more aggressive.
   ]]--
   input:bind('1', function() gotoRoom('CircleRoom') end)
   input:bind('2', function() gotoRoom('RectangleRoom') end)
