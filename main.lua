@@ -1,4 +1,5 @@
 io.stdout:setvbuf("no")
+require('mobdebug').start() 
 require 'utils'
 Object = require 'libraries/classic/classic'
 Input = require 'libraries/boipushy/Input'
