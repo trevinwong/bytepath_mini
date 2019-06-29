@@ -6,6 +6,19 @@ Input = require 'libraries/boipushy/Input'
 Timer = require 'libraries/EnhancedTimer/EnhancedTimer'
 M = require 'libraries/Moses/moses'
 
+--[[
+  Exercise 53:
+    a = 2
+    b = nil
+    c = 3
+    d = 4
+    e = 4
+    f = 1
+    g = 2
+    
+    You can also run these expressions in the Lua interpreter and check for yourself. If you have ZeroBrane Studio, you can find it in the "Local console" tab below.
+]]--
+
 function love.load()
   requireAllInFolder('objects')
   requireAllInFolder('rooms')
