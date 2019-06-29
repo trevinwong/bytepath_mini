@@ -3,21 +3,30 @@ Stage = Object:extend()
 function Stage:new()
   self.area = Area(self)
   self.timer = Timer()
-  local radius = 20
-  self.timer:every({1, 2}, function() self.area:addGameObject('Circle', love.math.random() * window.width, love.math.random() * window.height, { radius = radius }) end)
   
-  input:bind('g', function()
-      local circles = self.area:getGameObjects(function(game_object) if (game_object:is(Circle)) then return true end end)
-      M.each(circles, print)
-    end
-  )
+  self:generateRectangles()
+  
+  input:bind('d', function()
+    self.area.game_objects[love.math.random(#self.area.game_objects)].dead = true
+  end)
 end
 
 function Stage:update(dt)
   self.timer:update(dt)
   self.area:update(dt)
+  if (#self.area.game_objects == 0) then self:generateRectangles() end
 end
 
 function Stage:draw()
   self.area:draw()
+end
+
+function Stage:generateRectangles()
+  for i = 1, 10 do
+    local x = love.math.random() * window.width;
+    local y = love.math.random() * window.height;
+    local width = love.math.random() * 40;
+    local height = love.math.random() * 40;
+    self.area:addGameObject("Rectangle", x, y, {width = width, height = height})
+  end
 end

@@ -6,11 +6,6 @@ Input = require 'libraries/boipushy/Input'
 Timer = require 'libraries/EnhancedTimer/EnhancedTimer'
 M = require 'libraries/Moses/moses'
 
---[[
-  Exercise 58:
-    You can do so by simply calling error("Your custom error message here.")
-]]--
-
 function love.load()
   requireAllInFolder('objects')
   requireAllInFolder('rooms')
