@@ -7,23 +7,24 @@ Timer = require 'libraries/EnhancedTimer/EnhancedTimer'
 M = require 'libraries/Moses/moses'
 
 --[[
-  Exercise 53:
-    a = 2
-    b = nil
-    c = 3
-    d = 4
-    e = 4
-    f = 1
-    g = 2
-    
-    You can also run these expressions in the Lua interpreter and check for yourself. If you have ZeroBrane Studio, you can find it in the "Local console" tab below.
+  Exercise 54:
+    For some reason, the argument "..." needs to be wrapped in a table before it works with ipairs. Not sure why yet.
 ]]--
+
+function printAll(...)
+  for i,v in ipairs({...}) do
+    print(v)
+  end
+end
 
 function love.load()
   requireAllInFolder('objects')
   requireAllInFolder('rooms')
   input = Input()
   current_room = nil  
+  
+  printAll(1, 2, 3)
+  printAll(1, 2, 3, 4, 5, 6, 7, 8, 9)
   
   input:bind('1', function() gotoRoom('CircleRoom') end)
   input:bind('2', function() gotoRoom('RectangleRoom') end)
