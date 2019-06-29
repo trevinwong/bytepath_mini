@@ -7,8 +7,8 @@ Timer = require 'libraries/EnhancedTimer/EnhancedTimer'
 M = require 'libraries/Moses/moses'
 
 --[[
-  Exercise 57:
-    You can find the memory usage by doing collectgarbage("count"). It returns the total amount in kilobytes.
+  Exercise 58:
+    You can do so by simply calling error("Your custom error message here.")
 ]]--
 
 function love.load()
