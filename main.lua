@@ -6,23 +6,17 @@ Input = require 'libraries/boipushy/Input'
 Timer = require 'libraries/EnhancedTimer/EnhancedTimer'
 M = require 'libraries/Moses/moses'
 
-function printText(...)
-  local string = ""
-  for i,v in ipairs({...}) do
-    string = string .. v
-  end
-  print(string)
-end
+--[[
+  Exercise 56:
+    You can trigger it by calling collectgarbage("collect").
+]]--
 
 function love.load()
   requireAllInFolder('objects')
   requireAllInFolder('rooms')
   input = Input()
   current_room = nil  
-  
-  printText(1, 2, 3)
-  printText(1, 2, 3, 4, 5, 6, 7, 8, 9)
-  
+    
   input:bind('1', function() gotoRoom('CircleRoom') end)
   input:bind('2', function() gotoRoom('RectangleRoom') end)
   input:bind('3', function() gotoRoom('PolygonRoom') end)
