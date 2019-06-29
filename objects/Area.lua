@@ -33,3 +33,27 @@ function Area:addGameObject(game_object_type, x, y, opts)
     table.insert(self.game_objects, game_object)
     return game_object
 end
+
+function Area:queryCircleArea(x, y, radius, targetClasses)
+  local gameObjectsToReturn = {}
+  for _, game_object in ipairs(self.game_objects) do
+    local distToGameObject = math.sqrt(math.pow(x - game_object.x, 2) + math.pow(y - game_object.y, 2))
+    if (distToGameObject <= radius) then
+      for _, class in ipairs(targetClasses) do
+        --[[
+          Exercise 61:
+            Remember that :is takes an actual table as an argument, not a string. Thus we need to access the global class table itself and pass that in, which we can do
+            by simply indexing using the strings in targetClasses.
+            
+            The implementation of :is may depend on the actual OOP library you use, however.
+            I find it's helpful to actually take a look into the library code itself and see what's actually happening underneath the hood.
+        ]]--
+        if (game_object:is(_G[class])) then
+          table.insert(gameObjectsToReturn, game_object)
+          break
+        end
+      end
+    end
+  end
+  return gameObjectsToReturn
+end
