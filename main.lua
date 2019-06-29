@@ -6,15 +6,12 @@ Input = require 'libraries/boipushy/Input'
 Timer = require 'libraries/EnhancedTimer/EnhancedTimer'
 M = require 'libraries/Moses/moses'
 
---[[
-  Exercise 54:
-    For some reason, the argument "..." needs to be wrapped in a table before it works with ipairs. Not sure why yet.
-]]--
-
-function printAll(...)
+function printText(...)
+  local string = ""
   for i,v in ipairs({...}) do
-    print(v)
+    string = string .. v
   end
+  print(string)
 end
 
 function love.load()
@@ -23,8 +20,8 @@ function love.load()
   input = Input()
   current_room = nil  
   
-  printAll(1, 2, 3)
-  printAll(1, 2, 3, 4, 5, 6, 7, 8, 9)
+  printText(1, 2, 3)
+  printText(1, 2, 3, 4, 5, 6, 7, 8, 9)
   
   input:bind('1', function() gotoRoom('CircleRoom') end)
   input:bind('2', function() gotoRoom('RectangleRoom') end)
