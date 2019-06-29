@@ -5,7 +5,7 @@ function Stage:new()
   self.timer = Timer()
 
   self:generateCircles()
-  M.each(self.area:queryCircleArea(window.width / 2, window.height / 2, 200, {"Circle"}), print)
+  print(self.area:getClosestGameObject(window.width / 2, window.height / 2, 200, {"Circle"}))
 end
 
 function Stage:update(dt)
