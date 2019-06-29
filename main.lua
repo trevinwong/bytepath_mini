@@ -6,6 +6,12 @@ Input = require 'libraries/boipushy/Input'
 Timer = require 'libraries/EnhancedTimer/EnhancedTimer'
 M = require 'libraries/Moses/moses'
 
+--[[
+  Exercise 63:
+    You can check if a method or an attribute exists by simply checking if it is nil.
+    Why? Both methods and attributes are variables, and variables that do not exist are simply set to nil.
+]]--
+
 function love.load()
   requireAllInFolder('objects')
   requireAllInFolder('rooms')
