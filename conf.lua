@@ -1,10 +1,11 @@
+gw = 480
+gh = 270
+sx = 1
+sy = 1
+
 function love.conf(t)
 	t.title = "Bytepath With Exercises!"
 	t.version = "11.2"
-	t.window.width = 800
-	t.window.height = 600
-  
-  window = {}
-  window.width = t.window.width
-  window.height = t.window.height
+	t.window.width = gw
+	t.window.height = gh
 end

@@ -3,9 +3,7 @@ Stage = Object:extend()
 function Stage:new()
   self.area = Area(self)
   self.timer = Timer()
-
-  self:generateCircles()
-  print(self.area:getClosestGameObject(window.width / 2, window.height / 2, 200, {"Circle"}))
+  self.main_canvas = love.graphics.newCanvas(gw, gh)
 end
 
 function Stage:update(dt)
@@ -14,15 +12,14 @@ function Stage:update(dt)
 end
 
 function Stage:draw()
-  self.area:draw()
-  love.graphics.circle('line', window.width / 2, window.height / 2, 200)
-end
+  love.graphics.setCanvas(self.main_canvas)
+  love.graphics.clear()
+      love.graphics.circle('line', gw/2, gh/2, 50)
+      self.area:draw()
+  love.graphics.setCanvas()
 
-function Stage:generateCircles()
-  for i = 1, 10 do
-    local x = love.math.random() * window.width;
-    local y = love.math.random() * window.height;
-    local radius = love.math.random() * 40
-    self.area:addGameObject("Circle", x, y, {radius = 1})
-  end
+  love.graphics.setColor(255, 255, 255, 255)
+  love.graphics.setBlendMode('alpha', 'premultiplied')
+  love.graphics.draw(self.main_canvas, 0, 0, 0, sx, sy)
+  love.graphics.setBlendMode('alpha')
 end

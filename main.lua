@@ -7,8 +7,14 @@ Timer = require 'libraries/EnhancedTimer/EnhancedTimer'
 M = require 'libraries/Moses/moses'
 
 --[[
-  Exercise 64:
-    Simply use pairs(), which will automatically give you the key and the value of the table you're iterating over.
+  Exercise 65:
+    There are two options when it comes to scaling into a resolution that your current resolution does not neatly multiply into.
+    
+    1. Scale to the target resolution using whatever ratio you get. This is usually a bad idea, since it'll lead to nasty pixel stretching that will make your game
+    look bad. If your game is especially sensitive to being pixel perfect, this is even worse of an idea.
+    
+    2. Scale to the closest resolution that you neatly multiply into (underneath the target resolution, of course.) Then, fill the rest of the game area using
+    a black background, or stretch the background of your game. This is what I did for Paper Cut.
 ]]--
 
 function love.load()
@@ -17,18 +23,9 @@ function love.load()
   input = Input()
   current_room = nil  
   
-  local tableOne = {1, "a", true}
-  tableOne[10] = "text"
-  local asdf = function() end
-  tableOne.func = asdf
-  tableOne[true] = 3
-  
-  local tableTwo = {}
-  for k, v in pairs(tableOne) do
-    tableTwo[k] = v
-  end
-  
-  M.each(tableTwo, print)
+  resize(3)
+  love.graphics.setDefaultFilter('nearest')
+  love.graphics.setLineStyle('rough')
     
   input:bind('1', function() gotoRoom('CircleRoom') end)
   input:bind('2', function() gotoRoom('RectangleRoom') end)
@@ -72,4 +69,9 @@ function requireFiles(files)
         local fileNoDotLua = file:sub(1, -5)
         require(fileNoDotLua)
     end
+end
+
+function resize(s)
+    love.window.setMode(s*gw, s*gh) 
+    sx, sy = s, s
 end
