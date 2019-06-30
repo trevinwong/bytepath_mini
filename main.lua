@@ -7,9 +7,8 @@ Timer = require 'libraries/EnhancedTimer/EnhancedTimer'
 M = require 'libraries/Moses/moses'
 
 --[[
-  Exercise 63:
-    You can check if a method or an attribute exists by simply checking if it is nil.
-    Why? Both methods and attributes are variables, and variables that do not exist are simply set to nil.
+  Exercise 64:
+    Simply use pairs(), which will automatically give you the key and the value of the table you're iterating over.
 ]]--
 
 function love.load()
@@ -17,6 +16,19 @@ function love.load()
   requireAllInFolder('rooms')
   input = Input()
   current_room = nil  
+  
+  local tableOne = {1, "a", true}
+  tableOne[10] = "text"
+  local asdf = function() end
+  tableOne.func = asdf
+  tableOne[true] = 3
+  
+  local tableTwo = {}
+  for k, v in pairs(tableOne) do
+    tableTwo[k] = v
+  end
+  
+  M.each(tableTwo, print)
     
   input:bind('1', function() gotoRoom('CircleRoom') end)
   input:bind('2', function() gotoRoom('RectangleRoom') end)
