@@ -7,14 +7,11 @@ Timer = require 'libraries/EnhancedTimer/EnhancedTimer'
 M = require 'libraries/Moses/moses'
 
 --[[
-  Exercise 65:
-    There are two options when it comes to scaling into a resolution that your current resolution does not neatly multiply into.
+  Exercise 66:
+    I did this for Paper Cut. https://github.com/terbb/Paper-Cut
+    You can see how I determined the resolution at the bottom of main.lua. After that, I used a scaling library known as scaleinator.
     
-    1. Scale to the target resolution using whatever ratio you get. This is usually a bad idea, since it'll lead to nasty pixel stretching that will make your game
-    look bad. If your game is especially sensitive to being pixel perfect, this is even worse of an idea.
-    
-    2. Scale to the closest resolution that you neatly multiply into (underneath the target resolution, of course.) Then, fill the rest of the game area using
-    a black background, or stretch the background of your game. This is what I did for Paper Cut.
+    Since what I did for scaling was pretty simple, there wasn't really any need to use a library, but I decided to anyways since I didn't want to think about it.
 ]]--
 
 function love.load()
