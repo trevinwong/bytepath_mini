@@ -30,8 +30,9 @@ function Stage:draw()
   love.graphics.setBlendMode('alpha')
   
 --[[
-  Exercise 72:
-    We do pretty much exactly the same thing we did for Exercise 71.
+  Exercise 73:
+    Translate the angle into Cartesian coordinates. Multiply by the distance. Translate the point by the previous point you're drawing a line from.
+    Do that for every single point from "A" to "C".
 ]]--
 
   local pointA = {x = 300, y = 300}
