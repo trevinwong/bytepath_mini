@@ -8,23 +8,6 @@ M = require 'libraries/Moses/moses'
 Camera = require 'libraries/hump/camera'
 wf = require 'libraries/windfield/windfield'
 
---[[
-  Exercise 69:
-    math.pi/2 * 180/pi = 90 degrees = between the bottom-left and bottom-right quadrant
-    math.pi/4 * 180/pi = 45 degrees = the bottom-right quadrant 
-    3*math.pi/4 * 180/pi = 135 degrees = the bottom-left quadrant
-    -5*math.pi/6 * 180/pi = -150 degrees = the top-left quadrant
-    0 * 180/pi = 0 degrees = between the top-right and the bottom-right quadrant
-    11*math.pi/12 * 180/pi = 165 degrees = the bottom-left quadrant
-    -math.pi/6 * 180/pi = -30 degrees = the top-right quadrant
-    -math.pi/2 + math.pi/4  = -math.pi/4 * 180/pi = -45 degrees = the top-right quadrant
-    3*math.pi/4 + math.pi/3 = 9*math.pi/12 + 4*math.pi/12 = 13*math.pi/12 * 180/pi = 195 degrees = the bottom-left quadrant
-    math.pi * 180/pi = 180 degrees = between the top-left and the bottom-left quadrant
-    
-    All were calculated using pure brainpower.
-    Remember that in LOVE angles are counted in a clockwise manner as opposed to standard math convention which is quite confusing.
-]]--
-
 function love.load()
   requireAllInFolder('objects')
   requireAllInFolder('rooms')

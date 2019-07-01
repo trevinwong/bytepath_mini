@@ -1,5 +1,17 @@
 Player = GameObject:extend()
 
+--[[
+  Exercise 70:
+    Technically, for this game, the acceleration property doesn't need to exist. The player never stops moving and is always moving at max velocity.
+    
+    The player's update function would look almost exactly the same, but instead:
+    1. We would remove the line with the update to velocity.
+    2. We would use the player's max velocity to set the linear velocity of our collider.
+    
+    There aren't really any benefits other than the player having to accelerate to max velocity at the beginning of the game.
+    Perhaps it would come into play if somehow the player's velocity was slowed down.
+]]--
+
 function Player:new(area, x, y, opts)
   Player.super.new(self, area, x, y, opts)
   self.x, self.y = x, y
