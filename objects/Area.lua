@@ -74,14 +74,15 @@ end
 
 
 function Area:addPhysicsWorld()
-    self.world = wf.newWorld(0, 0, true)
-    
     --[[
-      Exercise 67:
-        Setting the physics world's y-gravity to 512 causes the Player object to fall, as expected.
+      Exercise 68:
+        The third option determines whether or not bodies can sleep.
         
-        Note that two circles will be drawn if you do include the call to "world:draw()" - one for the Player game object, and one for the collider.
-        You'll have to update the Player object to use the (x,y) coordinate of the collider if you want it to be drawn correctly according to it's collider.
+        Setting a body to sleep means excluding it from expensive physics calculations that would be needed if the body were awake. Of course, the body can't be
+        fully excluded, as awake bodies need it's information to collide with it. However, it still saves some computing time.
+        
+        By setting it to true, you get better performance.
+        By setting it to false, you get more (technically, but maybe not practically speaking) accurate results.
     ]]--
-    self.world:setGravity(0, 512)
+    self.world = wf.newWorld(0, 0, true)
 end
