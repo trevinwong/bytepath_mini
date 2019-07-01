@@ -13,6 +13,11 @@ function Player:new(area, x, y, opts)
   self.collider:setObject(self)
 end
 
+--[[
+  Exercise 74:
+    Our collider is represented by a circle, so it doesn't matter how we rotate it. All orientations look and collide exactly the same.
+]]--
+
 function Player:update(dt)
   Player.super.update(self, dt)
   if input:down('left') then self.r = self.r - self.rv*dt end

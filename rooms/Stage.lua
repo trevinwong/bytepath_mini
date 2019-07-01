@@ -28,23 +28,4 @@ function Stage:draw()
   love.graphics.setBlendMode('alpha', 'premultiplied')
   love.graphics.draw(self.main_canvas, 0, 0, 0, sx, sy)
   love.graphics.setBlendMode('alpha')
-  
---[[
-  Exercise 73:
-    Translate the angle into Cartesian coordinates. Multiply by the distance. Translate the point by the previous point you're drawing a line from.
-    Do that for every single point from "A" to "C".
-]]--
-
-  local pointA = {x = 300, y = 300}
-  local angle = -math.pi/4
-  local distance = 100
-  local pointB = {x = (math.cos(angle) * 100) + pointA.x, y = (math.sin(angle) * 100) + pointA.y}
-  local pointC = {x = (math.cos(math.pi/4) * 50) + pointB.x, y = (math.sin(math.pi/4) * 50) + pointB.y}
-  love.graphics.setPointSize(5)
-  love.graphics.points(pointA.x, pointA.y, pointB.x, pointB.y, pointC.x, pointC.y)
-  love.graphics.print("A", pointA.x, pointA.y)
-  love.graphics.print("B", pointB.x, pointB.y)
-  love.graphics.print("C", pointC.x, pointC.y)
-  love.graphics.line(pointA.x, pointA.y, pointB.x, pointB.y)
-  love.graphics.line(pointB.x, pointB.y, pointC.x, pointC.y)
 end
