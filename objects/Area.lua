@@ -74,15 +74,5 @@ end
 
 
 function Area:addPhysicsWorld()
-    --[[
-      Exercise 68:
-        The third option determines whether or not bodies can sleep.
-        
-        Setting a body to sleep means excluding it from expensive physics calculations that would be needed if the body were awake. Of course, the body can't be
-        fully excluded, as awake bodies need it's information to collide with it. However, it still saves some computing time.
-        
-        By setting it to true, you get better performance.
-        By setting it to false, you get more (technically, but maybe not practically speaking) accurate results.
-    ]]--
     self.world = wf.newWorld(0, 0, true)
 end
