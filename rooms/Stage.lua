@@ -6,7 +6,6 @@ function Stage:new()
   self.timer = Timer()
   self.player = self.area:addGameObject('Player', gw/2, gh/2)
   self.main_canvas = love.graphics.newCanvas(gw, gh)
-  input:bind('f3', function() self.player.dead = true end)
 end
 
 function Stage:update(dt)
@@ -28,4 +27,9 @@ function Stage:draw()
   love.graphics.setBlendMode('alpha', 'premultiplied')
   love.graphics.draw(self.main_canvas, 0, 0, 0, sx, sy)
   love.graphics.setBlendMode('alpha')
+end
+
+function Stage:destroy()
+  self.area:destroy()
+  self.area = nil
 end
