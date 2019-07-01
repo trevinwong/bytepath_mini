@@ -6,6 +6,7 @@ function Area:new(room)
 end
 
 function Area:update(dt)
+  if self.world then self.world:update(dt) end
   for i = #self.game_objects, 1, -1 do
       local game_object = self.game_objects[i]
       game_object:update(dt)
@@ -14,6 +15,7 @@ function Area:update(dt)
 end
 
 function Area:draw()
+  --if self.world then self.world:draw() end -- For debugging
   for _, game_object in ipairs(self.game_objects) do game_object:draw() end
 end
 
@@ -68,4 +70,18 @@ function Area:getClosestGameObject(x, y, radius, targetClasses)
     end
   end
   return closestGameObject
+end
+
+
+function Area:addPhysicsWorld()
+    self.world = wf.newWorld(0, 0, true)
+    
+    --[[
+      Exercise 67:
+        Setting the physics world's y-gravity to 512 causes the Player object to fall, as expected.
+        
+        Note that two circles will be drawn if you do include the call to "world:draw()" - one for the Player game object, and one for the collider.
+        You'll have to update the Player object to use the (x,y) coordinate of the collider if you want it to be drawn correctly according to it's collider.
+    ]]--
+    self.world:setGravity(0, 512)
 end

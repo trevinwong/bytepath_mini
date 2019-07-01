@@ -13,3 +13,6 @@
 [submodule "libraries/Moses"]
 	path = libraries/Moses
 	url = git@github.com:Yonaba/Moses.git
+[submodule "libraries/windfield"]
+	path = libraries/windfield
+	url = git@github.com:adnzzzzZ/windfield.git

@@ -5,32 +5,25 @@ Object = require 'libraries/classic/classic'
 Input = require 'libraries/boipushy/Input'
 Timer = require 'libraries/EnhancedTimer/EnhancedTimer'
 M = require 'libraries/Moses/moses'
-
---[[
-  Exercise 66:
-    I did this for Paper Cut. https://github.com/terbb/Paper-Cut
-    You can see how I determined the resolution at the bottom of main.lua. After that, I used a scaling library known as scaleinator.
-    
-    Since what I did for scaling was pretty simple, there wasn't really any need to use a library, but I decided to anyways since I didn't want to think about it.
-]]--
+Camera = require 'libraries/hump/camera'
+wf = require 'libraries/windfield/windfield'
 
 function love.load()
   requireAllInFolder('objects')
   requireAllInFolder('rooms')
-  input = Input()
-  current_room = nil  
-  
-  resize(3)
   love.graphics.setDefaultFilter('nearest')
   love.graphics.setLineStyle('rough')
-    
-  input:bind('1', function() gotoRoom('CircleRoom') end)
-  input:bind('2', function() gotoRoom('RectangleRoom') end)
-  input:bind('3', function() gotoRoom('PolygonRoom') end)
-  input:bind('4', function() gotoRoom('Stage') end)
+  
+  input = Input()
+  camera = Camera()
+
+  resize(3)
+
+  current_room = Stage()
 end
 
 function love.update(dt)
+  camera:update(dt)
   if current_room then current_room:update(dt) end
 end
 
