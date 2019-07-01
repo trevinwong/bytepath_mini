@@ -14,12 +14,12 @@ function Player:new(area, x, y, opts)
 end
 
 function Player:update(dt)
-    Player.super.update(self, dt)
-    if input:down('left') then self.r = self.r - self.rv*dt end
-    if input:down('right') then self.r = self.r + self.rv*dt end
+--    Player.super.update(self, dt)
+--    if input:down('left') then self.r = self.r - self.rv*dt end
+--    if input:down('right') then self.r = self.r + self.rv*dt end
 
-    self.v = math.min(self.v + self.a*dt, self.max_v)
-    self.collider:setLinearVelocity(self.v*math.cos(self.r), self.v*math.sin(self.r))
+--    self.v = math.min(self.v + self.a*dt, self.max_v)
+--    self.collider:setLinearVelocity(self.v*math.cos(self.r), self.v*math.sin(self.r))
 end
 
 function Player:draw()

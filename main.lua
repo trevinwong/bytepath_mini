@@ -9,15 +9,9 @@ Camera = require 'libraries/hump/camera'
 wf = require 'libraries/windfield/windfield'
 
 --[[
-    Exercise 77:
-        It was less by a small amount afterwards (0.02), which I'm assuming is due to objects like the World, Stage and Player being properly destroyed and collected.
-        
-        Also, I'm trying a new thing where my tabs are now 4 spaces. I'm not sure if Github will display it the same as before or not, but I'm in the process
-        of transitioning all my files to use these new tabs. So bear with me if things look terrible.
-        
-        Before I used to have my tabs as 2 spaces (and I think ZeroBrane Studio actually does this by default), but I've started to notice that on platforms like
-        Bitbucket, my tabs get rendered as regular 4-space tabs and they sometimes look very weird. And re-formatting copy-and-pasted text is annoying since
-        most code on the Internet has 4-space indents.
+    Exercise 78:
+        Dramatically so. Having 101 Player objects skyrockets the memory usage to 1.9Kb. Deleting those objects reduces it to 0.74Kb which is a large difference.
+        There may be in-fact more memory that isn't being collected as the amount of memory used with just 1 Player object after deleting it was 0.54Kb.
 ]]--
 
 function love.load()

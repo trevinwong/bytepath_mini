@@ -1,11 +1,14 @@
 Stage = Object:extend()
 
 function Stage:new()
-  self.area = Area(self)
-  self.area:addPhysicsWorld()
-  self.timer = Timer()
-  self.player = self.area:addGameObject('Player', gw/2, gh/2)
-  self.main_canvas = love.graphics.newCanvas(gw, gh)
+    self.area = Area(self)
+    self.area:addPhysicsWorld()
+    self.timer = Timer()
+    self.player = self.area:addGameObject('Player', gw/2, gh/2)
+    self.main_canvas = love.graphics.newCanvas(gw, gh)
+    for i = 1, 100 do 
+        self.area:addGameObject('Player', gw/2 + random(-4, 4), gh/2 + random(-4, 4))
+    end
 end
 
 function Stage:update(dt)
