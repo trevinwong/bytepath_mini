@@ -8,12 +8,6 @@ M = require 'libraries/Moses/moses'
 Camera = require 'libraries/hump/camera'
 wf = require 'libraries/windfield/windfield'
 
---[[
-    Exercise 78:
-        Dramatically so. Having 101 Player objects skyrockets the memory usage to 1.9Kb. Deleting those objects reduces it to 0.74Kb which is a large difference.
-        There may be in-fact more memory that isn't being collected as the amount of memory used with just 1 Player object after deleting it was 0.54Kb.
-]]--
-
 function love.load()
     requireAllInFolder('objects')
     requireAllInFolder('rooms')
