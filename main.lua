@@ -37,7 +37,7 @@ function love.load()
     end)
 
     input:bind('f3', function()
-            current_room:destroy()
+             current_room:destroy()
             current_room = nil
         end
     )

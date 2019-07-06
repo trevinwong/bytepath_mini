@@ -22,6 +22,15 @@ function ShootEffect:draw()
     love.graphics.pop()
 end
 
+--[[
+    Exercise 81:
+        In this case, no. You only have to be careful if the object can be accessed through some other reference. Since the ShootEffect will automatically be removed
+        from the GameObject list in Area, it will eventually be garbage collected (since there is nothing else referencing it). Once it is garbage collected, the
+        reference to the player will disappear, and the player can then be garbage collected like normal.
+        
+        But it might still be a good practice just to de-reference things just in-case.
+]]--
+
 function ShootEffect:destroy()
     ShootEffect.super.destroy(self)
 end

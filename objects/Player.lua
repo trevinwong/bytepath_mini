@@ -13,20 +13,9 @@ function Player:new(area, x, y, opts)
     self.a = 100
     self.collider = self.area.world:newCircleCollider(self.x, self.y, self.w)
     self.collider:setObject(self)
-    --[[
-        Exercise 80:
-            timer:after() is really useful for these sorts of situations in which you'd like to re-evaluate something after each run.
-    ]]--
-    self.attack_speed = 1
-    self.timer:every(5, function() self.attack_speed = random(1, 5) end)
---    self.timer:every(0.24, function()
---        self:shoot()
---    end)
-    self.timer:after(0.24/self.attack_speed, function(f)
-            self:shoot()
-            self.timer:after(0.24/self.attack_speed, f)
-        end
-    )
+    self.timer:every(0.24, function()
+        self:shoot()
+    end)
 end
 
 function Player:update(dt)
