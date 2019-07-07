@@ -30,11 +30,18 @@ end
 function Player:draw()
     love.graphics.circle('line', self.x, self.y, self.w)
     --[[
-        Exercise 82:
-            One thing to be aware of in this exercise is that you should be rotating by math.pi, not math.pi + self.r.
-            We want the final rotation to be math.pi + self.r, not math.pi + 2*self.r.
+        Exercise 83:
+            This requires a little bit of knowledge about how rotations work. See, the way rotations are performed is around the origin of the current space -
+            for example, (0, 0) in world space.
+            
+            So if we want to rotate an object around a different point, we have to translate our space such that the point we want to rotate around is the new origin.
+            That is exactly what pushRotate is doing.
+            
+            In this case, we want to rotate around the center of the line that we're drawing, so we pass in exactly that to pushRotate.
     ]]--
-    pushRotate(self.x, self.y, math.pi)
+    local pt2_x = self.x + 2*self.w*math.cos(self.r)
+    local pt2_y = self.y + 2*self.w*math.sin(self.r)
+    pushRotate((self.x + pt2_x)/2, (self.y + pt2_y)/2, math.pi/2)
     love.graphics.line(self.x, self.y, self.x + 2*self.w*math.cos(self.r), self.y + 2*self.w*math.sin(self.r))
     love.graphics.pop()
 
