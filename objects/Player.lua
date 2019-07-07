@@ -29,7 +29,15 @@ end
 
 function Player:draw()
     love.graphics.circle('line', self.x, self.y, self.w)
+    --[[
+        Exercise 82:
+            One thing to be aware of in this exercise is that you should be rotating by math.pi, not math.pi + self.r.
+            We want the final rotation to be math.pi + self.r, not math.pi + 2*self.r.
+    ]]--
+    pushRotate(self.x, self.y, math.pi)
     love.graphics.line(self.x, self.y, self.x + 2*self.w*math.cos(self.r), self.y + 2*self.w*math.sin(self.r))
+    love.graphics.pop()
+
 end
 
 function Player:shoot()
