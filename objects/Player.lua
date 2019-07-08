@@ -29,9 +29,7 @@ end
 
 function Player:draw()
     love.graphics.circle('line', self.x, self.y, self.w)
-    pushRotate(self.x, self.y, math.pi/2)
     love.graphics.line(self.x, self.y, self.x + 2*self.w*math.cos(self.r), self.y + 2*self.w*math.sin(self.r))
-    love.graphics.pop()
 
 end
 
