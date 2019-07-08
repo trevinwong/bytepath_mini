@@ -6,6 +6,8 @@ function Projectile:new(area, x, y, opts)
 
     self.s = opts.s or 2.5
     self.v = opts.v or 200
+    self.a = opts.a or 600
+    self.max_v = opts.a or 400
 
     self.collider = self.area.world:newCircleCollider(self.x, self.y, self.s)
     self.collider:setObject(self)
@@ -14,6 +16,7 @@ end
 
 function Projectile:update(dt)
     Projectile.super.update(self, dt)
+    self.v = math.min(self.v + self.a*dt, self.max_v)
     self.collider:setLinearVelocity(self.v*math.cos(self.r), self.v*math.sin(self.r))
 end
 
