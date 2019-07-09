@@ -52,17 +52,17 @@ end
 function love.update(dt)
     timer:update(dt*slow_amount)
     camera:update(dt*slow_amount)
+    if flash_seconds then 
+        flash_seconds = flash_seconds - dt
+        if flash_seconds < 0 then flash_seconds = nil end
+    end
     if current_room then current_room:update(dt*slow_amount) end
 end
 
 function love.draw()
     if current_room then current_room:draw() end
 
-    if flash_frames then 
-        flash_frames = flash_frames - 1
-        if flash_frames == -1 then flash_frames = nil end
-    end
-    if flash_frames then
+    if flash_seconds then
         love.graphics.setColor(background_color)
         love.graphics.rectangle('fill', 0, 0, sx*gw, sy*gh)
         love.graphics.setColor(255, 255, 255)

@@ -5,11 +5,6 @@ ProjectileDeathEffect = GameObject:extend()
 function ProjectileDeathEffect:new(area, x, y, opts)
     ProjectileDeathEffect.super.new(self, area, x, y, opts)
 
-    --[[
-        Exercise 90:
-            This is a much nicer way of changing colors on the fly. I usually revert any changes to the code that result from the exercises, but I personally believe
-            this is both easier to write and understand.
-    ]]--
     self.current_color = default_color
     self.timer:after(0.1, function()
         self.current_color = hp_color
