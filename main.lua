@@ -1,6 +1,7 @@
 io.stdout:setvbuf("no")
 require('mobdebug').start() 
 require 'utils'
+require 'globals'
 Object = require 'libraries/classic/classic'
 Input = require 'libraries/boipushy/Input'
 Timer = require 'libraries/EnhancedTimer/EnhancedTimer'
@@ -16,7 +17,10 @@ function love.load()
 
     input = Input()
     camera = Camera()
+    timer = Timer()
 
+    slow_amount = 1
+    flash_frames = nil
     resize(3)
     input:bind('left', 'left')
     input:bind('right', 'right')
@@ -46,12 +50,23 @@ function love.load()
 end
 
 function love.update(dt)
-    camera:update(dt)
-    if current_room then current_room:update(dt) end
+    timer:update(dt*slow_amount)
+    camera:update(dt*slow_amount)
+    if current_room then current_room:update(dt*slow_amount) end
 end
 
 function love.draw()
     if current_room then current_room:draw() end
+
+    if flash_frames then 
+        flash_frames = flash_frames - 1
+        if flash_frames == -1 then flash_frames = nil end
+    end
+    if flash_frames then
+        love.graphics.setColor(background_color)
+        love.graphics.rectangle('fill', 0, 0, sx*gw, sy*gh)
+        love.graphics.setColor(255, 255, 255)
+    end
 end
 
 function gotoRoom(room_type, ...)

@@ -16,10 +16,16 @@ function Player:new(area, x, y, opts)
     self.timer:every(0.24, function()
         self:shoot()
     end)
+    input:bind('f4', function() self:die() end)
 end
 
 function Player:update(dt)
     Player.super.update(self, dt)
+    if self.x < 0 then self:die() end
+    if self.y < 0 then self:die() end
+    if self.x > gw then self:die() end
+    if self.y > gh then self:die() end
+    
     if input:down('left') then self.r = self.r - self.rv*dt end
     if input:down('right') then self.r = self.r + self.rv*dt end
 
@@ -28,6 +34,7 @@ function Player:update(dt)
 end
 
 function Player:draw()
+    love.graphics.setColor(default_color)
     love.graphics.circle('line', self.x, self.y, self.w)
     love.graphics.line(self.x, self.y, self.x + 2*self.w*math.cos(self.r), self.y + 2*self.w*math.sin(self.r))
 end
@@ -35,5 +42,16 @@ end
 function Player:shoot()
     local d = 1.2*self.w
     self.area:addGameObject('ShootEffect', self.x + 1.2*self.w*math.cos(self.r), self.y + 1.2*self.w*math.sin(self.r), {player = self, d = d})
-    self.area:addGameObject('Projectile', self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), {r = self.r, v = 100, a = 600, max_v = 400})
+    self.area:addGameObject('Projectile', self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), {r = self.r})
+end
+
+function Player:die()
+    self.dead = true 
+    flash(4)
+    camera:shake(6, 60, 0.4)
+    slow(0.15, 1)
+
+    for i = 1, love.math.random(8, 12) do 
+    	self.area:addGameObject('ExplodeParticle', self.x, self.y) 
+  	end
 end

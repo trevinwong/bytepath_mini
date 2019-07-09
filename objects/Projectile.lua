@@ -6,8 +6,6 @@ function Projectile:new(area, x, y, opts)
 
     self.s = opts.s or 2.5
     self.v = opts.v or 200
-    self.a = opts.a or 600
-    self.max_v = opts.a or 400
 
     self.collider = self.area.world:newCircleCollider(self.x, self.y, self.s)
     self.collider:setObject(self)
@@ -16,10 +14,20 @@ end
 
 function Projectile:update(dt)
     Projectile.super.update(self, dt)
-    self.v = math.min(self.v + self.a*dt, self.max_v)
+    if self.x < 0 then self:die() end
+    if self.y < 0 then self:die() end
+    if self.x > gw then self:die() end
+    if self.y > gh then self:die() end
     self.collider:setLinearVelocity(self.v*math.cos(self.r), self.v*math.sin(self.r))
 end
 
 function Projectile:draw()
+    love.graphics.setColor(default_color)
     love.graphics.circle('line', self.x, self.y, self.s)
+end
+
+function Projectile:die()
+    self.dead = true
+    self.area:addGameObject('ProjectileDeathEffect', self.x, self.y, 
+    {color = hp_color, w = 3*self.s})
 end

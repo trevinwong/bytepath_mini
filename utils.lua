@@ -72,3 +72,14 @@ function pushRotateScale(x, y, r, sx, sy)
     love.graphics.scale(sx or 1, sy or sx or 1)
     love.graphics.translate(-x, -y)
 end
+
+-- Gameplay
+
+function slow(amount, duration)
+    slow_amount = amount
+    timer:tween('slow', duration, _G, {slow_amount = 1}, 'in-out-cubic')
+end
+
+function flash(frames)
+    flash_frames = frames
+end
