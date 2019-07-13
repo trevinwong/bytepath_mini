@@ -6,10 +6,10 @@ function Stage:new()
     self.timer = Timer()
     self.player = self.area:addGameObject('Player', gw/2, gh/2)
     self.main_canvas = love.graphics.newCanvas(gw, gh)
+    camera.smoother = Camera.smooth.damped(5)
 end
 
 function Stage:update(dt)
-  camera.smoother = Camera.smooth.damped(5)
   camera:lockPosition(dt, gw/2, gh/2)
   self.timer:update(dt)
   self.area:update(dt)

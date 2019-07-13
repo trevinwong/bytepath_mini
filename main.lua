@@ -1,5 +1,6 @@
 io.stdout:setvbuf("no")
-require('mobdebug').start() 
+-- Beware, enabling mobdebug will kill the performance of your game.
+--require('mobdebug').start() 
 require 'utils'
 require 'globals'
 Object = require 'libraries/classic/classic'
@@ -10,6 +11,13 @@ Camera = require 'libraries/hump/camera'
 wf = require 'libraries/windfield/windfield'
 
 function love.load()
+    
+    
+--  love.profiler = require('libraries/profile') 
+--  love.profiler.hookall("Lua")
+--  love.profiler.start()
+  
+    requireAllInFolder('data')
     requireAllInFolder('objects')
     requireAllInFolder('rooms')
     love.graphics.setDefaultFilter('nearest')
@@ -24,6 +32,8 @@ function love.load()
     resize(3)
     input:bind('left', 'left')
     input:bind('right', 'right')
+    input:bind('up', 'up')
+    input:bind('down', 'down')
     
     input:bind('f1', function()
         print("Before collection: " .. collectgarbage("count")/1024)
@@ -45,11 +55,48 @@ function love.load()
             current_room = nil
         end
     )
+    
+    --[[
+        Useful time manipulation functions that I picked up during my time at Skybox :)
+    ]]--
+    input:bind('1', function()
+            slow_amount = 1
+        end
+    )
+    input:bind('2', function()
+            slow_amount = 0.5
+        end
+    )
+    input:bind('3', function()
+            slow_amount = 0.1
+        end
+    )
+    input:bind('4', function()
+            slow_amount = 0.05
+        end
+    )
+    input:bind('5', function()
+            slow_amount = 2
+        end
+    )
+    input:bind('6', function()
+            slow_amount = 5
+        end
+    )
+    
 
     current_room = Stage()
 end
 
+--love.frame = 0
 function love.update(dt)
+    print(dt)
+--      love.frame = love.frame + 1
+--  if love.frame%100 == 0 then
+--    love.report = love.profiler.report('time', 20)
+--    love.profiler.reset()
+--  end
+  
     timer:update(dt*slow_amount)
     camera:update(dt*slow_amount)
     if flash_seconds then 
@@ -67,6 +114,7 @@ function love.draw()
         love.graphics.rectangle('fill', 0, 0, sx*gw, sy*gh)
         love.graphics.setColor(255, 255, 255)
     end
+--      love.graphics.print(love.report or "Please wait...")
 end
 
 function gotoRoom(room_type, ...)

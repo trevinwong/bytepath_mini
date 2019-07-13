@@ -17,9 +17,20 @@ function Area:update(dt)
   end
 end
 
+--[[
+    Exercise 93:
+        Simply flip the comparison operator.
+        It's easier to think about if you interpret the sort function like this: "If true, put a before b."
+        In this case, we get true when "a.depth > b.depth", which means objects with a higher depth are drawn first.
+]]--
 function Area:draw()
   --if self.world then self.world:draw() end -- For debugging
-  for _, game_object in ipairs(self.game_objects) do game_object:draw() end
+    table.sort(self.game_objects, function(a, b) 
+        if a.depth == b.depth then return a.creation_time > b.creation_time
+        else return a.depth > b.depth end
+    end)
+
+    for _, game_object in ipairs(self.game_objects) do game_object:draw() end
 end
 
 function Area:getGameObjects(func)

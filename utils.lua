@@ -13,7 +13,6 @@ function random(min, max)
     return (min > max and (love.math.random()*(min - max) + max)) or (love.math.random()*(max - min) + min)
 end
 
-
 -- Memory leak checking
 
 function count_all(f)
@@ -80,18 +79,6 @@ function slow(amount, duration)
     timer:tween('slow', duration, _G, {slow_amount = 1}, 'in-out-cubic')
 end
 
---[[
-    Exercise 91:
-        I think seconds are better. The problem with frames is that it's frame-rate dependent which means your effects are going to have unpredictable results.
-        If you have a very fast machine, your effect could last very little, while if you have a very slow machine, your effect could last for a very long time.
-        
-        For seconds, if you have a very fast machine, your effect is still going to last the same amount of time you intend it to last for, say, 0.5 seconds.
-        The only situation that isn't that good is having a very slow machine - your effect will last a much shorter time than you expect since the dt will likely
-        be massive. But by then the user is probably expecting a big shift in the simulation of your state anyways, so I don't think it's that unexpected to see
-        everything zoom by.
-        
-        Plus, seconds are more intuitive to use.
-]]--
 function flash(seconds)
     flash_seconds = seconds
 end
