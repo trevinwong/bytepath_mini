@@ -26,19 +26,23 @@ function InfoText:new(area, x, y, opts)
         self.timer:every(0.035, function()
             local random_characters = '0123456789!@#$%¨&*()-=+[]^~/;?><.,|abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWYXZ'
             for i, character in ipairs(self.characters) do
-                if love.math.random(1, 20) <= 1 then
+                --[[
+                    Exercise 98:
+                        All you have to do is change the min/max numbers for Love2D's random function to adjust the probabilities.
+                ]]--
+                if love.math.random(1, 5) <= 1 then
                     local r = love.math.random(1, #random_characters)
                     self.characters[i] = random_characters:utf8sub(r, r)
                 else
                     self.characters[i] = character
                 end
-                if love.math.random(1, 10) <= 1 then
+                if love.math.random(1, 20) <= 1 then
                     self.background_colors[i] = table.random(self.all_colors)
                 else
                     self.background_colors[i] = nil
                 end
               
-                if love.math.random(1, 10) <= 2 then
+                if love.math.random(3, 10) <= 2 then
                     self.foreground_colors[i] = table.random(self.all_colors)
                 else
                     self.background_colors[i] = nil
