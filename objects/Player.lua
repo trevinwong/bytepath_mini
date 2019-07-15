@@ -217,9 +217,25 @@ function Player:destroy()
 end
 
 function Player:addAmmo(amount)
-    self.ammo = math.min(self.ammo + amount, self.max_ammo)
+    if amount > 0 then
+        self.ammo = math.min(self.ammo + amount, self.max_ammo)
+    else
+        self.ammo = math.max(self.ammo + amount, 0)
+    end
 end
 
 function Player:addBoost(amount)
-    self.boost = math.min(self.boost + amount, self.max_boost)
+    if amount > 0 then
+        self.boost = math.min(self.boost + amount, self.max_boost)
+    else
+        self.boost = math.max(self.boost + amount, 0)
+    end
+end
+
+function Player:addHP(amount)
+    if amount > 0 then
+        self.hp = math.min(self.hp + amount, self.max_hp)
+    else
+        self.hp = math.max(self.hp + amount, 0)
+    end
 end

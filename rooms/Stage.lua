@@ -4,10 +4,6 @@ function Stage:new()
     self.area = Area(self)
     self.area:addPhysicsWorld()
     self.area.world:addCollisionClass('Player')
-    --[[
-        Exercise 95:
-            Simply just add it to the ignore list.
-    ]]--
     self.area.world:addCollisionClass('Projectile', {ignores = {'Projectile', 'Player'}})
     self.area.world:addCollisionClass('Collectable', {ignores = {'Collectable', 'Projectile'}})
     
