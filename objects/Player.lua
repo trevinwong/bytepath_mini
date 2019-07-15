@@ -216,6 +216,15 @@ function Player:destroy()
    Player.super.destroy(self)
 end
 
+--[[
+    Exercise 97:
+        I personally think it's better to handle positive and negative values on the same function.
+        Then you don't have to remember as many function names.
+        
+        You could argue that by adding separate functions, it makes it harder to accidentally add the wrong value since you have to type out entirely the wrong name
+        (plus you could throw some errors if you end up passing a negative number and you intend to add), but, I think it's a matter of personal preference.
+]]--
+
 function Player:addAmmo(amount)
     if amount > 0 then
         self.ammo = math.min(self.ammo + amount, self.max_ammo)
