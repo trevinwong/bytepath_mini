@@ -1,8 +1,7 @@
 io.stdout:setvbuf("no")
 -- Beware, enabling mobdebug will kill the performance of your game.
 --require('mobdebug').start() 
-require 'utils'
-require 'globals'
+
 Object = require 'libraries/classic/classic'
 Input = require 'libraries/boipushy/Input'
 Timer = require 'libraries/EnhancedTimer/EnhancedTimer'
@@ -12,6 +11,8 @@ Vector = require 'libraries/hump/vector'
 wf = require 'libraries/windfield/windfield'
 Draft = require('libraries/draft/draft')
 draft = Draft('line')
+require 'utils'
+require 'globals'
 require 'libraries/utf8'
 
 function love.load()
