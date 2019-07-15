@@ -17,14 +17,6 @@ function Area:update(dt)
   end
 end
 
---[[
-    Exercise 94:
-        function(a, b)
-            return a.Y < b.Y
-        end
-        
-        If true, a should be placed before b. In this case, we get true when the Y value of a is lower than b.
-]]--
 function Area:draw()
   --if self.world then self.world:draw() end -- For debugging
     table.sort(self.game_objects, function(a, b) 

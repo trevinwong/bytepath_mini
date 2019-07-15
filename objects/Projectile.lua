@@ -8,6 +8,7 @@ function Projectile:new(area, x, y, opts)
     self.v = opts.v or 200
 
     self.collider = self.area.world:newCircleCollider(self.x, self.y, self.s)
+    self.collider:setCollisionClass('Projectile')
     self.collider:setObject(self)
     self.collider:setLinearVelocity(self.v*math.cos(self.r), self.v*math.sin(self.r))
 end

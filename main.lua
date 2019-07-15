@@ -8,7 +8,11 @@ Input = require 'libraries/boipushy/Input'
 Timer = require 'libraries/EnhancedTimer/EnhancedTimer'
 M = require 'libraries/Moses/moses'
 Camera = require 'libraries/hump/camera'
+Vector = require 'libraries/hump/vector'
 wf = require 'libraries/windfield/windfield'
+Draft = require('libraries/draft/draft')
+draft = Draft('line')
+require 'libraries/utf8'
 
 function love.load()
     
@@ -20,7 +24,9 @@ function love.load()
     requireAllInFolder('data')
     requireAllInFolder('objects')
     requireAllInFolder('rooms')
-    love.graphics.setDefaultFilter('nearest')
+    fonts = {}
+    loadFontsInFolderAsSize('resources/fonts', 16)
+    love.graphics.setDefaultFilter('nearest', 'nearest')
     love.graphics.setLineStyle('rough')
 
     input = Input()
@@ -90,7 +96,6 @@ end
 
 --love.frame = 0
 function love.update(dt)
-    print(dt)
 --      love.frame = love.frame + 1
 --  if love.frame%100 == 0 then
 --    love.report = love.profiler.report('time', 20)
@@ -145,6 +150,22 @@ function requireFiles(files)
     for _, file in ipairs(files) do
         local fileNoDotLua = file:sub(1, -5)
         require(fileNoDotLua)
+    end
+end
+
+function loadFontsInFolderAsSize(folder, size)
+    local items = love.filesystem.getDirectoryItems(folder)
+    for _, item in ipairs(items) do
+        local file = folder .. '/' .. item
+        local info = love.filesystem.getInfo(file)
+        if info.type == 'file' then
+            local name = item:sub(0, item:len() - 4) .. "_" .. size
+            fonts[name] = love.graphics.newFont(file, size)
+            --[[
+                Don't forget to set the filter of your fonts to use nearest, otherwise, you'll get blurry text.
+            ]]--
+            fonts[name]:setFilter('nearest', 'nearest')
+        end
     end
 end
 

@@ -13,6 +13,10 @@ function random(min, max)
     return (min > max and (love.math.random()*(min - max) + max)) or (love.math.random()*(max - min) + min)
 end
 
+function table.random(t)
+    return t[love.math.random(1, #t)]
+end
+
 -- Memory leak checking
 
 function count_all(f)

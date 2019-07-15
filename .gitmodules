@@ -16,3 +16,6 @@
 [submodule "libraries/windfield"]
 	path = libraries/windfield
 	url = git@github.com:adnzzzzZ/windfield.git
+[submodule "libraries/draft"]
+	path = libraries/draft
+	url = git@github.com:pelevesque/draft.git
