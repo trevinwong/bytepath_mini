@@ -97,3 +97,22 @@ function Area:destroy()
       self.world = nil
   end
 end
+
+--[[
+    Exercise 101:
+        I usually don't cheap out on an exercise, but I personally believe this exercise is neither A) helpful to the project or B) helpful to my learning.
+        The naive solution is to create a big bounding box of all your objects and then place your object outside of that. Obviously, this is a very flawed solution.
+        
+        I'm sure there are better solutions, but I don't really feel like banging my head against the wall to come up with a complex solution that won't be used at all.
+        Overlapping text is obviously quite normal in games and even necessary at times to know which object the text is referring to.
+]]--
+
+function Area:getAllGameObjectsThat(filter)
+    local out = {}
+    for _, game_object in pairs(self.game_objects) do
+        if filter(game_object) then
+            table.insert(out, game_object)
+        end
+    end
+    return out
+end

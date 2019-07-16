@@ -6,15 +6,8 @@ function InfoText:new(area, x, y, opts)
     InfoText.super.new(self, area, x, y, opts)
     self.font = fonts["m5x7_16"]
     
-    
-    --[[
-        Exercise 100:
-            We randomize a number between 0 and 1 which basically represents how far along the two points we want to go.
-            Then, we start at the first point (self.x - self.w) and add that distance. 
-    ]]--
     self.x = self.x + -self.w + (love.math.random() * (2 * self.w))
     self.y = self.y + -self.h + (love.math.random() * (2 * self.h))
-    
 
     self.background_colors = {}
     self.foreground_colors = {}
