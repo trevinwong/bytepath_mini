@@ -36,6 +36,9 @@ function Player:new(area, x, y, opts)
     self.max_ammo = 100
     self.ammo = self.max_ammo
     
+    -- SP
+    sp = 0
+    max_sp = 999
 
     -- Collision
     self.collider = self.area.world:newCircleCollider(self.x, self.y, self.w)
@@ -126,15 +129,15 @@ function Player:update(dt)
     if self.collider:enter('Collectable') then
         local collision_data = self.collider:getEnterCollisionData('Collectable')
         local object = collision_data.collider:getObject()
+        object:die()
         if object:is(Ammo) then
-            object:die()
             self:addAmmo(5)
         elseif object:is(Boost) then
-            object:die()
             self:addBoost(25)        
         elseif object:is(HP) then
-            object:die()
             self:addHP(25)
+        elseif object:is(SP) then
+            self:addSP(1)
         end
     end
 
@@ -241,4 +244,12 @@ function Player:addHP(amount)
     else
         self.hp = math.max(self.hp + amount, 0)
     end
+end
+
+function Player:addSP(amount)
+    if amount > 0 then
+        sp = math.min(sp + amount, max_sp)
+    else
+        sp = math.max(sp + amount, 0)
+    end    
 end

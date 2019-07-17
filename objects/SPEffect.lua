@@ -1,16 +1,16 @@
 require "objects/GameObject"
 
-BoostEffect = GameObject:extend()
+SPEffect = GameObject:extend()
 
-function BoostEffect:new(area, x, y, opts)
-    BoostEffect.super.new(self, area, x, y, opts)
+function SPEffect:new(area, x, y, opts)
+    SPEffect.super.new(self, area, x, y, opts)
     self.current_color = default_color
     
     self.sx, self.sy = 1, 1
     self.timer:tween(0.35, self, {sx = 1.8, sy = 1.8}, 'in-out-cubic')
     
     self.timer:after(0.2, function() 
-        self.current_color = boost_color 
+        self.current_color = skill_point_color 
         self.timer:after(0.35, function()
             self.dead = true
         end)
@@ -23,7 +23,7 @@ function BoostEffect:new(area, x, y, opts)
     end)
 end
 
-function BoostEffect:draw()
+function SPEffect:draw()
     if not self.visible then return end
 
     love.graphics.setColor(self.current_color)

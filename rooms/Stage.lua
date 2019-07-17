@@ -18,8 +18,11 @@ function Stage:new()
     input:bind('o', function() 
         self.area:addGameObject('Boost') 
     end)
-    input:bind('y', function() 
+    input:bind('i', function() 
         self.area:addGameObject('HP') 
+    end)
+    input:bind('u', function() 
+        self.area:addGameObject('SP') 
     end)
 end
 
