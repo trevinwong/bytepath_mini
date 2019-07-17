@@ -44,9 +44,11 @@ function Player:new(area, x, y, opts)
     self.collider = self.area.world:newCircleCollider(self.x, self.y, self.w)
     self.collider:setCollisionClass('Player')
     self.collider:setObject(self)
-    self.timer:every(0.24, function()
-        self:shoot()
-    end)
+
+    -- Attacks
+    self.shoot_timer = 0
+    self.shoot_cooldown = 0.24
+    self:setAttack('Triple')
 
     -- Test
     input:bind('f4', function() self:die() end)
@@ -141,7 +143,12 @@ function Player:update(dt)
         end
     end
 
-
+    -- Attacks
+    self.shoot_timer = self.shoot_timer + dt
+    if self.shoot_timer > self.shoot_cooldown then
+        self.shoot_timer = 0
+        self:shoot()
+    end
     
     -- Boost/Movement
     self.boost = math.min(self.boost + 10*dt, self.max_boost)
@@ -199,8 +206,42 @@ end
 
 function Player:shoot()
     local d = 1.2*self.w
-    self.area:addGameObject('ShootEffect', self.x + 1.2*self.w*math.cos(self.r), self.y + 1.2*self.w*math.sin(self.r), {player = self, d = d})
-    self.area:addGameObject('Projectile', self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), {r = self.r})
+    self.area:addGameObject('ShootEffect', 
+    self.x + d*math.cos(self.r), self.y + d*math.sin(self.r), {player = self, d = d})
+    self.ammo = self.ammo - attacks[self.attack].ammo
+
+    if self.attack == 'Neutral' then
+        self.area:addGameObject('Projectile', 
+      	self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), {r = self.r, attack = self.attack})
+    elseif self.attack == 'Double' then
+        self.area:addGameObject('Projectile', 
+    	self.x + 1.5*d*math.cos(self.r + math.pi/12), 
+    	self.y + 1.5*d*math.sin(self.r + math.pi/12), 
+    	{r = self.r + math.pi/12, attack = self.attack})
+        
+        self.area:addGameObject('Projectile', 
+    	self.x + 1.5*d*math.cos(self.r - math.pi/12),
+    	self.y + 1.5*d*math.sin(self.r - math.pi/12), 
+    	{r = self.r - math.pi/12, attack = self.attack})
+    elseif self.attack == 'Triple' then
+        self.area:addGameObject('Projectile', 
+      	self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), {r = self.r, attack = self.attack})
+    
+        self.area:addGameObject('Projectile', 
+    	self.x + 1.5*d*math.cos(self.r + math.pi/12), 
+    	self.y + 1.5*d*math.sin(self.r + math.pi/12), 
+    	{r = self.r + math.pi/12, attack = self.attack})
+        
+        self.area:addGameObject('Projectile', 
+    	self.x + 1.5*d*math.cos(self.r - math.pi/12),
+    	self.y + 1.5*d*math.sin(self.r - math.pi/12), 
+    	{r = self.r - math.pi/12, attack = self.attack})       
+    end
+    
+    if self.ammo <= 0 then 
+        self:setAttack('Neutral')
+        self.ammo = self.max_ammo
+    end
 end
 
 function Player:die()
@@ -252,4 +293,10 @@ function Player:addSP(amount)
     else
         sp = math.max(sp + amount, 0)
     end    
+end
+
+function Player:setAttack(attack)
+    self.attack = attack
+    self.shoot_cooldown = attacks[attack].cooldown
+    self.ammo = self.max_ammo
 end
