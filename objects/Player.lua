@@ -48,7 +48,7 @@ function Player:new(area, x, y, opts)
     -- Attacks
     self.shoot_timer = 0
     self.shoot_cooldown = 0.24
-    self:setAttack('Back')
+    self:setAttack('Side')
 
     -- Test
     input:bind('f4', function() self:die() end)
@@ -251,6 +251,17 @@ function Player:shoot()
         local back_r = self.r - math.pi
         self.area:addGameObject('Projectile', 
       	self.x + 1.5*d*math.cos(back_r), self.y + 1.5*d*math.sin(back_r), {r = back_r, attack = self.attack})
+    elseif self.attack == 'Side' then
+        self.area:addGameObject('Projectile', 
+      	self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), {r = self.r, attack = self.attack})
+    
+        local side1_r = self.r - math.pi/2
+        self.area:addGameObject('Projectile', 
+      	self.x + 1.5*d*math.cos(side1_r), self.y + 1.5*d*math.sin(side1_r), {r = side1_r, attack = self.attack})
+    
+        local side2_r = self.r + math.pi/2
+        self.area:addGameObject('Projectile', 
+      	self.x + 1.5*d*math.cos(side2_r), self.y + 1.5*d*math.sin(side2_r), {r = side2_r, attack = self.attack})
     end
     
     if self.ammo <= 0 then 
