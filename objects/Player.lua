@@ -48,7 +48,7 @@ function Player:new(area, x, y, opts)
     -- Attacks
     self.shoot_timer = 0
     self.shoot_cooldown = 0.24
-    self:setAttack('Rapid')
+    self:setAttack('Spread')
 
     -- Test
     input:bind('f4', function() self:die() end)
@@ -239,6 +239,11 @@ function Player:shoot()
     elseif self.attack == 'Rapid' then
         self.area:addGameObject('Projectile', 
       	self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), {r = self.r, attack = self.attack})
+    elseif self.attack == 'Spread' then
+        local t = love.math.random()
+        local r = (t * (-math.pi/8)) + ((1-t) * (math.pi/8))
+        self.area:addGameObject('Projectile', 
+      	self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), {r = self.r + r, attack = self.attack})
     end
     
     if self.ammo <= 0 then 
