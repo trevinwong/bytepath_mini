@@ -1,9 +1,9 @@
 require "objects/GameObject"
 
-ProjectileDeathEffect = GameObject:extend()
+EnemyDeathEffect = GameObject:extend()
 
-function ProjectileDeathEffect:new(area, x, y, opts)
-    ProjectileDeathEffect.super.new(self, area, x, y, opts)
+function EnemyDeathEffect:new(area, x, y, opts)
+    EnemyDeathEffect.super.new(self, area, x, y, opts)
 
     self.current_color = default_color
     self.timer:after(0.1, function()
@@ -14,7 +14,7 @@ function ProjectileDeathEffect:new(area, x, y, opts)
     end)
 end
 
-function ProjectileDeathEffect:draw()
+function EnemyDeathEffect:draw()
     love.graphics.setColor(self.current_color)
-    love.graphics.rectangle('fill', self.x - self.w/2, self.y - self.w/2, self.w, self.w)
+    love.graphics.rectangle('fill', self.x - self.w/2, self.y - self.h/2, self.w, self.h)
 end

@@ -48,7 +48,7 @@ function Player:new(area, x, y, opts)
     -- Attacks
     self.shoot_timer = 0
     self.shoot_cooldown = 0.24
-    self:setAttack('Spread')
+    self:setAttack('Neutral')
 
     -- Test
     input:bind('f4', function() self:die() end)
@@ -144,6 +144,12 @@ function Player:update(dt)
             self:setAttack(object.attack)
         end
     end
+    
+    if self.collider:enter('Enemy') then
+        local collision_data = self.collider:getEnterCollisionData('Enemy')
+        local object = collision_data.collider:getObject()
+        self:hit(-30)
+    end
 
     -- Attacks
     self.shoot_timer = self.shoot_timer + dt
@@ -191,6 +197,7 @@ function Player:update(dt)
 end
 
 function Player:draw()
+    if self.invisible then return end
     pushRotate(self.x, self.y, self.r)
     love.graphics.setColor(default_color)
     for _, polygon in ipairs(self.polygons) do
@@ -314,6 +321,10 @@ function Player:addHP(amount)
     else
         self.hp = math.max(self.hp + amount, 0)
     end
+    print(self.hp)
+    if self.hp <= 0 then
+        self:die()
+    end
 end
 
 function Player:addSP(amount)
@@ -328,4 +339,41 @@ function Player:setAttack(attack)
     self.attack = attack
     self.shoot_cooldown = attacks[attack].cooldown
     self.ammo = self.max_ammo
+end
+
+function Player:hit(damage)
+    if self.invincible then return end
+    local damage = damage or 10
+    for i = 1, love.math.random(4, 8) do 
+    	self.area:addGameObject('ExplodeParticle', self.x, self.y) 
+    end
+    self:addHP(damage)
+    
+    if damage <= -30 then
+        self.invincible = true
+        self.invisible = true
+        self.timer:after(2, function()
+                self.invincible = false
+                self.invisible = false
+            end)
+        flash(0.05)
+        camera:shake(6, 60, 0.2)
+        slow(0.25, 0.5)
+        self.timer:after(0.04, function(f)
+                if self.invincible then
+                    self.invisible = not self.invisible
+                    self.timer:after(0.05, f)
+                end
+            end)
+        self.timer:every(0.04, function(f)
+                if self.invincible then
+                    self.invisible = not self.invisible
+                end
+            end,
+        18)
+    else 
+        flash(0.03)
+        camera:shake(6, 60, 0.1)
+        slow(0.75, 0.25) 
+    end
 end
