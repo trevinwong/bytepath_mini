@@ -48,7 +48,7 @@ function Player:new(area, x, y, opts)
     -- Attacks
     self.shoot_timer = 0
     self.shoot_cooldown = 0.24
-    self:setAttack('Side')
+    self:setAttack('Spread')
 
     -- Test
     input:bind('f4', function() self:die() end)
@@ -140,6 +140,8 @@ function Player:update(dt)
             self:addHP(25)
         elseif object:is(SP) then
             self:addSP(1)
+        elseif object:is(Attack) then
+            self:setAttack(object.attack)
         end
     end
 
@@ -244,6 +246,7 @@ function Player:shoot()
         local r = (t * (-math.pi/8)) + ((1-t) * (math.pi/8))
         self.area:addGameObject('Projectile', 
       	self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), {r = self.r + r, attack = self.attack})
+        attacks[self.attack].color = table.random(all_colors)
     elseif self.attack == 'Back' then
         self.area:addGameObject('Projectile', 
       	self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), {r = self.r, attack = self.attack})

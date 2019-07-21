@@ -24,6 +24,9 @@ function Stage:new()
     input:bind('u', function() 
         self.area:addGameObject('SP') 
     end)
+    input:bind('y', function() 
+        self.area:addGameObject('Attack', 0, 0, {attack = "Triple"})
+    end)
 end
 
 function Stage:update(dt)
