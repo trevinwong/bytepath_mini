@@ -13,6 +13,7 @@ function Player:new(area, x, y, opts)
 	-- Flats
     self.flat_hp = 0
 	self.flat_ammo = 0
+	self.flat_boost = 0
 	
     -- Geometry
     self.x, self.y = x, y
@@ -135,7 +136,7 @@ end
 function Player:setStats()
     self.max_hp = (self.max_hp + self.flat_hp)*self.hp_multiplier	
 	self.max_ammo = (self.max_ammo + self.flat_ammo)*self.ammo_multiplier
-	self.max_boost = self.max_boost*self.boost_multiplier
+	self.max_boost = (self.max_boost + self.flat_boost)*self.boost_multiplier
     self.hp = self.max_hp
 	self.ammo = self.max_ammo
 	self.boost = self.max_boost
