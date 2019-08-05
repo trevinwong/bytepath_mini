@@ -57,7 +57,6 @@ function Director:new(area, x, y, opts)
 	-- Resources
 	self.resource_spawn_chances = chanceList({'Boost', 28}, {'HP', 14}, {'SP', 58})
 	self.timer:every(16, function()
-			print(self.resource_spawn_chances:next())
 			self.area:addGameObject(self.resource_spawn_chances:next())
 		end
 	)

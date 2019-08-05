@@ -87,6 +87,20 @@ function Stage:draw()
     love.graphics.print(ammo .. '/' .. max_ammo, gw/2 - 52 + 24, 26, 0, 1, 1,
     math.floor(self.font:getWidth(ammo .. '/' .. max_ammo)/2), math.floor(self.font:getHeight()/2))
     
+    -- Boost
+    local r, g, b = unpack(boost_color)
+    local boost, max_boost = self.player.boost, self.player.max_boost
+    love.graphics.setColor(r, g, b)
+    love.graphics.rectangle('fill', gw/2 + 4, 16, 48*(boost/max_boost), 4)
+    love.graphics.setColor(r - 32/255, g - 32/255, b - 32/255)
+    love.graphics.rectangle('line', gw/2 + 4, 16, 48, 4)
+    
+    love.graphics.print('BOOST', gw/2 + 4 + 24, 8, 0, 1, 1,
+    math.floor(self.font:getWidth('BOOST')/2), math.floor(self.font:getHeight()/2))
+    
+    love.graphics.print(math.floor(boost) .. '/' .. max_boost, gw/2 + 4 + 24, 26, 0, 1, 1,
+    math.floor(self.font:getWidth(math.floor(boost) .. '/' .. max_boost)/2), math.floor(self.font:getHeight()/2))
+    
     -- Score
     love.graphics.setColor(default_color)
     love.graphics.print(self.score, gw - 40, 10, 0, 1, 1,
