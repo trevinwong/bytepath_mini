@@ -134,14 +134,19 @@ function Player:update(dt)
         object:die()
         if object:is(Ammo) then
             self:addAmmo(5)
+			-- I thought it would be a better idea to increase the score here since we potentially could use addAmmo in different places.
+		    current_room.score = current_room.score + 50
         elseif object:is(Boost) then
             self:addBoost(25)        
+			current_room.score = current_room.score + 150
         elseif object:is(HP) then
             self:addHP(25)
         elseif object:is(SP) then
             self:addSP(1)
+		    current_room.score = current_room.score + 250
         elseif object:is(Attack) then
             self:setAttack(object.attack)
+		    current_room.score = current_room.score + 500
         end
     end
     
@@ -289,6 +294,8 @@ function Player:die()
     for i = 1, love.math.random(8, 12) do 
     	self.area:addGameObject('ExplodeParticle', self.x, self.y) 
   	end
+	
+	current_room:finish()
 end
 
 function Player:tick()
@@ -321,7 +328,7 @@ function Player:addHP(amount)
     else
         self.hp = math.max(self.hp + amount, 0)
     end
-    print(self.hp)
+	
     if self.hp <= 0 then
         self:die()
     end

@@ -84,4 +84,5 @@ function Shooter:die()
    local width, height = self:getWidthAndHeight()
    self.area:addGameObject('EnemyDeathEffect', self.x, self.y, 
     {color = hp_color, w = 30, h = 30})
+	current_room.score = current_room.score + 150
 end

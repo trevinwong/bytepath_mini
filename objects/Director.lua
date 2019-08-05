@@ -95,6 +95,9 @@ function Director:setEnemySpawnsForThisRound()
 			If, however, the case that the author claims would happen were to actually happen, I would simply just spawn the lowest value enemy for that wave
 			and call it a day. But to be honest, I don't think the above scenario is actually a bad alternative (technically our player could get a little
 			screwed over by RNG), but since it's just 1 enemy, I don't think it will influence the gameplay that much.
+			
+			This is actually mentioned in the post itself by another reader. Reading the author's response, I do agree that one should be very careful with
+			using while loops - perhaps it's a good routine to always think - "is there a way that this can not terminate?"
 	]]--
 
     -- Find enemies

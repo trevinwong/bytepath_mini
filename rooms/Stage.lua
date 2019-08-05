@@ -16,6 +16,7 @@ function Stage:new()
     camera.smoother = Camera.smooth.damped(5)
     
     self.director = self.area:addGameObject('Director', 0, 0)
+    self.score = 0
     
     input:bind('p', function() 
         self.area:addGameObject('Ammo', random(0, gw), random(0, gh)) 
@@ -61,7 +62,14 @@ function Stage:draw()
   love.graphics.setBlendMode('alpha')
 end
 
+function Stage:finish()
+    timer:after(1, function()
+        gotoRoom('Stage')
+    end)
+end
+
 function Stage:destroy()
   self.area:destroy()
+  self.player = nil
   self.area = nil
 end
