@@ -15,6 +15,8 @@ function Stage:new()
     self.main_canvas = love.graphics.newCanvas(gw, gh)
     camera.smoother = Camera.smooth.damped(5)
     
+    self.director = self.area:addGameObject('Director', 0, 0)
+    
     input:bind('p', function() 
         self.area:addGameObject('Ammo', random(0, gw), random(0, gh)) 
     end)
@@ -39,9 +41,10 @@ function Stage:new()
 end
 
 function Stage:update(dt)
-  camera:lockPosition(dt, gw/2, gh/2)
-  self.timer:update(dt)
-  self.area:update(dt)
+    self.director:update(dt)
+    camera:lockPosition(dt, gw/2, gh/2)
+    self.timer:update(dt)
+    self.area:update(dt)
 end
 
 function Stage:draw()
