@@ -5,6 +5,10 @@ Player = GameObject:extend()
 function Player:new(area, x, y, opts)
     Player.super.new(self, area, x, y, opts)
     
+	-- Multipliers
+    self.hp_multiplier = 1
+	self.ammo_multiplier = 1
+	
     -- Geometry
     self.x, self.y = x, y
     self.w, self.h = 12, 12
@@ -118,6 +122,15 @@ function Player:new(area, x, y, opts)
             {parent = self, r = random(4, 6), d = random(0.15, 0.25), color = self.trail_color})      
         end
     end)
+
+    -- treeToPlayer(self)
+    self:setStats()
+end
+
+function Player:setStats()
+    self.max_hp = self.max_hp*self.hp_multiplier
+	self.max_ammo = self.max_ammo*self.ammo_multiplier
+    self.hp = self.max_hp
 end
 
 function Player:update(dt)
