@@ -54,7 +54,8 @@ function Player:new(area, x, y, opts)
     input:bind('f4', function() self:die() end)
     
     -- Tick
-    self.timer:every(5, function() self:tick() end)
+	self.time_to_tick = 5
+	self.time_since_last_tick = 0
     
     -- Trail
     self.trail_color = skill_point_color 
@@ -199,6 +200,13 @@ function Player:update(dt)
     self.boost = math.min(self.boost + 10*dt, self.max_boost)
     self.v = math.min(self.v + self.a*dt, self.max_v)
     self.collider:setLinearVelocity(self.v*math.cos(self.r), self.v*math.sin(self.r))
+	
+	-- Tick
+	self.time_since_last_tick = self.time_since_last_tick + dt
+	if self.time_since_last_tick >= self.time_to_tick then
+		self:tick()
+		self.time_since_last_tick = 0
+	end
 end
 
 function Player:draw()

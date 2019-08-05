@@ -100,6 +100,17 @@ function Stage:draw()
     
     love.graphics.print(math.floor(boost) .. '/' .. max_boost, gw/2 + 4 + 24, 26, 0, 1, 1,
     math.floor(self.font:getWidth(math.floor(boost) .. '/' .. max_boost)/2), math.floor(self.font:getHeight()/2))
+
+    -- Cycle
+    local r, g, b = unpack(default_color)
+    local time_since_last_tick, time_to_tick = self.player.time_since_last_tick, self.player.time_to_tick
+    love.graphics.setColor(r, g, b)
+    love.graphics.rectangle('fill', gw/2 + 4, gh - 16, 48*(time_since_last_tick/time_to_tick), 4)
+    love.graphics.setColor(r - 32/255, g - 32/255, b - 32/255)
+    love.graphics.rectangle('line', gw/2 + 4, gh - 16, 48, 4)
+    
+    love.graphics.print('CYCLE', gw/2 + 4 + 24, gh - 24, 0, 1, 1,
+    math.floor(self.font:getWidth('CYCLE')/2), math.floor(self.font:getHeight()/2))
     
     -- Score
     love.graphics.setColor(default_color)
