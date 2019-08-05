@@ -8,6 +8,7 @@ function Player:new(area, x, y, opts)
 	-- Multipliers
     self.hp_multiplier = 1
 	self.ammo_multiplier = 1
+	self.boost_multiplier = 1
 	
     -- Geometry
     self.x, self.y = x, y
@@ -130,7 +131,10 @@ end
 function Player:setStats()
     self.max_hp = self.max_hp*self.hp_multiplier
 	self.max_ammo = self.max_ammo*self.ammo_multiplier
+	self.max_boost = self.max_boost*self.boost_multiplier
     self.hp = self.max_hp
+	self.ammo = self.max_ammo
+	self.boost = self.max_boost
 end
 
 function Player:update(dt)
