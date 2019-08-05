@@ -5,6 +5,14 @@ Shooter = GameObject:extend()
 function Shooter:new(area, x, y, opts)
     Shooter.super.new(self, area, x, y, opts)
 
+	--[[
+		Exercise 115:
+			Direction is a little bit confusing. It makes sense in that it's the direction that the enemy is coming from, but we also use the same attribute
+			to define where the enemy should be facing, which would be the opposite direction.
+			
+			Still, I think it becomes apparent enough after a little bit of thought, so I think the current set-up is fine.
+	]]--
+
     local direction = table.random({-1, 1})
     self.x = gw/2 + direction*(gw/2 + 48)
     self.y = random(16, gh - 16)
