@@ -14,6 +14,7 @@ function Player:new(area, x, y, opts)
     self.flat_hp = 0
 	self.flat_ammo = 0
 	self.flat_boost = 0
+	self.ammo_gain = 0
 	
     -- Geometry
     self.x, self.y = x, y
@@ -156,7 +157,7 @@ function Player:update(dt)
         local object = collision_data.collider:getObject()
         object:die()
         if object:is(Ammo) then
-            self:addAmmo(5)
+            self:addAmmo(5 + self.ammo_gain)
 			-- I thought it would be a better idea to increase the score here since we potentially could use addAmmo in different places.
 		    current_room.score = current_room.score + 50
         elseif object:is(Boost) then
