@@ -14,3 +14,5 @@ negative_colors = {
     {1-skill_point_color[1], 1-skill_point_color[2], 1-skill_point_color[3]}
 }
 all_colors = M.append(default_colors, negative_colors)
+
+enemies = {'Rock', 'Shooter'}

@@ -59,7 +59,7 @@ function Player:new(area, x, y, opts)
     -- Attacks
     self.shoot_timer = 0
     self.shoot_cooldown = 0.24
-    self:setAttack('Neutral')
+    self:setAttack('Homing')
 
     -- Test
     input:bind('f4', function() self:die() end)
@@ -308,7 +308,10 @@ function Player:shoot()
         local side2_r = self.r + math.pi/2
         self.area:addGameObject('Projectile', 
       	self.x + 1.5*d*math.cos(side2_r), self.y + 1.5*d*math.sin(side2_r), {r = side2_r, attack = self.attack})
-    end
+    elseif self.attack == 'Homing' then
+		local projectile = self.area:addGameObject('Projectile', 
+      	self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), {r = self.r, attack = self.attack, s = 8})
+	end
     
     if self.ammo <= 0 then 
         self:setAttack('Neutral')
