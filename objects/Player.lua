@@ -19,6 +19,7 @@ function Player:new(area, x, y, opts)
 	-- Chances
     self.launch_homing_projectile_on_ammo_pickup_chance = 0
 	self.regain_hp_on_ammo_pickup_chance = 0
+	self.regain_hp_on_sp_pickup_chance = 0
 	
     -- Geometry
     self.x, self.y = x, y
@@ -172,6 +173,7 @@ function Player:update(dt)
             self:addHP(25)
         elseif object:is(SP) then
             self:addSP(1)
+			self:onSPPickup()
 		    current_room.score = current_room.score + 250
         elseif object:is(Attack) then
             self:setAttack(object.attack)
@@ -442,6 +444,13 @@ function Player:onAmmoPickup()
         self.area:addGameObject('InfoText', self.x, self.y, {text = 'Homing Projectile!', w = self.w, h = self.h})
     end
 	if self.chances.regain_hp_on_ammo_pickup_chance:next() then
+		self:addHP(25)
+		self.area:addGameObject('InfoText', self.x, self.y, {text = 'HP Regain!', w = self.w, h = self.h})
+	end
+end
+
+function Player:onSPPickup()
+	if self.chances.regain_hp_on_sp_pickup_chance:next() then
 		self:addHP(25)
 		self.area:addGameObject('InfoText', self.x, self.y, {text = 'HP Regain!', w = self.w, h = self.h})
 	end
