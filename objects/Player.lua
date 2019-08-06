@@ -16,6 +16,10 @@ function Player:new(area, x, y, opts)
 	self.flat_boost = 0
 	self.ammo_gain = 0
 	
+	-- Chances
+    self.launch_homing_projectile_on_ammo_pickup_chance = 0
+	self.regain_hp_on_ammo_pickup_chance = 0
+	
     -- Geometry
     self.x, self.y = x, y
     self.w, self.h = 12, 12
@@ -132,6 +136,7 @@ function Player:new(area, x, y, opts)
 
     -- treeToPlayer(self)
     self:setStats()
+    self:generateChances()
 end
 
 function Player:setStats()
@@ -158,7 +163,7 @@ function Player:update(dt)
         object:die()
         if object:is(Ammo) then
             self:addAmmo(5 + self.ammo_gain)
-			-- I thought it would be a better idea to increase the score here since we potentially could use addAmmo in different places.
+			self:onAmmoPickup()
 		    current_room.score = current_room.score + 50
         elseif object:is(Boost) then
             self:addBoost(25)        
@@ -382,6 +387,15 @@ function Player:setAttack(attack)
     self.ammo = self.max_ammo
 end
 
+function Player:generateChances()
+    self.chances = {}
+    for k, v in pairs(self) do
+        if k:find('_chance') and type(v) == 'number' then
+      	    self.chances[k] = chanceList({true, math.ceil(v)}, {false, 100-math.ceil(v)})
+      	end
+    end
+end
+
 function Player:hit(damage)
     if self.invincible then return end
     local damage = damage or 10
@@ -417,4 +431,18 @@ function Player:hit(damage)
         camera:shake(6, 60, 0.1)
         slow(0.75, 0.25) 
     end
+end
+
+function Player:onAmmoPickup()
+    if self.chances.launch_homing_projectile_on_ammo_pickup_chance:next() then
+        local d = 1.2*self.w
+        self.area:addGameObject('Projectile', 
+      	self.x + d*math.cos(self.r), self.y + d*math.sin(self.r), 
+      	{r = self.r, attack = 'Homing'})
+        self.area:addGameObject('InfoText', self.x, self.y, {text = 'Homing Projectile!', w = self.w, h = self.h})
+    end
+	if self.chances.regain_hp_on_ammo_pickup_chance:next() then
+		self:addHP(25)
+		self.area:addGameObject('InfoText', self.x, self.y, {text = 'HP Regain!', w = self.w, h = self.h})
+	end
 end
