@@ -30,7 +30,8 @@ function Player:new(area, x, y, opts)
 	self.regain_full_ammo_on_cycle_chance = 0
 	self.change_attack_on_cycle_chance = 0
 	self.spawn_haste_area_on_cycle_chance = 0
-	self.barrage_on_cycle_chance = 100
+	self.barrage_on_cycle_chance = 0
+	self.launch_homing_projectile_on_cycle_chance = 0
 	
     -- Geometry
     self.x, self.y = x, y
@@ -450,10 +451,7 @@ end
 
 function Player:onAmmoPickup()
     if self.chances.launch_homing_projectile_on_ammo_pickup_chance:next() then
-        local d = 1.2*self.w
-        self.area:addGameObject('Projectile', 
-      	self.x + d*math.cos(self.r), self.y + d*math.sin(self.r), 
-      	{r = self.r, attack = 'Homing'})
+        self:launchHomingProjectile()
         self.area:addGameObject('InfoText', self.x, self.y, {text = 'Homing Projectile!', w = self.w, h = self.h})
     end
 	if self.chances.regain_hp_on_ammo_pickup_chance:next() then
@@ -511,6 +509,10 @@ function Player:onCycle()
 		self:barrage()
         self.area:addGameObject('InfoText', self.x, self.y, {text = 'Barrage!!!', w = self.w, h = self.h})
 	end
+    if self.chances.launch_homing_projectile_on_cycle_chance:next() then
+        self:launchHomingProjectile()
+        self.area:addGameObject('InfoText', self.x, self.y, {text = 'Homing Projectile!', w = self.w, h = self.h})
+    end
 end
 
 function Player:onKill()
@@ -543,4 +545,11 @@ function Player:barrage()
 			{r = self.r + random_angle, attack = self.attack})
 		end)
 	end
+end
+
+function Player:launchHomingProjectile()
+	local d = 1.2*self.w
+	self.area:addGameObject('Projectile', 
+	self.x + d*math.cos(self.r), self.y + d*math.sin(self.r), 
+	{r = self.r, attack = 'Homing'})
 end
