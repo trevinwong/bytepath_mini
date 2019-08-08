@@ -22,7 +22,8 @@ function Player:new(area, x, y, opts)
 	self.regain_hp_on_ammo_pickup_chance = 0
 	self.regain_hp_on_sp_pickup_chance = 0
 	self.spawn_haste_area_on_hp_pickup_chance = 0
-	
+	self.spawn_haste_area_on_sp_pickup_chance = 0
+
     -- Geometry
     self.x, self.y = x, y
     self.w, self.h = 12, 12
@@ -456,6 +457,10 @@ function Player:onSPPickup()
 	if self.chances.regain_hp_on_sp_pickup_chance:next() then
 		self:addHP(25)
 		self.area:addGameObject('InfoText', self.x, self.y, {text = 'HP Regain!', w = self.w, h = self.h})
+	end
+	if self.chances.spawn_haste_area_on_sp_pickup_chance:next() then
+		self.area:addGameObject('HasteArea', self.x, self.y)
+		self.area:addGameObject('InfoText', self.x, self.y, {text = 'Haste Area!', w = self.w, h = self.h})
 	end
 end
 
