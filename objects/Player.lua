@@ -9,8 +9,9 @@ function Player:new(area, x, y, opts)
     self.hp_multiplier = 1
 	self.ammo_multiplier = 1
 	self.boost_multiplier = 1
-	self.aspd_multiplier = 1
-		
+    self.aspd_multiplier = Stat(1)
+	self.mvspd_multiplier = Stat(1)
+	
 	-- Flats
     self.flat_hp = 0
 	self.flat_ammo = 0
@@ -34,7 +35,10 @@ function Player:new(area, x, y, opts)
 	self.launch_homing_projectile_on_cycle_chance = 0
 	self.regain_ammo_on_kill_chance = 0
 	self.launch_homing_projectile_on_kill_chance = 0
-	self.regain_boost_on_kill_chance = 100
+	self.regain_boost_on_kill_chance = 0
+	self.spawn_boost_on_kill_chance = 0
+	self.gain_aspd_boost_on_kill_chance = 0	
+	self.mvspd_boost_on_cycle_chance = 100
 	
     -- Geometry
     self.x, self.y = x, y
@@ -202,10 +206,19 @@ function Player:update(dt)
         local object = collision_data.collider:getObject()
         self:hit(-30)
     end
+	
+	-- Aspd
+	if self.inside_haste_area then self.aspd_multiplier:increase(100) end
+    if self.aspd_boosting then self.aspd_multiplier:increase(100) end
+    self.aspd_multiplier:update(dt)
+	
+	-- Mvspd
+    if self.mvspd_boosting then self.mvspd_multiplier:increase(50) end
+    self.mvspd_multiplier:update(dt)
 
-    -- Attacks
+    -- Shoot
     self.shoot_timer = self.shoot_timer + dt
-    if self.shoot_timer > self.shoot_cooldown*self.aspd_multiplier then
+    if self.shoot_timer > self.shoot_cooldown/self.aspd_multiplier.value then
         self.shoot_timer = 0
         self:shoot()
     end
@@ -244,7 +257,7 @@ function Player:update(dt)
     if input:down('right') then self.r = self.r + self.rv*dt end
     
     self.boost = math.min(self.boost + 10*dt, self.max_boost)
-    self.v = math.min(self.v + self.a*dt, self.max_v)
+    self.v = math.min(self.v + self.a*dt, self.max_v) * self.mvspd_multiplier.value
     self.collider:setLinearVelocity(self.v*math.cos(self.r), self.v*math.sin(self.r))
 	
 	-- Cycle
@@ -516,6 +529,12 @@ function Player:onCycle()
         self:launchHomingProjectile()
         self.area:addGameObject('InfoText', self.x, self.y, {text = 'Homing Projectile!', w = self.w, h = self.h})
     end
+    if self.chances.mvspd_boost_on_cycle_chance:next() then
+        self.mvspd_boosting = true
+        self.timer:after(4, function() self.mvspd_boosting = false end)
+        self.area:addGameObject('InfoText', self.x, self.y, 
+      	{text = 'MVSPD Boost!', color = boost_color, w = self.w, h = self.h})
+    end
 end
 
 function Player:onKill()
@@ -533,20 +552,19 @@ function Player:onKill()
 	end
 	if self.chances.regain_boost_on_kill_chance:next() then
 		self:addBoost(40)
-        self.area:addGameObject('InfoText', self.x, self.y, {text = 'Regain Boost!', w = self.w, h = self.h})
+        self.area:addGameObject('InfoText', self.x, self.y, {text = 'Regain Boost !', w = self.w, h = self.h})
 	end
-end
-
-function Player:enterHasteArea()
-    self.inside_haste_area = true
-    self.pre_haste_aspd_multiplier = self.aspd_multiplier
-    self.aspd_multiplier = self.aspd_multiplier/2
-end
-
-function Player:exitHasteArea()
-    self.inside_haste_area = false
-    self.aspd_multiplier = self.pre_haste_aspd_multiplier
-    self.pre_haste_aspd_multiplier = nil
+	if self.chances.spawn_boost_on_kill_chance:next() then
+		self.area:addGameObject('Boost')
+		self.area:addGameObject('InfoText', self.x, self.y, 
+		{text = 'Boost Spawn!', color = boost_color, w = self.w, h = self.h})
+	end
+    if self.chances.gain_aspd_boost_on_kill_chance:next() then
+        self.aspd_boosting = true
+        self.timer:after(4, function() self.aspd_boosting = false end)
+        self.area:addGameObject('InfoText', self.x, self.y, 
+      	{text = 'ASPD Boost!', color = ammo_color, w = self.w, h = self.h})
+    end
 end
 
 function Player:barrage()

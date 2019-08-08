@@ -10,14 +10,12 @@ end
 
 function HasteArea:update(dt)
     HasteArea.super.update(self, dt)
+
     local player = current_room.player
     if not player then return end
     local d = distance(self.x, self.y, player.x, player.y)
-    if d < self.r and not player.inside_haste_area then -- Enter event
-        player:enterHasteArea()
-    elseif d >= self.r and player.inside_haste_area then -- Leave event
-    	player:exitHasteArea()
-    end
+    if d < self.r then player.inside_haste_area = true
+    elseif d >= self.r then player.inside_haste_area = false end
 end
 
 function HasteArea:draw()
