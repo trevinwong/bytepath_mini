@@ -23,7 +23,10 @@ function Player:new(area, x, y, opts)
 	self.regain_hp_on_sp_pickup_chance = 0
 	self.spawn_haste_area_on_hp_pickup_chance = 0
 	self.spawn_haste_area_on_sp_pickup_chance = 0
-
+    self.spawn_sp_on_cycle_chance = 0
+    self.barrage_on_kill_chance = 0
+	self.spawn_hp_on_cycle_chance = 0
+	
     -- Geometry
     self.x, self.y = x, y
     self.w, self.h = 12, 12
@@ -72,9 +75,9 @@ function Player:new(area, x, y, opts)
     -- Test
     input:bind('f4', function() self:die() end)
     
-    -- Tick
-	self.time_to_tick = 5
-	self.time_since_last_tick = 0
+    -- Cycle
+	self.cycle_cooldown = 5
+	self.cycle_timer = 0
     
     -- Trail
     self.trail_color = skill_point_color 
@@ -235,11 +238,11 @@ function Player:update(dt)
     self.v = math.min(self.v + self.a*dt, self.max_v)
     self.collider:setLinearVelocity(self.v*math.cos(self.r), self.v*math.sin(self.r))
 	
-	-- Tick
-	self.time_since_last_tick = self.time_since_last_tick + dt
-	if self.time_since_last_tick >= self.time_to_tick then
-		self:tick()
-		self.time_since_last_tick = 0
+	-- Cycle
+	self.cycle_timer = self.cycle_timer + dt
+	if self.cycle_timer >= self.cycle_cooldown then
+		self:cycle()
+		self.cycle_timer = 0
 	end
 end
 
@@ -343,7 +346,8 @@ function Player:die()
 	current_room:finish()
 end
 
-function Player:tick()
+function Player:cycle()
+    self:onCycle()
     self.area:addGameObject('TickEffect', self.x, self.y, {parent = self})
 end
 
@@ -469,6 +473,35 @@ function Player:onHPPickup()
 		self.area:addGameObject('HasteArea', self.x, self.y)
 		self.area:addGameObject('InfoText', self.x, self.y, {text = 'Haste Area!', w = self.w, h = self.h})
 	end
+end
+
+function Player:onCycle()
+    if self.chances.spawn_sp_on_cycle_chance:next() then
+        self.area:addGameObject('SP')
+        self.area:addGameObject('InfoText', self.x, self.y, 
+      	{text = 'SP Spawn!', color = skill_point_color, w = self.w, h = self.h})
+    end
+    if self.chances.spawn_hp_on_cycle_chance:next() then
+        self.area:addGameObject('HP')
+        self.area:addGameObject('InfoText', self.x, self.y, 
+      	{text = 'HP Spawn!', color = hp_color, w = self.w, h = self.h})
+    end
+end
+
+function Player:onKill()
+    if self.chances.barrage_on_kill_chance:next() then
+        for i = 1, 8 do
+            self.timer:after((i-1)*0.05, function()
+                local random_angle = random(-math.pi/8, math.pi/8)
+                local d = 2.2*self.w
+                self.area:addGameObject('Projectile', 
+            	self.x + d*math.cos(self.r + random_angle), 
+            	self.y + d*math.sin(self.r + random_angle), 
+            	{r = self.r + random_angle, attack = self.attack})
+            end)
+        end
+        self.area:addGameObject('InfoText', self.x, self.y, {text = 'Barrage!!!', w = self.w, h = self.h})
+    end
 end
 
 function Player:enterHasteArea()

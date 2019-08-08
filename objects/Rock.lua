@@ -48,7 +48,7 @@ end
 
 function Rock:hit(damage)
     local damage = damage or 100
-    self.hp = self.hp + damage
+    self.hp = self.hp - damage
     if (self.hp <= 0) then
         self:die()
     else

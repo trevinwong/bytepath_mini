@@ -103,9 +103,9 @@ function Stage:draw()
 
     -- Cycle
     local r, g, b = unpack(default_color)
-    local time_since_last_tick, time_to_tick = self.player.time_since_last_tick, self.player.time_to_tick
+    local cycle_timer, cycle_cooldown = self.player.cycle_timer, self.player.cycle_cooldown
     love.graphics.setColor(r, g, b)
-    love.graphics.rectangle('fill', gw/2 + 4, gh - 16, 48*(time_since_last_tick/time_to_tick), 4)
+    love.graphics.rectangle('fill', gw/2 + 4, gh - 16, 48*(cycle_timer/cycle_cooldown), 4)
     love.graphics.setColor(r - 32/255, g - 32/255, b - 32/255)
     love.graphics.rectangle('line', gw/2 + 4, gh - 16, 48, 4)
     
