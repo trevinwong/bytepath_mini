@@ -32,6 +32,7 @@ function Player:new(area, x, y, opts)
 	self.spawn_haste_area_on_cycle_chance = 0
 	self.barrage_on_cycle_chance = 0
 	self.launch_homing_projectile_on_cycle_chance = 0
+	self.regain_ammo_on_kill_chance = 0
 	
     -- Geometry
     self.x, self.y = x, y
@@ -520,6 +521,10 @@ function Player:onKill()
 		self:barrage()
         self.area:addGameObject('InfoText', self.x, self.y, {text = 'Barrage!!!', w = self.w, h = self.h})
     end
+	if self.chances.regain_ammo_on_kill_chance:next() then
+		self:addAmmo(20)
+        self.area:addGameObject('InfoText', self.x, self.y, {text = 'Regain Ammo!', w = self.w, h = self.h})
+	end
 end
 
 function Player:enterHasteArea()
