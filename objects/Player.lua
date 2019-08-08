@@ -11,6 +11,7 @@ function Player:new(area, x, y, opts)
 	self.boost_multiplier = 1
     self.aspd_multiplier = Stat(1)
 	self.mvspd_multiplier = Stat(1)
+	self.pspd_multiplier = Stat(1)
 	
 	-- Flats
     self.flat_hp = 0
@@ -38,7 +39,8 @@ function Player:new(area, x, y, opts)
 	self.regain_boost_on_kill_chance = 0
 	self.spawn_boost_on_kill_chance = 0
 	self.gain_aspd_boost_on_kill_chance = 0	
-	self.mvspd_boost_on_cycle_chance = 100
+	self.mvspd_boost_on_cycle_chance = 0
+	self.pspd_boost_on_cycle_chance = 100
 	
     -- Geometry
     self.x, self.y = x, y
@@ -215,7 +217,11 @@ function Player:update(dt)
 	-- Mvspd
     if self.mvspd_boosting then self.mvspd_multiplier:increase(50) end
     self.mvspd_multiplier:update(dt)
-
+	
+	-- Pspd
+    if self.pspd_boosting then self.pspd_multiplier:increase(100) end
+    self.pspd_multiplier:update(dt)
+	
     -- Shoot
     self.shoot_timer = self.shoot_timer + dt
     if self.shoot_timer > self.shoot_cooldown/self.aspd_multiplier.value then
@@ -534,6 +540,12 @@ function Player:onCycle()
         self.timer:after(4, function() self.mvspd_boosting = false end)
         self.area:addGameObject('InfoText', self.x, self.y, 
       	{text = 'MVSPD Boost!', color = boost_color, w = self.w, h = self.h})
+    end
+    if self.chances.pspd_boost_on_cycle_chance:next() then
+        self.pspd_boosting = true
+        self.timer:after(4, function() self.pspd_boosting = false end)
+        self.area:addGameObject('InfoText', self.x, self.y, 
+      	{text = 'PSPD Boost!', color = skill_point_color, w = self.w, h = self.h})
     end
 end
 

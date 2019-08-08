@@ -5,7 +5,8 @@ function Projectile:new(area, x, y, opts)
     Projectile.super.new(self, area, x, y, opts)
 
     self.s = opts.s or 2.5
-    self.v = opts.v or 200
+    self.max_v = opts.max_v or 200
+    self.v = opts.v or self.max_v
     self.color = attacks[self.attack].color
     self.damage = attacks[self.attack].damage or 100
     
@@ -21,6 +22,8 @@ function Projectile:update(dt)
     if self.y < 0 then self:die() end
     if self.x > gw then self:die() end
     if self.y > gh then self:die() end
+    
+    self.v = math.min(self.v, self.max_v) * current_room.player.pspd_multiplier.value
     
     if self.collider:enter('Enemy') then
         local collision_data = self.collider:getEnterCollisionData('Enemy')
