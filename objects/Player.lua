@@ -4,7 +4,7 @@ Player = GameObject:extend()
 
 function Player:new(area, x, y, opts)
     Player.super.new(self, area, x, y, opts)
-    
+	
 	-- Multipliers
     self.hp_multiplier = 1
 	self.ammo_multiplier = 1
@@ -28,6 +28,7 @@ function Player:new(area, x, y, opts)
 	self.spawn_hp_on_cycle_chance = 0
 	self.regain_hp_on_cycle_chance = 0
 	self.regain_full_ammo_on_cycle_chance = 0
+	self.change_attack_on_cycle_chance = 100
 	
     -- Geometry
     self.x, self.y = x, y
@@ -495,6 +496,10 @@ function Player:onCycle()
 	if self.chances.regain_full_ammo_on_cycle_chance:next() then
 		self.ammo = self.max_ammo
 		self.area:addGameObject('InfoText', self.x, self.y, {text = 'MAX Ammo Regain!', w = self.w, h = self.h})
+	end
+	if self.chances.change_attack_on_cycle_chance:next() then
+		self:setAttack(selectRandomKey(attacks))
+		self.area:addGameObject('InfoText', self.x, self.y, {text = 'Change Attack!', w = self.w, h = self.h})
 	end
 end
 

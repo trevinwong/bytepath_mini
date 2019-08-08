@@ -34,6 +34,13 @@ function chanceList(...)
     }
 end
 
+function selectRandomKey(t)
+	local keys = {}
+	for key, _ in pairs(t) do
+		table.insert(keys, key)
+	end
+	return keys[love.math.random(1, #keys)]
+end
 -- Memory leak checking
 
 function count_all(f)
