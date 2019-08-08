@@ -28,7 +28,8 @@ function Player:new(area, x, y, opts)
 	self.spawn_hp_on_cycle_chance = 0
 	self.regain_hp_on_cycle_chance = 0
 	self.regain_full_ammo_on_cycle_chance = 0
-	self.change_attack_on_cycle_chance = 100
+	self.change_attack_on_cycle_chance = 0
+	self.spawn_haste_area_on_cycle_chance = 0
 	
     -- Geometry
     self.x, self.y = x, y
@@ -500,6 +501,10 @@ function Player:onCycle()
 	if self.chances.change_attack_on_cycle_chance:next() then
 		self:setAttack(selectRandomKey(attacks))
 		self.area:addGameObject('InfoText', self.x, self.y, {text = 'Change Attack!', w = self.w, h = self.h})
+	end
+	if self.chances.spawn_haste_area_on_cycle_chance:next() then
+		self.area:addGameObject('HasteArea', self.x, self.y)
+		self.area:addGameObject('InfoText', self.x, self.y, {text = 'Haste Area!', w = self.w, h = self.h})
 	end
 end
 
