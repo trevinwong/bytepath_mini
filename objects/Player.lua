@@ -26,6 +26,7 @@ function Player:new(area, x, y, opts)
     self.spawn_sp_on_cycle_chance = 0
     self.barrage_on_kill_chance = 0
 	self.spawn_hp_on_cycle_chance = 0
+	self.regain_hp_on_cycle_chance = 0
 	
     -- Geometry
     self.x, self.y = x, y
@@ -486,6 +487,10 @@ function Player:onCycle()
         self.area:addGameObject('InfoText', self.x, self.y, 
       	{text = 'HP Spawn!', color = hp_color, w = self.w, h = self.h})
     end
+	if self.chances.regain_hp_on_cycle_chance:next() then
+		self:addHP(25)
+		self.area:addGameObject('InfoText', self.x, self.y, {text = 'HP Regain!', w = self.w, h = self.h})
+	end
 end
 
 function Player:onKill()
