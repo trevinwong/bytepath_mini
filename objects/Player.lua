@@ -34,6 +34,7 @@ function Player:new(area, x, y, opts)
 	self.launch_homing_projectile_on_cycle_chance = 0
 	self.regain_ammo_on_kill_chance = 0
 	self.launch_homing_projectile_on_kill_chance = 0
+	self.regain_boost_on_kill_chance = 100
 	
     -- Geometry
     self.x, self.y = x, y
@@ -529,6 +530,10 @@ function Player:onKill()
 	if self.chances.launch_homing_projectile_on_kill_chance:next() then
 		self:launchHomingProjectile()
         self.area:addGameObject('InfoText', self.x, self.y, {text = 'Homing Projectile!', w = self.w, h = self.h})
+	end
+	if self.chances.regain_boost_on_kill_chance:next() then
+		self:addBoost(40)
+        self.area:addGameObject('InfoText', self.x, self.y, {text = 'Regain Boost!', w = self.w, h = self.h})
 	end
 end
 
