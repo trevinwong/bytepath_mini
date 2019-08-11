@@ -11,6 +11,7 @@ function Player:new(area, x, y, opts)
 	self.boost_multiplier = 1
     self.hp_spawn_chance_multiplier = 1
 	self.sp_spawn_chance_multiplier = 1
+	self.boost_spawn_chance_multiplier = 1
     self.aspd_multiplier = Stat(1)
 	self.mvspd_multiplier = Stat(1)
 	self.pspd_multiplier = Stat(1)
@@ -47,6 +48,7 @@ function Player:new(area, x, y, opts)
 	self.pspd_boost_on_cycle_chance = 0
 	self.pspd_inhibit_on_cycle_chance = 0
     self.launch_homing_projectile_while_boosting_chance = 0
+	self.drop_double_ammo_chance = 0
 	
 	-- Passives
 	self.increased_cycle_speed_while_boosting = false
@@ -593,7 +595,13 @@ function Player:onCycle()
 
 end
 
-function Player:onKill()
+function Player:onKill(enemy_death_location)
+	-- Enemies originally did not spawn Ammo upon death, so I added it.
+	self.area:addGameObject('Ammo', unpack(enemy_death_location))
+	if self.chances.drop_double_ammo_chance:next() then
+		self.area:addGameObject('Ammo', unpack(enemy_death_location))
+		self.area:addGameObject('InfoText', self.x, self.y, {text = 'Double Ammo!', w = self.w, h = self.h})
+	end
     if self.chances.barrage_on_kill_chance:next() then
 		self:barrage()
         self.area:addGameObject('InfoText', self.x, self.y, {text = 'Barrage!!!', w = self.w, h = self.h})
