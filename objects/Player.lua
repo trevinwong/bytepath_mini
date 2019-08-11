@@ -17,6 +17,7 @@ function Player:new(area, x, y, opts)
 	self.attack_spawn_rate_multiplier = 1
 	self.turn_rate_multiplier = 1
 	self.boost_effectiveness_multiplier = 1
+	self.projectile_size_multiplier = 1
     self.aspd_multiplier = Stat(1)
 	self.mvspd_multiplier = Stat(1)
 	self.pspd_multiplier = Stat(1)

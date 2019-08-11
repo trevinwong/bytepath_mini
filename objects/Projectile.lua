@@ -10,7 +10,8 @@ function Projectile:new(area, x, y, opts)
     self.color = attacks[self.attack].color
     self.damage = attacks[self.attack].damage or 100
     
-    self:applyPspd()
+    self:applyPspdMultiplier()
+    self:applySizeMultiplier()
     
     self.collider = self.area.world:newCircleCollider(self.x, self.y, self.s)
     self.collider:setCollisionClass('Projectile')
@@ -111,8 +112,14 @@ end
     However, this does not work for the "Pspd Inhibit", for reasons I should have seen coming, since it'll trend our velocity infinitely close to 0.
     Of course, the solution is to just apply Pspd once.
 ]]--
-function Projectile:applyPspd()
+function Projectile:applyPspdMultiplier()
     if current_room and current_room.player then
         self.v = math.min(self.v, self.max_v) * current_room.player.pspd_multiplier.value
+    end
+end
+
+function Projectile:applySizeMultiplier()
+    if current_room and current_room.player then
+        self.s = self.s * current_room.player.projectile_size_multiplier
     end
 end
