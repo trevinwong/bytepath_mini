@@ -15,6 +15,7 @@ function Player:new(area, x, y, opts)
 	self.enemy_spawn_rate_multiplier = 1
 	self.resource_spawn_rate_multiplier = 1
 	self.attack_spawn_rate_multiplier = 1
+	self.turn_rate_multiplier = 1
     self.aspd_multiplier = Stat(1)
 	self.mvspd_multiplier = Stat(1)
 	self.pspd_multiplier = Stat(1)
@@ -55,7 +56,7 @@ function Player:new(area, x, y, opts)
 	self.attack_twice_chance = 0
 	self.spawn_double_hp_chance = 0
 	self.spawn_double_sp_chance = 0
-	self.gain_double_sp_chance = 1
+	self.gain_double_sp_chance = 0
 	
 	-- Passives
 	self.increased_cycle_speed_while_boosting = false
@@ -303,8 +304,8 @@ function Player:update(dt)
     self.trail_color = skill_point_color 
     if self.boosting then self.trail_color = boost_color end
     
-    if input:down('left') then self.r = self.r - self.rv*dt end
-    if input:down('right') then self.r = self.r + self.rv*dt end
+    if input:down('left') then self.r = self.r - self.rv*self.turn_rate_multiplier*dt end
+    if input:down('right') then self.r = self.r + self.rv*self.turn_rate_multiplier*dt end
     
     self.boost = math.min(self.boost + 10*dt, self.max_boost)
     self.v = math.min(self.v + self.a*dt, self.max_v) * self.mvspd_multiplier.value
