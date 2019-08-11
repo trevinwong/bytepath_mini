@@ -10,8 +10,10 @@ function Player:new(area, x, y, opts)
 	self.ammo_multiplier = 1
 	self.boost_multiplier = 1
     self.hp_spawn_chance_multiplier = 1
-	self.sp_spawn_chance_multiplier = 100
+	self.sp_spawn_chance_multiplier = 1
 	self.boost_spawn_chance_multiplier = 1
+	self.enemy_spawn_rate_multiplier = 1
+	self.resource_spawn_rate_multiplier = 1
     self.aspd_multiplier = Stat(1)
 	self.mvspd_multiplier = Stat(1)
 	self.pspd_multiplier = Stat(1)
@@ -52,7 +54,7 @@ function Player:new(area, x, y, opts)
 	self.attack_twice_chance = 0
 	self.spawn_double_hp_chance = 0
 	self.spawn_double_sp_chance = 0
-	self.gain_double_sp_chance = 100
+	self.gain_double_sp_chance = 1
 	
 	-- Passives
 	self.increased_cycle_speed_while_boosting = false
