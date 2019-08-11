@@ -49,7 +49,8 @@ function Player:new(area, x, y, opts)
 	self.pspd_inhibit_on_cycle_chance = 0
     self.launch_homing_projectile_while_boosting_chance = 0
 	self.drop_double_ammo_chance = 0
-	self.attack_twice_chance = 100
+	self.attack_twice_chance = 0
+	self.spawn_double_hp_chance = 0
 	
 	-- Passives
 	self.increased_cycle_speed_while_boosting = false
@@ -637,7 +638,17 @@ function Player:onShoot()
 	if self.chances.attack_twice_chance:next() then
 		self:shoot()
 		self.area:addGameObject('InfoText', self.x, self.y, 
-		{text = 'Double Attack!', color = default_color, w = self.w, h = self.h})
+		{text = 'Double Attack!', w = self.w, h = self.h})
+	end
+end
+
+function Player:onResourceSpawn(resource_name)
+	if resource_name == 'HP' then
+		if self.chances.spawn_double_hp_chance:next() then
+			self.area:addGameObject('HP')
+			self.area:addGameObject('InfoText', self.x, self.y, 
+			{text = 'Double HP Spawn!', color = hp_color, w = self.w, h = self.h})
+		end
 	end
 end
 
