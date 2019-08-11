@@ -14,6 +14,7 @@ function Player:new(area, x, y, opts)
 	self.boost_spawn_chance_multiplier = 1
 	self.enemy_spawn_rate_multiplier = 1
 	self.resource_spawn_rate_multiplier = 1
+	self.attack_spawn_rate_multiplier = 1
     self.aspd_multiplier = Stat(1)
 	self.mvspd_multiplier = Stat(1)
 	self.pspd_multiplier = Stat(1)

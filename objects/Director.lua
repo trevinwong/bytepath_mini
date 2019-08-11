@@ -65,7 +65,7 @@ function Director:new(area, x, y, opts)
 	)
 	
 	-- Attacks
-	self.timer:every(30, function()
+	self.timer:every(30/self.player.attack_spawn_rate_multiplier, function()
 			local i = 1
 			local selectAttackName = {}
 			for attackName, _ in pairs(attacks) do
