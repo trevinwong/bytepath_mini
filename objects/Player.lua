@@ -20,6 +20,7 @@ function Player:new(area, x, y, opts)
 	self.projectile_size_multiplier = 1
 	self.boost_recharge_rate_multiplier = 1
 	self.invulnerability_time_multiplier = 1
+	self.ammo_consumption_multiplier = 1
     self.aspd_multiplier = Stat(1)
 	self.mvspd_multiplier = Stat(1)
 	self.pspd_multiplier = Stat(1)
@@ -347,7 +348,8 @@ function Player:shoot()
     local d = 1.2*self.w
     self.area:addGameObject('ShootEffect', 
     self.x + d*math.cos(self.r), self.y + d*math.sin(self.r), {player = self, d = d})
-    self.ammo = self.ammo - attacks[self.attack].ammo
+
+    self.ammo = self.ammo - (attacks[self.attack].ammo * self.ammo_consumption_multiplier)
 
     if self.attack == 'Neutral' then
         self.area:addGameObject('Projectile', 
