@@ -33,6 +33,18 @@ function Projectile:new(area, x, y, opts)
       	end)
     end
     
+    if current_room.player.wavy_projectiles then
+        local direction = table.random({-1, 1}) * current_room.player.projectile_waviness_multiplier
+        self.timer:tween(0.25, self, {r = self.r + direction*math.pi/8}, 'linear', function()
+            self.timer:tween(0.25, self, {r = self.r - direction*math.pi/4}, 'linear')
+        end)
+        self.timer:every(0.75, function()
+            self.timer:tween(0.25, self, {r = self.r + direction*math.pi/4}, 'linear',  function()
+                self.timer:tween(0.5, self, {r = self.r - direction*math.pi/4}, 'linear')
+            end)
+        end)
+    end
+    
     self.collider = self.area.world:newCircleCollider(self.x, self.y, self.s)
     self.collider:setCollisionClass('Projectile')
     self.collider:setObject(self)
