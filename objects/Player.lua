@@ -43,7 +43,10 @@ function Player:new(area, x, y, opts)
 	self.mvspd_boost_on_cycle_chance = 0
 	self.pspd_boost_on_cycle_chance = 0
 	self.pspd_inhibit_on_cycle_chance = 0
-    self.launch_homing_projectile_while_boosting_chance = 100
+    self.launch_homing_projectile_while_boosting_chance = 0
+	
+	-- Passives
+	self.increased_cycle_speed_while_boosting = false
 	
     -- Geometry
     self.x, self.y = x, y
@@ -212,6 +215,8 @@ function Player:update(dt)
         self:hit(-30)
     end
 	
+	-- Passives
+	
 	-- Aspd
 	if self.inside_haste_area then self.aspd_multiplier:increase(100) end
     if self.aspd_boosting then self.aspd_multiplier:increase(100) end
@@ -225,6 +230,10 @@ function Player:update(dt)
     if self.pspd_boosting then self.pspd_multiplier:increase(100) end
 	if self.pspd_inhibiting then self.pspd_multiplier:decrease(100) end
     self.pspd_multiplier:update(dt)
+	
+	-- Cycle
+	if self.cycle_boosting then self.cycle_speed_multiplier:increase(200) end
+	self.cycle_speed_multiplier:update(dt)
 	
     -- Shoot
     self.shoot_timer = self.shoot_timer + dt
@@ -607,10 +616,12 @@ function Player:onBoostStart()
             self.area:addGameObject('InfoText', self.x, self.y, {text = 'Homing Projectile!', w = self.w, h = self.h})
         end
     end)
+	if self.increased_cycle_speed_while_boosting then self.cycle_boosting = true end
 end
 
 function Player:onBoostEnd()
     self.timer:cancel('launch_homing_projectile_while_boosting_chance')
+	if self.increased_cycle_speed_while_boosting then self.cycle_boosting = false end
 end
 
 function Player:barrage()
