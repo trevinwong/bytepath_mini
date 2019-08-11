@@ -16,6 +16,7 @@ function Player:new(area, x, y, opts)
 	self.resource_spawn_rate_multiplier = 1
 	self.attack_spawn_rate_multiplier = 1
 	self.turn_rate_multiplier = 1
+	self.boost_effectiveness_multiplier = 1
     self.aspd_multiplier = Stat(1)
 	self.mvspd_multiplier = Stat(1)
 	self.pspd_multiplier = Stat(1)
@@ -37,7 +38,7 @@ function Player:new(area, x, y, opts)
     self.spawn_sp_on_cycle_chance = 0
     self.barrage_on_kill_chance = 0
 	self.spawn_hp_on_cycle_chance = 0
-	self.regain_hp_on_cycle_chance = 0
+	self.regain_hp_on_cycle_chance = 50
 	self.regain_full_ammo_on_cycle_chance = 0
 	self.change_attack_on_cycle_chance = 0
 	self.spawn_haste_area_on_cycle_chance = 0
@@ -61,6 +62,7 @@ function Player:new(area, x, y, opts)
 	-- Passives
 	self.increased_cycle_speed_while_boosting = false
 	self.invulnerability_while_boosting = false
+	self.increased_luck_while_boosting = true
 	
     -- Geometry
     self.x, self.y = x, y
@@ -255,6 +257,7 @@ function Player:update(dt)
 	-- Luck
 	if self.luck_boosting then 
 		self.luck_multiplier:increase(200)
+		self.luck_multiplier:update(dt)
 		self:generateChances()
 	end
 	self.luck_multiplier:update(dt)
@@ -279,7 +282,7 @@ function Player:update(dt)
     if input:released('up') then self:onBoostEnd() end
     if input:down('up') and self.boost > 1 and self.can_boost then         
 		self.boosting = true
-        self.max_v = 1.5*self.base_max_v 
+        self.max_v = 1.5*self.base_max_v*self.boost_effectiveness_multiplier
         self.boost = self.boost - 50*dt
         if self.boost <= 1 then
             self.boosting = false
@@ -292,7 +295,7 @@ function Player:update(dt)
     if input:released('down') then self:onBoostEnd() end
     if input:down('down') and self.boost > 1 and self.can_boost then 
         self.boosting = true
-        self.max_v = 0.5*self.base_max_v 
+        self.max_v = 0.5*self.base_max_v/self.boost_effectiveness_multiplier
         self.boost = self.boost - 50*dt
         if self.boost <= 1 then
             self.boosting = false
