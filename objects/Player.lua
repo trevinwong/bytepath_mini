@@ -19,6 +19,7 @@ function Player:new(area, x, y, opts)
 	self.boost_effectiveness_multiplier = 1
 	self.projectile_size_multiplier = 1
 	self.boost_recharge_rate_multiplier = 1
+	self.invulnerability_time_multiplier = 1
     self.aspd_multiplier = Stat(1)
 	self.mvspd_multiplier = Stat(1)
 	self.pspd_multiplier = Stat(1)
@@ -498,7 +499,7 @@ function Player:hit(damage)
     if damage <= -30 then
         self.invincible = true
         self.invisible = true
-        self.timer:after(2, function()
+        self.timer:after(2 * self.invulnerability_time_multiplier, function()
                 self.invincible = false
                 self.invisible = false
             end)
@@ -511,12 +512,6 @@ function Player:hit(damage)
                     self.timer:after(0.05, f)
                 end
             end)
-        self.timer:every(0.04, function(f)
-                if self.invincible then
-                    self.invisible = not self.invisible
-                end
-            end,
-        18)
     else 
         flash(0.03)
         camera:shake(6, 60, 0.1)
