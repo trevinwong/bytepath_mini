@@ -21,6 +21,7 @@ function Player:new(area, x, y, opts)
 	self.boost_recharge_rate_multiplier = 1
 	self.invulnerability_time_multiplier = 1
 	self.ammo_consumption_multiplier = 1
+	self.size_multiplier = 1
     self.aspd_multiplier = Stat(1)
 	self.mvspd_multiplier = Stat(1)
 	self.pspd_multiplier = Stat(1)
@@ -70,7 +71,7 @@ function Player:new(area, x, y, opts)
 	
     -- Geometry
     self.x, self.y = x, y
-    self.w, self.h = 12, 12
+    self.w, self.h = 12 * self.size_multiplier, 12 * self.size_multiplier
     
     -- Ship
     self.ship = "Robo"
@@ -127,58 +128,58 @@ function Player:new(area, x, y, opts)
             self.area:addGameObject('TrailParticle', 
             self.x - 0.9*self.w*math.cos(self.r) + 0.2*self.w*math.cos(self.r - math.pi/2), 
             self.y - 0.9*self.w*math.sin(self.r) + 0.2*self.w*math.sin(self.r - math.pi/2), 
-            {parent = self, r = random(2, 4), d = random(0.15, 0.25), color = self.trail_color}) 
+            {parent = self, r = random(2, 4) * self.size_multiplier, d = random(0.15, 0.25), color = self.trail_color}) 
            self.area:addGameObject('TrailParticle', 
             self.x - 0.9*self.w*math.cos(self.r) + 0.2*self.w*math.cos(self.r + math.pi/2), 
             self.y - 0.9*self.w*math.sin(self.r) + 0.2*self.w*math.sin(self.r + math.pi/2), 
-            {parent = self, r = random(2, 4), d = random(0.15, 0.25), color = self.trail_color})
+            {parent = self, r = random(2, 4) * self.size_multiplier, d = random(0.15, 0.25), color = self.trail_color})
         elseif self.ship == "Brick" then
             self.area:addGameObject('TrailParticle', 
             self.x - 0.9*self.w*math.cos(self.r), 
             self.y - 0.9*self.w*math.sin(self.r), 
-            {parent = self, r = random(4, 5), d = random(0.15, 0.25), color = self.trail_color})            
+            {parent = self, r = random(4, 5) * self.size_multiplier, d = random(0.15, 0.25), color = self.trail_color})            
         elseif self.ship == "Rocket" then
             self.area:addGameObject('TrailParticle', 
             self.x - 0.9*self.w*math.cos(self.r), 
             self.y - 0.9*self.w*math.sin(self.r), 
-            {parent = self, r = random(3, 4), d = random(0.15, 0.25), color = self.trail_color})            
+            {parent = self, r = random(3, 4) * self.size_multiplier, d = random(0.15, 0.25), color = self.trail_color})            
         elseif self.ship == "Night" then
             self.area:addGameObject('TrailParticle', 
             self.x - 0.9*self.w*math.cos(self.r) + 0.4*self.w*math.cos(self.r - math.pi/2), 
             self.y - 0.9*self.w*math.sin(self.r) + 0.4*self.w*math.sin(self.r - math.pi/2), 
-            {parent = self, r = random(2, 3), d = random(0.15, 0.25), color = self.trail_color})      
+            {parent = self, r = random(2, 3) * self.size_multiplier, d = random(0.15, 0.25), color = self.trail_color})      
             self.area:addGameObject('TrailParticle', 
             self.x - 0.9*self.w*math.cos(self.r) + 0.4*self.w*math.cos(self.r + math.pi/2),  
             self.y - 0.9*self.w*math.sin(self.r) + 0.4*self.w*math.sin(self.r + math.pi/2), 
-            {parent = self, r = random(2, 3), d = random(0.15, 0.25), color = self.trail_color})      
+            {parent = self, r = random(2, 3) * self.size_multiplier, d = random(0.15, 0.25), color = self.trail_color})      
         elseif self.ship == "Crystal" then
             self.area:addGameObject('TrailParticle', 
             self.x - 0.9*self.w*math.cos(self.r), 
             self.y - 0.9*self.w*math.sin(self.r), 
-            {parent = self, r = random(3, 5), d = random(0.15, 0.25), color = self.trail_color})               
+            {parent = self, r = random(3, 5) * self.size_multiplier, d = random(0.15, 0.25), color = self.trail_color})               
         elseif self.ship == "Robo" then
             self.area:addGameObject('TrailParticle', 
             self.x - 0.9*self.w*math.cos(self.r) + 0.5*self.w*math.cos(self.r - math.pi/2), 
             self.y - 0.9*self.w*math.sin(self.r) + 0.5*self.w*math.sin(self.r - math.pi/2), 
-            {parent = self, r = random(3, 4), d = random(0.15, 0.25), color = self.trail_color})      
+            {parent = self, r = random(3, 4) * self.size_multiplier, d = random(0.15, 0.25), color = self.trail_color})      
             self.area:addGameObject('TrailParticle', 
             self.x - 0.9*self.w*math.cos(self.r) + 0.5*self.w*math.cos(self.r + math.pi/2),  
             self.y - 0.9*self.w*math.sin(self.r) + 0.5*self.w*math.sin(self.r + math.pi/2), 
-            {parent = self, r = random(3, 4), d = random(0.15, 0.25), color = self.trail_color})             
+            {parent = self, r = random(3, 4) * self.size_multiplier, d = random(0.15, 0.25), color = self.trail_color})             
         elseif self.ship == "Freedom" then
             self.area:addGameObject('TrailParticle', 
             self.x - 0.9*self.w*math.cos(self.r) + 0.2*self.w*math.cos(self.r - math.pi/2), 
             self.y - 0.9*self.w*math.sin(self.r) + 0.2*self.w*math.sin(self.r - math.pi/2), 
-            {parent = self, r = random(2, 4), d = random(0.15, 0.25), color = self.trail_color}) 
+            {parent = self, r = random(2, 4) * self.size_multiplier, d = random(0.15, 0.25), color = self.trail_color}) 
            self.area:addGameObject('TrailParticle', 
             self.x - 0.9*self.w*math.cos(self.r) + 0.2*self.w*math.cos(self.r + math.pi/2), 
             self.y - 0.9*self.w*math.sin(self.r) + 0.2*self.w*math.sin(self.r + math.pi/2), 
-            {parent = self, r = random(2, 4), d = random(0.15, 0.25), color = self.trail_color})   
+            {parent = self, r = random(2, 4) * self.size_multiplier, d = random(0.15, 0.25), color = self.trail_color})   
         elseif self.ship == "Stabbinator" then
             self.area:addGameObject('TrailParticle', 
             self.x - 0.4*self.w*math.cos(self.r), 
             self.y - 0.4*self.w*math.sin(self.r), 
-            {parent = self, r = random(4, 6), d = random(0.15, 0.25), color = self.trail_color})      
+            {parent = self, r = random(4, 6) * self.size_multiplier, d = random(0.15, 0.25), color = self.trail_color})      
         end
     end)
 
@@ -334,9 +335,9 @@ function Player:draw()
     for _, polygon in ipairs(self.polygons) do
         local points = M.map(polygon, function(v, k) 
         	if k % 2 == 1 then 
-          		return self.x + v + random(-1, 1) 
+          		return (self.x + v + random(-1, 1))
         	else 
-          		return self.y + v + random(-1, 1) 
+          		return (self.y + v + random(-1, 1))
         	end 
       	end)
         love.graphics.polygon('line', points)
