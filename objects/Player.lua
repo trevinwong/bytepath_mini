@@ -22,6 +22,7 @@ function Player:new(area, x, y, opts)
 	self.invulnerability_time_multiplier = 1
 	self.ammo_consumption_multiplier = 1
 	self.size_multiplier = 1
+	self.stat_boost_duration_multiplier = 1
     self.aspd_multiplier = Stat(1)
 	self.mvspd_multiplier = Stat(1)
 	self.pspd_multiplier = Stat(1)
@@ -43,7 +44,7 @@ function Player:new(area, x, y, opts)
     self.spawn_sp_on_cycle_chance = 0
     self.barrage_on_kill_chance = 0
 	self.spawn_hp_on_cycle_chance = 0
-	self.regain_hp_on_cycle_chance = 50
+	self.regain_hp_on_cycle_chance = 0
 	self.regain_full_ammo_on_cycle_chance = 0
 	self.change_attack_on_cycle_chance = 0
 	self.spawn_haste_area_on_cycle_chance = 0
@@ -591,19 +592,17 @@ function Player:onCycle()
         self.area:addGameObject('InfoText', self.x, self.y, {text = 'Homing Projectile!', w = self.w, h = self.h})
     end
     if self.chances.mvspd_boost_on_cycle_chance:next() then
-        self.mvspd_boosting = true
-        self.timer:after(4, function() self.mvspd_boosting = false end)
+		self:applyStatus(4, "mvspd_boosting")
         self.area:addGameObject('InfoText', self.x, self.y, 
       	{text = 'MVSPD Boost!', color = boost_color, w = self.w, h = self.h})
     end
     if self.chances.pspd_boost_on_cycle_chance:next() then
-        self.pspd_boosting = true
-        self.timer:after(4, function() self.pspd_boosting = false end)
+		self:applyStatus(4, "pspd_boosting")
         self.area:addGameObject('InfoText', self.x, self.y, 
       	{text = 'PSPD Boost!', color = skill_point_color, w = self.w, h = self.h})
     end
     if self.chances.pspd_inhibit_on_cycle_chance:next() then
-        self.pspd_inhibiting = true
+		self:applyStatus(4, "pspd_inhibiting")
         self.timer:after(4, function() self.pspd_inhibiting = false end)
         self.area:addGameObject('InfoText', self.x, self.y, 
       	{text = 'PSPD Inhibit!', color = skill_point_color, w = self.w, h = self.h})
@@ -719,4 +718,11 @@ function Player:launchHomingProjectile()
 	self.area:addGameObject('Projectile', 
 	self.x + d*math.cos(self.r), self.y + d*math.sin(self.r), 
 	{r = self.r, attack = 'Homing'})
+end
+
+function Player:applyStatus(base_seconds, name)
+	self[name] = true
+	self.timer:after(base_seconds * self.stat_boost_duration_multiplier, function() 
+		self[name] = false
+	end)
 end
