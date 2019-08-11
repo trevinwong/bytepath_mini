@@ -23,6 +23,7 @@ function Player:new(area, x, y, opts)
 	self.ammo_consumption_multiplier = 1
 	self.size_multiplier = 1
 	self.stat_boost_duration_multiplier = 1
+	self.angle_change_frequency_multiplier = 1
     self.aspd_multiplier = Stat(1)
 	self.mvspd_multiplier = Stat(1)
 	self.pspd_multiplier = Stat(1)
@@ -70,7 +71,7 @@ function Player:new(area, x, y, opts)
 	self.invulnerability_while_boosting = false
 	self.increased_luck_while_boosting = false
     self.projectile_ninety_degree_change = false
-	self.projectile_random_degree_change = true
+	self.projectile_random_degree_change = false
 	
     -- Geometry
     self.x, self.y = x, y
