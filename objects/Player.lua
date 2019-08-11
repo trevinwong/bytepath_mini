@@ -51,6 +51,7 @@ function Player:new(area, x, y, opts)
 	self.drop_double_ammo_chance = 0
 	self.attack_twice_chance = 0
 	self.spawn_double_hp_chance = 0
+	self.spawn_double_sp_chance = 0
 	
 	-- Passives
 	self.increased_cycle_speed_while_boosting = false
@@ -648,6 +649,13 @@ function Player:onResourceSpawn(resource_name)
 			self.area:addGameObject('HP')
 			self.area:addGameObject('InfoText', self.x, self.y, 
 			{text = 'Double HP Spawn!', color = hp_color, w = self.w, h = self.h})
+		end
+	end
+	if resource_name == 'SP' then
+		if self.chances.spawn_double_sp_chance:next() then
+			self.area:addGameObject('SP')
+			self.area:addGameObject('InfoText', self.x, self.y, 
+			{text = 'Double SP Spawn!', color = skill_point_color, w = self.w, h = self.h})
 		end
 	end
 end
