@@ -68,7 +68,9 @@ function Player:new(area, x, y, opts)
 	-- Passives
 	self.increased_cycle_speed_while_boosting = false
 	self.invulnerability_while_boosting = false
-	self.increased_luck_while_boosting = true
+	self.increased_luck_while_boosting = false
+    self.projectile_ninety_degree_change = false
+	self.projectile_random_degree_change = true
 	
     -- Geometry
     self.x, self.y = x, y
@@ -113,7 +115,7 @@ function Player:new(area, x, y, opts)
     -- Attacks
     self.shoot_timer = 0
     self.shoot_cooldown = 0.24
-    self:setAttack('Homing')
+    self:setAttack('Neutral')
 
     -- Test
     input:bind('f4', function() self:die() end)
