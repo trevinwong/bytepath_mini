@@ -55,7 +55,8 @@ function Director:new(area, x, y, opts)
 	self:setEnemySpawnsForThisRound()
 	
 	-- Resources
-	self.resource_spawn_chances = chanceList({'Boost', 28}, {'HP', 14}, {'SP', 58})
+    self.resource_spawn_chances = chanceList({'Boost', 28}, 
+    {'HP', 14*self.player.hp_spawn_chance_multiplier}, {'SP', 58*self.player.sp_spawn_chance_multiplier})
 	self.timer:every(16, function()
 			self.area:addGameObject(self.resource_spawn_chances:next())
 		end
@@ -81,23 +82,6 @@ end
 
 function Director:setEnemySpawnsForThisRound()
     local points = self.difficulty_to_points[self.difficulty]
-
-	--[[
-		Exercise 118:
-			Interestingly enough, the existing code already handles this case. The author claims that the while loop will get stuck if we can only spawn
-			enemies with point values higher than the number of points we currently have to allocate for enemies.
-			
-			This is actually not the case however, since we don't actually care how many points we have remaining since our number of points can be negative
-			due to the fact that we do a simple subtraction. So even if we only have 1 point remaining, we can actually just spawn an enemy with an extremely
-			high point value, and that'll exit the loop since our number of points will be lower or equal to 0.
-			
-			If, however, the case that the author claims would happen were to actually happen, I would simply just spawn the lowest value enemy for that wave
-			and call it a day. But to be honest, I don't think the above scenario is actually a bad alternative (technically our player could get a little
-			screwed over by RNG), but since it's just 1 enemy, I don't think it will influence the gameplay that much.
-			
-			This is actually mentioned in the post itself by another reader. Reading the author's response, I do agree that one should be very careful with
-			using while loops - perhaps it's a good routine to always think - "is there a way that this can not terminate?"
-	]]--
 
     -- Find enemies
     local enemy_list = {}

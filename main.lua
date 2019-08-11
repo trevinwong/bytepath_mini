@@ -91,7 +91,6 @@ function love.load()
         end
     )
     
-
     current_room = Stage()
 end
 

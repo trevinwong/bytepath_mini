@@ -15,7 +15,7 @@ function Stage:new()
     self.main_canvas = love.graphics.newCanvas(gw, gh)
     camera.smoother = Camera.smooth.damped(5)
     
-    self.director = self.area:addGameObject('Director', 0, 0)
+    self.director = self.area:addGameObject('Director', 0, 0, {player = self.player})
     self.score = 0
     self.font = fonts.m5x7_16
     

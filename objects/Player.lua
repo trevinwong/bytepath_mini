@@ -9,10 +9,13 @@ function Player:new(area, x, y, opts)
     self.hp_multiplier = 1
 	self.ammo_multiplier = 1
 	self.boost_multiplier = 1
+    self.hp_spawn_chance_multiplier = 1
+	self.sp_spawn_chance_multiplier = 1
     self.aspd_multiplier = Stat(1)
 	self.mvspd_multiplier = Stat(1)
 	self.pspd_multiplier = Stat(1)
 	self.cycle_speed_multiplier = Stat(1)
+	self.luck_multiplier = Stat(1)
 
 	-- Flats
     self.flat_hp = 0
@@ -239,6 +242,13 @@ function Player:update(dt)
 	if self.cycle_boosting then self.cycle_speed_multiplier:increase(200) end
 	self.cycle_speed_multiplier:update(dt)
 	
+	-- Luck
+	if self.luck_boosting then 
+		self.luck_multiplier:increase(200)
+		self:generateChances()
+	end
+	self.luck_multiplier:update(dt)
+	
     -- Shoot
     self.shoot_timer = self.shoot_timer + dt
     if self.shoot_timer > self.shoot_cooldown/self.aspd_multiplier.value then
@@ -454,8 +464,10 @@ function Player:generateChances()
     self.chances = {}
     for k, v in pairs(self) do
         if k:find('_chance') and type(v) == 'number' then
-      	    self.chances[k] = chanceList({true, math.ceil(v)}, {false, 100-math.ceil(v)})
-      	end
+      	    self.chances[k] = chanceList(
+            {true, math.ceil(v*self.luck_multiplier.value)}, 
+            {false, 100-math.ceil(v*self.luck_multiplier.value)})
+        end
     end
 end
 
@@ -621,6 +633,9 @@ function Player:onBoostStart()
             self.area:addGameObject('InfoText', self.x, self.y, {text = 'Homing Projectile!', w = self.w, h = self.h})
         end
     end)
+    if self.increased_luck_while_boosting then 
+    	self.luck_boosting = true
+    end
 	if self.increased_cycle_speed_while_boosting then 
 		self.cycle_boosting = true 
 		self.area:addGameObject('InfoText', self.x, self.y, {text = 'Cycle Boost!', w = self.w, h = self.h})
