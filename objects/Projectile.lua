@@ -10,6 +10,8 @@ function Projectile:new(area, x, y, opts)
     self.color = attacks[self.attack].color
     self.damage = attacks[self.attack].damage or 100
     
+    self:applyPspd()
+    
     self.collider = self.area.world:newCircleCollider(self.x, self.y, self.s)
     self.collider:setCollisionClass('Projectile')
     self.collider:setObject(self)
@@ -22,8 +24,6 @@ function Projectile:update(dt)
     if self.y < 0 then self:die() end
     if self.x > gw then self:die() end
     if self.y > gh then self:die() end
-    
-    self.v = math.min(self.v, self.max_v) * current_room.player.pspd_multiplier.value
     
     if self.collider:enter('Enemy') then
         local collision_data = self.collider:getEnterCollisionData('Enemy')
@@ -39,8 +39,10 @@ function Projectile:update(dt)
     if self.collider:enter('EnemyProjectile') then
         local collision_data = self.collider:getEnterCollisionData('EnemyProjectile')
         local object = collision_data.collider:getObject()
-        object:die()
-        self:die()
+        if object then
+            object:die()
+            self:die()
+        end
     end
     
     -- Homing
@@ -102,4 +104,15 @@ function Projectile:die()
     self.dead = true
     self.area:addGameObject('ProjectileDeathEffect', self.x, self.y, 
     {color = hp_color, w = 3*self.s})
+end
+
+--[[
+    The previous method of applying the Pspd stat on every tick worked for the "Pspd Boost" because we had a max velocity.
+    However, this does not work for the "Pspd Inhibit", for reasons I should have seen coming, since it'll trend our velocity infinitely close to 0.
+    Of course, the solution is to just apply Pspd once.
+]]--
+function Projectile:applyPspd()
+    if current_room and current_room.player then
+        self.v = math.min(self.v, self.max_v) * current_room.player.pspd_multiplier.value
+    end
 end
