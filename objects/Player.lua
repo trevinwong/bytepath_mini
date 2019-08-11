@@ -18,6 +18,7 @@ function Player:new(area, x, y, opts)
 	self.turn_rate_multiplier = 1
 	self.boost_effectiveness_multiplier = 1
 	self.projectile_size_multiplier = 1
+	self.boost_recharge_rate_multiplier = 1
     self.aspd_multiplier = Stat(1)
 	self.mvspd_multiplier = Stat(1)
 	self.pspd_multiplier = Stat(1)
@@ -272,7 +273,7 @@ function Player:update(dt)
     end
     
     -- Boost/Movement
-    self.boost = math.min(self.boost + 10*dt, self.max_boost)
+    self.boost = math.min(self.boost + 10*dt*self.boost_recharge_rate_multiplier, self.max_boost)
     self.boost_timer = self.boost_timer + dt
     if self.boost_timer > self.boost_cooldown then self.can_boost = true end
     
