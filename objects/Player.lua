@@ -47,6 +47,7 @@ function Player:new(area, x, y, opts)
 	
 	-- Passives
 	self.increased_cycle_speed_while_boosting = false
+	self.invulnerability_while_boosting = false
 	
     -- Geometry
     self.x, self.y = x, y
@@ -161,6 +162,9 @@ function Player:new(area, x, y, opts)
             {parent = self, r = random(4, 6), d = random(0.15, 0.25), color = self.trail_color})      
         end
     end)
+
+	-- Color
+	self.color = default_color
 
     -- treeToPlayer(self)
     self:setStats()
@@ -296,8 +300,9 @@ end
 
 function Player:draw()
     if self.invisible then return end
+	
     pushRotate(self.x, self.y, self.r)
-    love.graphics.setColor(default_color)
+    love.graphics.setColor(self.color)
     for _, polygon in ipairs(self.polygons) do
         local points = M.map(polygon, function(v, k) 
         	if k % 2 == 1 then 
@@ -616,12 +621,20 @@ function Player:onBoostStart()
             self.area:addGameObject('InfoText', self.x, self.y, {text = 'Homing Projectile!', w = self.w, h = self.h})
         end
     end)
-	if self.increased_cycle_speed_while_boosting then self.cycle_boosting = true end
+	if self.increased_cycle_speed_while_boosting then 
+		self.cycle_boosting = true 
+		self.area:addGameObject('InfoText', self.x, self.y, {text = 'Cycle Boost!', w = self.w, h = self.h})
+	end
+	if self.invulnerability_while_boosting then 
+		self.invincible = true 
+		self.area:addGameObject('InfoText', self.x, self.y, {text = 'Invincible!', w = self.w, h = self.h})
+	end
 end
 
 function Player:onBoostEnd()
     self.timer:cancel('launch_homing_projectile_while_boosting_chance')
 	if self.increased_cycle_speed_while_boosting then self.cycle_boosting = false end
+	if self.invulnerability_while_boosting then self.invincible = false end
 end
 
 function Player:barrage()
