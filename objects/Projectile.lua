@@ -44,6 +44,21 @@ function Projectile:new(area, x, y, opts)
             end)
         end)
     end
+
+    if current_room.player.fast_slow then
+        local initial_v = self.v
+        self.timer:tween('fast_slow_first', 0.2/current_room.player.projectile_acceleration_multiplier, self, {v = 2*initial_v}, 'in-out-cubic', function()
+            self.timer:tween('fast_slow_second', 0.3, self, {v = initial_v/2}, 'linear')
+        end)
+    end
+
+    if current_room.player.slow_fast then
+        local initial_v = self.v
+        self.timer:tween('slow_fast_first', 0.2, self, {v = initial_v/2}, 'in-out-cubic', function()
+            self.timer:tween('slow_fast_second', 0.3/current_room.player.projectile_acceleration_multiplier, self, {v = 2*initial_v}, 'linear')
+        end)
+    end
+
     
     self.collider = self.area.world:newCircleCollider(self.x, self.y, self.s)
     self.collider:setCollisionClass('Projectile')

@@ -25,6 +25,7 @@ function Player:new(area, x, y, opts)
 	self.stat_boost_duration_multiplier = 1
 	self.angle_change_frequency_multiplier = 1
 	self.projectile_waviness_multiplier = 1
+	self.projectile_acceleration_multiplier = 1
     self.aspd_multiplier = Stat(1)
 	self.mvspd_multiplier = Stat(1)
 	self.pspd_multiplier = Stat(1)
@@ -73,7 +74,9 @@ function Player:new(area, x, y, opts)
 	self.increased_luck_while_boosting = false
     self.projectile_ninety_degree_change = false
 	self.projectile_random_degree_change = false
-	self.wavy_projectiles = true
+	self.wavy_projectiles = false
+	self.fast_slow = false
+	self.slow_fast = false
 	
     -- Geometry
     self.x, self.y = x, y
