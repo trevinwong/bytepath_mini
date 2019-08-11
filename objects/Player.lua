@@ -49,6 +49,7 @@ function Player:new(area, x, y, opts)
 	self.pspd_inhibit_on_cycle_chance = 0
     self.launch_homing_projectile_while_boosting_chance = 0
 	self.drop_double_ammo_chance = 0
+	self.attack_twice_chance = 100
 	
 	-- Passives
 	self.increased_cycle_speed_while_boosting = false
@@ -256,6 +257,7 @@ function Player:update(dt)
     if self.shoot_timer > self.shoot_cooldown/self.aspd_multiplier.value then
         self.shoot_timer = 0
         self:shoot()
+		self:onShoot()
     end
     
     -- Boost/Movement
@@ -600,7 +602,7 @@ function Player:onKill(enemy_death_location)
 	self.area:addGameObject('Ammo', unpack(enemy_death_location))
 	if self.chances.drop_double_ammo_chance:next() then
 		self.area:addGameObject('Ammo', unpack(enemy_death_location))
-		self.area:addGameObject('InfoText', self.x, self.y, {text = 'Double Ammo!', w = self.w, h = self.h})
+		self.area:addGameObject('InfoText', self.x, self.y, {text = 'Double Ammo!', color = ammo_color, w = self.w, h = self.h})
 	end
     if self.chances.barrage_on_kill_chance:next() then
 		self:barrage()
@@ -629,6 +631,14 @@ function Player:onKill(enemy_death_location)
         self.area:addGameObject('InfoText', self.x, self.y, 
       	{text = 'ASPD Boost!', color = ammo_color, w = self.w, h = self.h})
     end
+end
+
+function Player:onShoot()
+	if self.chances.attack_twice_chance:next() then
+		self:shoot()
+		self.area:addGameObject('InfoText', self.x, self.y, 
+		{text = 'Double Attack!', color = default_color, w = self.w, h = self.h})
+	end
 end
 
 function Player:onBoostStart()
