@@ -41,6 +41,14 @@ function selectRandomKey(t)
 	end
 	return keys[love.math.random(1, #keys)]
 end
+
+function table.merge(t1, t2)
+    local new_table = {}
+    for k, v in pairs(t2) do new_table[k] = v end
+    for k, v in pairs(t1) do new_table[k] = v end
+    return new_table
+end
+
 -- Memory leak checking
 
 function count_all(f)

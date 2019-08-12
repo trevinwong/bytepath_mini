@@ -27,6 +27,7 @@ function Player:new(area, x, y, opts)
 	self.projectile_waviness_multiplier = 1
 	self.projectile_acceleration_multiplier = 1
 	self.projectile_deceleration_multiplier = 1
+	self.projectile_duration_multiplier = 2
     self.aspd_multiplier = Stat(1)
 	self.mvspd_multiplier = Stat(1)
 	self.pspd_multiplier = Stat(1)
@@ -68,6 +69,7 @@ function Player:new(area, x, y, opts)
 	self.spawn_double_hp_chance = 0
 	self.spawn_double_sp_chance = 0
 	self.gain_double_sp_chance = 0
+    self.shield_projectile_chance = 0
 	
 	-- Passives
 	self.increased_cycle_speed_while_boosting = false
@@ -76,7 +78,7 @@ function Player:new(area, x, y, opts)
     self.projectile_ninety_degree_change = false
 	self.projectile_random_degree_change = false
 	self.wavy_projectiles = false
-	self.fast_slow = true
+	self.fast_slow = false
 	self.slow_fast = false
 	
     -- Geometry
@@ -122,7 +124,7 @@ function Player:new(area, x, y, opts)
     -- Attacks
     self.shoot_timer = 0
     self.shoot_cooldown = 0.24
-    self:setAttack('Neutral')
+    self:setAttack('Flame')
 
     -- Test
     input:bind('f4', function() self:die() end)
@@ -362,62 +364,85 @@ function Player:shoot()
 
     self.ammo = self.ammo - (attacks[self.attack].ammo * self.ammo_consumption_multiplier)
 
+    local mods = {
+        shield = self.chances.shield_projectile_chance:next()
+    }
+	
     if self.attack == 'Neutral' then
         self.area:addGameObject('Projectile', 
-      	self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), {r = self.r, attack = self.attack})
+      	self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), table.merge({r = self.r, attack = self.attack}, mods))
     elseif self.attack == 'Double' then
         self.area:addGameObject('Projectile', 
     	self.x + 1.5*d*math.cos(self.r + math.pi/12), 
     	self.y + 1.5*d*math.sin(self.r + math.pi/12), 
-    	{r = self.r + math.pi/12, attack = self.attack})
+    	table.merge({r = self.r + math.pi/12, attack = self.attack}, mods))
         
         self.area:addGameObject('Projectile', 
     	self.x + 1.5*d*math.cos(self.r - math.pi/12),
     	self.y + 1.5*d*math.sin(self.r - math.pi/12), 
-    	{r = self.r - math.pi/12, attack = self.attack})
+    	table.merge({r = self.r - math.pi/12, attack = self.attack}, mods))
     elseif self.attack == 'Triple' then
         self.area:addGameObject('Projectile', 
-      	self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), {r = self.r, attack = self.attack})
+      	self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), table.merge({r = self.r, attack = self.attack}, mods))
     
         self.area:addGameObject('Projectile', 
     	self.x + 1.5*d*math.cos(self.r + math.pi/12), 
     	self.y + 1.5*d*math.sin(self.r + math.pi/12), 
-    	{r = self.r + math.pi/12, attack = self.attack})
+    	table.merge({r = self.r + math.pi/12, attack = self.attack}, mods))
         
         self.area:addGameObject('Projectile', 
     	self.x + 1.5*d*math.cos(self.r - math.pi/12),
     	self.y + 1.5*d*math.sin(self.r - math.pi/12), 
-    	{r = self.r - math.pi/12, attack = self.attack})       
+    	table.merge({r = self.r - math.pi/12, attack = self.attack}, mods))       
     elseif self.attack == 'Rapid' then
         self.area:addGameObject('Projectile', 
-      	self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), {r = self.r, attack = self.attack})
+      	self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), table.merge({r = self.r, attack = self.attack}, mods))
     elseif self.attack == 'Spread' then
         local t = love.math.random()
         local r = (t * (-math.pi/8)) + ((1-t) * (math.pi/8))
         self.area:addGameObject('Projectile', 
-      	self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), {r = self.r + r, attack = self.attack})
+      	self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), table.merge({r = self.r + r, attack = self.attack}, mods))
         attacks[self.attack].color = table.random(all_colors)
     elseif self.attack == 'Back' then
         self.area:addGameObject('Projectile', 
-      	self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), {r = self.r, attack = self.attack})
+      	self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), table.merge({r = self.r, attack = self.attack}, mods))
     
         local back_r = self.r - math.pi
         self.area:addGameObject('Projectile', 
-      	self.x + 1.5*d*math.cos(back_r), self.y + 1.5*d*math.sin(back_r), {r = back_r, attack = self.attack})
+      	self.x + 1.5*d*math.cos(back_r), self.y + 1.5*d*math.sin(back_r), table.merge({r = back_r, attack = self.attack}, mods))
     elseif self.attack == 'Side' then
         self.area:addGameObject('Projectile', 
-      	self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), {r = self.r, attack = self.attack})
+      	self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), table.merge({r = self.r, attack = self.attack}, mods))
     
         local side1_r = self.r - math.pi/2
         self.area:addGameObject('Projectile', 
-      	self.x + 1.5*d*math.cos(side1_r), self.y + 1.5*d*math.sin(side1_r), {r = side1_r, attack = self.attack})
+      	self.x + 1.5*d*math.cos(side1_r), self.y + 1.5*d*math.sin(side1_r), table.merge({r = side1_r, attack = self.attack}, mods))
     
         local side2_r = self.r + math.pi/2
         self.area:addGameObject('Projectile', 
-      	self.x + 1.5*d*math.cos(side2_r), self.y + 1.5*d*math.sin(side2_r), {r = side2_r, attack = self.attack})
+      	self.x + 1.5*d*math.cos(side2_r), self.y + 1.5*d*math.sin(side2_r), table.merge({r = side2_r, attack = self.attack}, mods))
     elseif self.attack == 'Homing' then
 		local projectile = self.area:addGameObject('Projectile', 
-      	self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), {r = self.r, attack = self.attack, s = 8})
+      	self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), table.merge({r = self.r, attack = self.attack, s = 8}, mods))
+	elseif self.attack == 'Blast' then
+        for i = 1, 12 do
+            local random_angle = random(-math.pi/6, math.pi/6)
+            self.area:addGameObject('Projectile', 
+      	        self.x + 1.5*d*math.cos(self.r + random_angle), 
+      	        self.y + 1.5*d*math.sin(self.r + random_angle), 
+            table.merge({r = self.r + random_angle, attack = self.attack, 
+          	v = random(500, 600)}, mods))
+        end
+        camera:shake(4, 60, 0.4)
+    elseif self.attack == 'Spin' then
+        self.area:addGameObject('Projectile', 
+    	self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), 
+    	table.merge({r = self.r, attack = self.attack}, mods))
+    elseif self.attack == 'Flame' then
+		local random_angle = random(-math.pi/20, math.pi/20)
+		self.area:addGameObject('Projectile', 
+    	self.x + 1.5*d*math.cos(self.r + random_angle), self.y + 1.5*d*math.sin(self.r + random_angle), 
+    	table.merge({r = self.r + random_angle, attack = self.attack, v = random(250, 300)}, mods))
 	end
     
     if self.ammo <= 0 then 

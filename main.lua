@@ -34,6 +34,7 @@ function love.load()
     camera = Camera()
     timer = Timer()
 
+    time = 0
     slow_amount = 1
     flash_frames = nil
     resize(3)
@@ -101,7 +102,7 @@ function love.update(dt)
 --    love.report = love.profiler.report('time', 20)
 --    love.profiler.reset()
 --  end
-  
+    time = time + dt
     timer:update(dt*slow_amount)
     camera:update(dt*slow_amount)
     if flash_seconds then 

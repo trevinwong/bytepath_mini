@@ -9,6 +9,7 @@ function Projectile:new(area, x, y, opts)
     self.v = opts.v or self.max_v
     self.color = attacks[self.attack].color
     self.damage = attacks[self.attack].damage or 100
+    self.rv = table.random({random(-2*math.pi, -math.pi), random(math.pi, 2*math.pi)})
     
     self:applyPspdMultiplier()
     self:applySizeMultiplier()
@@ -58,12 +59,59 @@ function Projectile:new(area, x, y, opts)
             self.timer:tween('slow_fast_second', 0.3/current_room.player.projectile_acceleration_multiplier, self, {v = 2*initial_v}, 'linear')
         end)
     end
+	
+    if self.attack == 'Blast' then
+        self.damage = 75
+        self.color = table.random(negative_colors)
+    	if not self.shield then
+            self.timer:tween(random(0.4, 0.6) * current_room.player.projectile_duration_multiplier, self, {v = 0}, 'linear', function() 
+                self:die() 
+            end)
+      	end
+	end
+	
+	if self.attack == 'Spin' then
+		self.rv = table.random({random(-2*math.pi, -math.pi), random(math.pi, 2*math.pi)})
+        self.timer:every(0.05, function()
+            self.area:addGameObject('ProjectileTrail', self.x, self.y, 
+            {r = Vector(self.collider:getLinearVelocity()):angleTo(), 
+            color = self.color, s = self.s})
+        end)
+    	if not self.shield then
+			self.timer:after(random(2.4, 3.2) * current_room.player.projectile_duration_multiplier, function() self:die() end)
+		end
+	end
+	
+	if self.attack == 'Flame' then
+		self.damage = 50
+        self.timer:every(0.05, function()
+            self.area:addGameObject('ProjectileTrail', self.x, self.y, 
+            {r = Vector(self.collider:getLinearVelocity()):angleTo(), 
+            color = self.color, s = self.s})
+        end)
+    	if not self.shield then
+            self.timer:tween(random(0.6, 0.8) * current_room.player.projectile_duration_multiplier, self, {v = 0}, 'linear', function() 
+                self:die() 
+            end)
+      	end
+	end
 
+    if self.shield then
+        self.orbit_distance = random(32, 64)
+        self.orbit_speed = random(-6, 6)
+        self.orbit_offset = random(0, 2*math.pi)
+        
+        self.invisible = true
+    	self.timer:after(0.05, function() self.invisible = false end)
+    	self.timer:after(6 * current_room.player.projectile_duration_multiplier, function() self:die() end)
+    end
     
     self.collider = self.area.world:newCircleCollider(self.x, self.y, self.s)
     self.collider:setCollisionClass('Projectile')
     self.collider:setObject(self)
     self.collider:setLinearVelocity(self.v*math.cos(self.r), self.v*math.sin(self.r))
+    
+    self.previous_x, self.previous_y = self.collider:getPosition()
 end
 
 function Projectile:update(dt)
@@ -92,6 +140,10 @@ function Projectile:update(dt)
             self:die()
         end
     end
+	
+	if self.attack == 'Spin' then
+    	self.r = self.r + self.rv*dt
+	end
     
     -- Homing
     if self.attack == 'Homing' then
@@ -119,14 +171,29 @@ function Projectile:update(dt)
         
         self.area:addGameObject('TrailParticle', self.x, self.y,
         {r = random(1, 3), d = random(0.15, 0.25), color = skill_point_color}) 
-    else
+	else
         -- We can only set linear velocity once for some reason, so this case is for normal movement
         self.collider:setLinearVelocity(self.v*math.cos(self.r), self.v*math.sin(self.r))
     end
-
+    
+    -- Shield
+    if self.shield then
+        local player = current_room.player
+        self.collider:setPosition(
+      	player.x + self.orbit_distance*math.cos(self.orbit_speed*time + self.orbit_offset),
+      	player.y + self.orbit_distance*math.sin(self.orbit_speed*time + self.orbit_offset))
+    
+        local x, y = self.collider:getPosition()
+        local dx, dy = x - self.previous_x, y - self.previous_y
+        self.r = Vector(dx, dy):angleTo()
+    end
+    
+    self.previous_x, self.previous_y = self.collider:getPosition()
 end
 
 function Projectile:draw()
+    if self.invisible then return end
+
     if self.attack == 'Homing' then
         pushRotate(self.x, self.y, Vector(self.collider:getLinearVelocity()):angleTo()) 
         love.graphics.setColor(skill_point_color)
@@ -142,7 +209,11 @@ function Projectile:draw()
     love.graphics.setLineWidth(self.s - self.s/4)
     love.graphics.setColor(self.color)
     love.graphics.line(self.x - 2*self.s, self.y, self.x, self.y)
-    love.graphics.setColor(default_color)
+	if self.attack == 'Flame' then
+		love.graphics.setColor(skill_point_color)
+	else 
+		love.graphics.setColor(default_color)
+	end
     love.graphics.line(self.x, self.y, self.x + 2*self.s, self.y)
     love.graphics.setLineWidth(1)
     love.graphics.pop()
@@ -150,8 +221,9 @@ end
 
 function Projectile:die()
     self.dead = true
+	local death_color = (self.color == default_color) and hp_color or self.color
     self.area:addGameObject('ProjectileDeathEffect', self.x, self.y, 
-    {color = hp_color, w = 3*self.s})
+    {color = death_color, w = 3*self.s})
 end
 
 --[[
