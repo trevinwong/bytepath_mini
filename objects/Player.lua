@@ -124,7 +124,7 @@ function Player:new(area, x, y, opts)
     -- Attacks
     self.shoot_timer = 0
     self.shoot_cooldown = 0.24
-    self:setAttack('2Split')
+    self:setAttack('4Split')
 
     -- Test
 	self.dont_move = false
@@ -425,7 +425,7 @@ function Player:shoot()
       	self.x + 1.5*d*math.cos(side2_r), self.y + 1.5*d*math.sin(side2_r), table.merge({r = side2_r, attack = self.attack}, mods))
     elseif self.attack == 'Homing' then
 		local projectile = self.area:addGameObject('Projectile', 
-      	self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), table.merge({r = self.r, attack = self.attack, s = 8}, mods))
+      	self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), table.merge({r = self.r, attack = self.attack, s = 4}, mods))
 	elseif self.attack == 'Blast' then
         for i = 1, 12 do
             local random_angle = random(-math.pi/6, math.pi/6)
@@ -452,7 +452,11 @@ function Player:shoot()
     elseif self.attack == '2Split' then
         self.area:addGameObject('Projectile', 
     	self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), 
-    	table.merge({r = self.r, attack = self.attack, s = 8}, mods))
+    	table.merge({r = self.r, attack = self.attack, s = 4}, mods))
+    elseif self.attack == '4Split' then
+        self.area:addGameObject('Projectile', 
+    	self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), 
+    	table.merge({r = self.r, attack = self.attack, s = 4}, mods))
 	end
     
     if self.ammo <= 0 then 

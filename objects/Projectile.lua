@@ -103,6 +103,13 @@ function Projectile:new(area, x, y, opts)
 			{r = random(2, 4), d = random(0.15, 0.25), color = ammo_color})
 		end)
 	end
+	
+	if self.attack == '4Split' then
+		self.timer:every(0.04, function()
+			self.area:addGameObject('TrailParticle', self.x, self.y,
+			{r = random(2, 4), d = random(0.15, 0.25), color = boost_color})
+		end)
+	end
 
     if self.shield then
         self.orbit_distance = random(32, 64)
@@ -229,9 +236,11 @@ function Projectile:draw()
     elseif self.attack == '2Split' then
 		self:drawRhombusType(ammo_color)
 		return
+	elseif self.attack == '4Split' then
+		self:drawRhombusType(boost_color)
+		return
 	end
 	
-    love.graphics.setColor(default_color)
     pushRotate(self.x, self.y, Vector(self.collider:getLinearVelocity()):angleTo()) 
     love.graphics.setLineWidth(self.s - self.s/4)
     love.graphics.setColor(self.color)
@@ -269,9 +278,9 @@ end
 function Projectile:drawRhombusType(chosen_color)
 	pushRotate(self.x, self.y, Vector(self.collider:getLinearVelocity()):angleTo()) 
 	love.graphics.setColor(chosen_color)
-	draft:rhombus(self.x, self.y, 1*self.s, 1*self.s, 'fill')
+	draft:rhombus(self.x, self.y, 2*self.s, 2*self.s, 'fill')
 	love.graphics.setColor(default_color)
-	draft:rhombus(self.x, self.y, 0.5*self.s, 0.5*self.s, 'fill')
+	draft:rhombus(self.x, self.y, 1*self.s, 1*self.s, 'fill')
 	love.graphics.pop()
 end
 
@@ -288,9 +297,24 @@ function Projectile:onWallHit()
             angle_2 = math.pi + self.r
         end
 		self.area:addGameObject('Projectile', 
-      	self.x, self.y, {r = angle_1, attack = 'Neutral', back_color = ammo_color})
+      	self.x, self.y, {r = angle_1, attack = 'Neutral', color = attacks[self.attack].color, back_color = attacks[self.attack].color})
 		self.area:addGameObject('Projectile', 
-      	self.x, self.y, {r = angle_2, attack = 'Neutral', back_color = ammo_color})
+      	self.x, self.y, {r = angle_2, attack = 'Neutral', color = attacks[self.attack].color, back_color = attacks[self.attack].color})
+	elseif self.attack == '4Split' then
+		local angle_1 = 0
+		local angle_2 = 0
+		if self.x < 0 or self.x > gw then
+            angle_1 = math.pi - self.r
+			angle_2 = math.pi + self.r
+        end
+        if self.y < 0 or self.y > gh then
+            angle_1 = 2*math.pi - self.r
+            angle_2 = math.pi + self.r
+        end
+		self.area:addGameObject('Projectile', 
+      	self.x, self.y, {r = angle_1, attack = 'Neutral', color = attacks[self.attack].color, back_color = attacks[self.attack].color})
+		self.area:addGameObject('Projectile', 
+      	self.x, self.y, {r = angle_2, attack = 'Neutral', color = attacks[self.attack].color, back_color = attacks[self.attack].color})
 	end
 end
 
@@ -300,8 +324,19 @@ function Projectile:onEnemyHit(enemy_position)
 		local angle_1 = self.r + math.pi / 4
 		local angle_2 = self.r - math.pi / 4
 		self.area:addGameObject('Projectile', 
-      	x, y, {r = angle_1, attack = 'Neutral', back_color = ammo_color})
+      	x, y, {r = angle_1, attack = 'Neutral', color = attacks[self.attack].color, back_color = attacks[self.attack].color})
 		self.area:addGameObject('Projectile', 
-      	x, y, {r = angle_2, attack = 'Neutral', back_color = ammo_color})
+      	x, y, {r = angle_2, attack = 'Neutral', color = attacks[self.attack].color, back_color = attacks[self.attack].color})
+	elseif self.attack == '4Split' then
+		local x, y = unpack(enemy_position)
+		local angle_1, angle_2, angle_3, angle_4 = math.pi/4, 3*math.pi/4, -math.pi/4, -3*math.pi/4
+		self.area:addGameObject('Projectile', 
+      	x, y, {r = angle_1, attack = 'Neutral', color = attacks[self.attack].color, back_color = attacks[self.attack].color})
+		self.area:addGameObject('Projectile', 
+      	x, y, {r = angle_2, attack = 'Neutral', color = attacks[self.attack].color, back_color = attacks[self.attack].color})
+		self.area:addGameObject('Projectile', 
+      	x, y, {r = angle_3, attack = 'Neutral', color = attacks[self.attack].color, back_color = attacks[self.attack].color})
+		self.area:addGameObject('Projectile', 
+      	x, y, {r = angle_4, attack = 'Neutral', color = attacks[self.attack].color, back_color = attacks[self.attack].color})
 	end
 end
