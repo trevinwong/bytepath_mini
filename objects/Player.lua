@@ -124,10 +124,11 @@ function Player:new(area, x, y, opts)
     -- Attacks
     self.shoot_timer = 0
     self.shoot_cooldown = 0.24
-    self:setAttack('Flame')
+    self:setAttack('2Split')
 
     -- Test
-    input:bind('f4', function() self:die() end)
+	self.dont_move = false
+    input:bind('f4', function() self.dont_move = true end)
     
     -- Cycle
 	self.cycle_cooldown = 5
@@ -337,6 +338,8 @@ function Player:update(dt)
 		self:cycle()
 		self.cycle_timer = 0
 	end
+	
+	if self.dont_move then self.v = 0 end
 end
 
 function Player:draw()
@@ -401,8 +404,7 @@ function Player:shoot()
         local t = love.math.random()
         local r = (t * (-math.pi/8)) + ((1-t) * (math.pi/8))
         self.area:addGameObject('Projectile', 
-      	self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), table.merge({r = self.r + r, attack = self.attack}, mods))
-        attacks[self.attack].color = table.random(all_colors)
+      	self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), table.merge({r = self.r + r, attack = self.attack, color = table.random(all_colors)}, mods))
     elseif self.attack == 'Back' then
         self.area:addGameObject('Projectile', 
       	self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), table.merge({r = self.r, attack = self.attack}, mods))
@@ -442,7 +444,15 @@ function Player:shoot()
 		local random_angle = random(-math.pi/20, math.pi/20)
 		self.area:addGameObject('Projectile', 
     	self.x + 1.5*d*math.cos(self.r + random_angle), self.y + 1.5*d*math.sin(self.r + random_angle), 
-    	table.merge({r = self.r + random_angle, attack = self.attack, v = random(250, 300)}, mods))
+    	table.merge({r = self.r + random_angle, attack = self.attack, v = random(250, 300), back_color = skill_point_color}, mods))
+	elseif self.attack == 'Bounce' then
+        self.area:addGameObject('Projectile', 
+    	self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), 
+    	table.merge({r = self.r, attack = self.attack, bounce = 4, color = table.random(default_colors)}, mods))
+    elseif self.attack == '2Split' then
+        self.area:addGameObject('Projectile', 
+    	self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), 
+    	table.merge({r = self.r, attack = self.attack, s = 8}, mods))
 	end
     
     if self.ammo <= 0 then 

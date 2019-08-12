@@ -7,7 +7,8 @@ function Projectile:new(area, x, y, opts)
     self.s = opts.s or 2.5
     self.max_v = opts.max_v or 200
     self.v = opts.v or self.max_v
-    self.color = attacks[self.attack].color
+    self.color = opts.color or attacks[self.attack].color
+	self.back_color = opts.back_color or default_color
     self.damage = attacks[self.attack].damage or 100
     self.rv = table.random({random(-2*math.pi, -math.pi), random(math.pi, 2*math.pi)})
     
@@ -95,6 +96,13 @@ function Projectile:new(area, x, y, opts)
             end)
       	end
 	end
+	
+	if self.attack == '2Split' then
+		self.timer:every(0.04, function()
+			self.area:addGameObject('TrailParticle', self.x, self.y,
+			{r = random(2, 4), d = random(0.15, 0.25), color = ammo_color})
+		end)
+	end
 
     if self.shield then
         self.orbit_distance = random(32, 64)
@@ -116,10 +124,30 @@ end
 
 function Projectile:update(dt)
     Projectile.super.update(self, dt)
-    if self.x < 0 then self:die() end
-    if self.y < 0 then self:die() end
-    if self.x > gw then self:die() end
-    if self.y > gh then self:die() end
+	
+	if self.bounce and self.bounce > 0 then
+        if self.x < 0 then
+            self.r = math.pi - self.r
+            self.bounce = self.bounce - 1
+        end
+        if self.y < 0 then
+            self.r = 2*math.pi - self.r
+            self.bounce = self.bounce - 1
+        end
+        if self.x > gw then
+            self.r = math.pi - self.r
+            self.bounce = self.bounce - 1
+        end
+        if self.y > gh then
+            self.r = 2*math.pi - self.r
+            self.bounce = self.bounce - 1
+        end
+    else
+		if self.x < 0 then self:die() self:onWallHit() end
+		if self.y < 0 then self:die() self:onWallHit() end
+		if self.x > gw then self:die() self:onWallHit() end
+		if self.y > gh then self:die() self:onWallHit() end
+	end
     
     if self.collider:enter('Enemy') then
         local collision_data = self.collider:getEnterCollisionData('Enemy')
@@ -128,6 +156,7 @@ function Projectile:update(dt)
             object:hit(self.damage)
             self:die()
             if object.hp <= 0 then current_room.player:onKill({object.x, object.y}) end
+			self:onEnemyHit({object.x, object.y})
         end
         self:die()
     end
@@ -195,25 +224,19 @@ function Projectile:draw()
     if self.invisible then return end
 
     if self.attack == 'Homing' then
-        pushRotate(self.x, self.y, Vector(self.collider:getLinearVelocity()):angleTo()) 
-        love.graphics.setColor(skill_point_color)
-        draft:rhombus(self.x, self.y, 1*self.s, 1*self.s, 'fill')
-        love.graphics.setColor(default_color)
-        draft:rhombus(self.x, self.y, 0.5*self.s, 0.5*self.s, 'fill')
-        love.graphics.pop()
+        self:drawRhombusType(skill_point_color)
         return
-    end
-    
+    elseif self.attack == '2Split' then
+		self:drawRhombusType(ammo_color)
+		return
+	end
+	
     love.graphics.setColor(default_color)
     pushRotate(self.x, self.y, Vector(self.collider:getLinearVelocity()):angleTo()) 
     love.graphics.setLineWidth(self.s - self.s/4)
     love.graphics.setColor(self.color)
     love.graphics.line(self.x - 2*self.s, self.y, self.x, self.y)
-	if self.attack == 'Flame' then
-		love.graphics.setColor(skill_point_color)
-	else 
-		love.graphics.setColor(default_color)
-	end
+	love.graphics.setColor(self.back_color)
     love.graphics.line(self.x, self.y, self.x + 2*self.s, self.y)
     love.graphics.setLineWidth(1)
     love.graphics.pop()
@@ -241,4 +264,44 @@ function Projectile:applySizeMultiplier()
     if current_room and current_room.player then
         self.s = self.s * current_room.player.projectile_size_multiplier
     end
+end
+
+function Projectile:drawRhombusType(chosen_color)
+	pushRotate(self.x, self.y, Vector(self.collider:getLinearVelocity()):angleTo()) 
+	love.graphics.setColor(chosen_color)
+	draft:rhombus(self.x, self.y, 1*self.s, 1*self.s, 'fill')
+	love.graphics.setColor(default_color)
+	draft:rhombus(self.x, self.y, 0.5*self.s, 0.5*self.s, 'fill')
+	love.graphics.pop()
+end
+
+function Projectile:onWallHit()
+	if self.attack == '2Split' then
+		local angle_1 = 0
+		local angle_2 = 0
+		if self.x < 0 or self.x > gw then
+            angle_1 = math.pi - self.r
+			angle_2 = math.pi + self.r
+        end
+        if self.y < 0 or self.y > gh then
+            angle_1 = 2*math.pi - self.r
+            angle_2 = math.pi + self.r
+        end
+		self.area:addGameObject('Projectile', 
+      	self.x, self.y, {r = angle_1, attack = 'Neutral', back_color = ammo_color})
+		self.area:addGameObject('Projectile', 
+      	self.x, self.y, {r = angle_2, attack = 'Neutral', back_color = ammo_color})
+	end
+end
+
+function Projectile:onEnemyHit(enemy_position)
+	if self.attack == '2Split' then
+		local x, y = unpack(enemy_position)
+		local angle_1 = self.r + math.pi / 4
+		local angle_2 = self.r - math.pi / 4
+		self.area:addGameObject('Projectile', 
+      	x, y, {r = angle_1, attack = 'Neutral', back_color = ammo_color})
+		self.area:addGameObject('Projectile', 
+      	x, y, {r = angle_2, attack = 'Neutral', back_color = ammo_color})
+	end
 end
