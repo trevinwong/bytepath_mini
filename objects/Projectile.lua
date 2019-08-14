@@ -110,6 +110,13 @@ function Projectile:new(area, x, y, opts)
 			{r = random(2, 4), d = random(0.15, 0.25), color = boost_color})
 		end)
 	end
+	
+	if self.attack == 'Explode' then
+		self.timer:every(0.04, function()
+			self.area:addGameObject('TrailParticle', self.x, self.y,
+			{r = random(2, 4), d = random(0.15, 0.25), color = hp_color})
+		end)
+	end
 
     if self.shield then
         self.orbit_distance = random(32, 64)
@@ -232,30 +239,34 @@ function Projectile:draw()
 
     if self.attack == 'Homing' then
         self:drawRhombusType(skill_point_color)
-        return
     elseif self.attack == '2Split' then
 		self:drawRhombusType(ammo_color)
-		return
 	elseif self.attack == '4Split' then
 		self:drawRhombusType(boost_color)
-		return
+	elseif self.attack == 'Explode' then
+		self:drawRhombusType(hp_color)
+	else
+		pushRotate(self.x, self.y, Vector(self.collider:getLinearVelocity()):angleTo()) 
+		love.graphics.setLineWidth(self.s - self.s/4)
+		love.graphics.setColor(self.color)
+		love.graphics.line(self.x - 2*self.s, self.y, self.x, self.y)
+		love.graphics.setColor(self.back_color)
+		love.graphics.line(self.x, self.y, self.x + 2*self.s, self.y)
+		love.graphics.setLineWidth(1)
+		love.graphics.pop()
 	end
-	
-    pushRotate(self.x, self.y, Vector(self.collider:getLinearVelocity()):angleTo()) 
-    love.graphics.setLineWidth(self.s - self.s/4)
-    love.graphics.setColor(self.color)
-    love.graphics.line(self.x - 2*self.s, self.y, self.x, self.y)
-	love.graphics.setColor(self.back_color)
-    love.graphics.line(self.x, self.y, self.x + 2*self.s, self.y)
-    love.graphics.setLineWidth(1)
-    love.graphics.pop()
 end
 
 function Projectile:die()
     self.dead = true
 	local death_color = (self.color == default_color) and hp_color or self.color
-    self.area:addGameObject('ProjectileDeathEffect', self.x, self.y, 
-    {color = death_color, w = 3*self.s})
+	
+	if self.attack == 'Explode' then
+		self.area:addGameObject('Explosion', self.x, self.y)
+	else
+		self.area:addGameObject('ProjectileDeathEffect', self.x, self.y, 
+		{color = death_color, w = 3*self.s})
+	end
 end
 
 --[[
@@ -278,9 +289,9 @@ end
 function Projectile:drawRhombusType(chosen_color)
 	pushRotate(self.x, self.y, Vector(self.collider:getLinearVelocity()):angleTo()) 
 	love.graphics.setColor(chosen_color)
-	draft:rhombus(self.x, self.y, 2*self.s, 2*self.s, 'fill')
+	draft:rhombus(self.x-1, self.y, 2*self.s, 2*self.s, 'fill')
 	love.graphics.setColor(default_color)
-	draft:rhombus(self.x, self.y, 1*self.s, 1*self.s, 'fill')
+	draft:rhombus(self.x, self.y, 1.5*self.s, 1.5*self.s, 'fill')
 	love.graphics.pop()
 end
 

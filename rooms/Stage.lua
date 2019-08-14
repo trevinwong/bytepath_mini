@@ -43,6 +43,9 @@ function Stage:new()
     input:bind('e', function()
         self.score = self.score * 10
     end)
+    input:bind('q', function()
+        self.area:addGameObject('Explosion', self.player.x, self.player.y)
+    end)
 end
 
 function Stage:update(dt)

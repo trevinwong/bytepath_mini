@@ -124,7 +124,7 @@ function Player:new(area, x, y, opts)
     -- Attacks
     self.shoot_timer = 0
     self.shoot_cooldown = 0.24
-    self:setAttack('Lightning')
+    self:setAttack('Explode')
 
     -- Test
 	self.dont_move = false
@@ -446,7 +446,7 @@ function Player:shoot()
       self.area:addGameObject('Projectile', 
         self.x + 1.5*d*math.cos(self.r + random_angle), self.y + 1.5*d*math.sin(self.r + random_angle), 
         table.merge({r = self.r + random_angle, attack = self.attack, v = random(250, 300), back_color = skill_point_color}, mods))
-	  elseif self.attack == 'Bounce' then
+	elseif self.attack == 'Bounce' then
         self.area:addGameObject('Projectile', 
     	self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), 
     	table.merge({r = self.r, attack = self.attack, bounce = 4, color = table.random(default_colors)}, mods))
@@ -490,13 +490,15 @@ function Player:shoot()
         else
             self.ammo = self.prev_ammo
         end
-    end
+    elseif self.attack == 'Explode' then
+		local projectile = self.area:addGameObject('Projectile', 
+      	self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), table.merge({r = self.r, attack = self.attack, s = 5}, mods))
 	end
 
     if self.ammo <= 0 then 
         self:setAttack('Neutral')
         self.ammo = self.max_ammo
-    end
+	end
 end
 
 function Player:die()
