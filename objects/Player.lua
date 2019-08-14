@@ -124,7 +124,7 @@ function Player:new(area, x, y, opts)
     -- Attacks
     self.shoot_timer = 0
     self.shoot_cooldown = 0.24
-    self:setAttack('Flame')
+    self:setAttack('Lightning')
 
     -- Test
     input:bind('f4', function() self:die() end)
@@ -362,6 +362,7 @@ function Player:shoot()
     self.area:addGameObject('ShootEffect', 
     self.x + d*math.cos(self.r), self.y + d*math.sin(self.r), {player = self, d = d})
 
+    self.prev_ammo = self.ammo
     self.ammo = self.ammo - (attacks[self.attack].ammo * self.ammo_consumption_multiplier)
 
     local mods = {
@@ -439,11 +440,43 @@ function Player:shoot()
     	self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), 
     	table.merge({r = self.r, attack = self.attack}, mods))
     elseif self.attack == 'Flame' then
-		local random_angle = random(-math.pi/20, math.pi/20)
-		self.area:addGameObject('Projectile', 
-    	self.x + 1.5*d*math.cos(self.r + random_angle), self.y + 1.5*d*math.sin(self.r + random_angle), 
-    	table.merge({r = self.r + random_angle, attack = self.attack, v = random(250, 300)}, mods))
-	end
+      local random_angle = random(-math.pi/20, math.pi/20)
+      self.area:addGameObject('Projectile', 
+        self.x + 1.5*d*math.cos(self.r + random_angle), self.y + 1.5*d*math.sin(self.r + random_angle), 
+        table.merge({r = self.r + random_angle, attack = self.attack, v = random(250, 300)}, mods))
+    elseif self.attack == 'Lightning' then
+        local x1, y1 = self.x + d*math.cos(self.r), self.y + d*math.sin(self.r)
+        local cx, cy = x1 + 24*math.cos(self.r), y1 + 24*math.sin(self.r)
+        
+        local nearby_enemies = self.area:getAllGameObjectsThat(function(e)
+            for _, enemy in ipairs(enemies) do
+                if e:is(_G[enemy]) and (distance(e.x, e.y, cx, cy) < 64) then
+                    return true
+                end
+            end
+        end)
+      
+        table.sort(nearby_enemies, function(a, b) 
+      	    return distance(a.x, a.y, cx, cy) < distance(b.x, b.y, cx, cy) 
+        end)
+        local closest_enemy = nearby_enemies[1]
+        
+        if closest_enemy then
+            closest_enemy:hit()
+            local x2, y2 = closest_enemy.x, closest_enemy.y
+            self.area:addGameObject('LightningLine', 0, 0, {start_point = Vector(x1, y1), end_point = Vector(x2, y2)})
+            for i = 1, love.math.random(4, 8) do 
+      	        self.area:addGameObject('ExplodeParticle', x1, y1, 
+                {color = table.random({default_color, boost_color})}) 
+            end
+            for i = 1, love.math.random(4, 8) do 
+      	        self.area:addGameObject('ExplodeParticle', x2, y2, 
+                {color = table.random({default_color, boost_color})}) 
+            end
+        else
+            self.ammo = self.prev_ammo
+        end
+    end
     
     if self.ammo <= 0 then 
         self:setAttack('Neutral')
