@@ -127,7 +127,8 @@ function Player:new(area, x, y, opts)
     self:setAttack('Lightning')
 
     -- Test
-    input:bind('f4', function() self:die() end)
+	self.dont_move = false
+    input:bind('f4', function() self.dont_move = true end)
     
     -- Cycle
 	self.cycle_cooldown = 5
@@ -337,6 +338,8 @@ function Player:update(dt)
 		self:cycle()
 		self.cycle_timer = 0
 	end
+	
+	if self.dont_move then self.v = 0 end
 end
 
 function Player:draw()
@@ -402,8 +405,7 @@ function Player:shoot()
         local t = love.math.random()
         local r = (t * (-math.pi/8)) + ((1-t) * (math.pi/8))
         self.area:addGameObject('Projectile', 
-      	self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), table.merge({r = self.r + r, attack = self.attack}, mods))
-        attacks[self.attack].color = table.random(all_colors)
+      	self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), table.merge({r = self.r + r, attack = self.attack, color = table.random(all_colors)}, mods))
     elseif self.attack == 'Back' then
         self.area:addGameObject('Projectile', 
       	self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), table.merge({r = self.r, attack = self.attack}, mods))
@@ -424,7 +426,7 @@ function Player:shoot()
       	self.x + 1.5*d*math.cos(side2_r), self.y + 1.5*d*math.sin(side2_r), table.merge({r = side2_r, attack = self.attack}, mods))
     elseif self.attack == 'Homing' then
 		local projectile = self.area:addGameObject('Projectile', 
-      	self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), table.merge({r = self.r, attack = self.attack, s = 8}, mods))
+      	self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), table.merge({r = self.r, attack = self.attack, s = 4}, mods))
 	elseif self.attack == 'Blast' then
         for i = 1, 12 do
             local random_angle = random(-math.pi/6, math.pi/6)
@@ -443,7 +445,19 @@ function Player:shoot()
       local random_angle = random(-math.pi/20, math.pi/20)
       self.area:addGameObject('Projectile', 
         self.x + 1.5*d*math.cos(self.r + random_angle), self.y + 1.5*d*math.sin(self.r + random_angle), 
-        table.merge({r = self.r + random_angle, attack = self.attack, v = random(250, 300)}, mods))
+        table.merge({r = self.r + random_angle, attack = self.attack, v = random(250, 300), back_color = skill_point_color}, mods))
+	  elseif self.attack == 'Bounce' then
+        self.area:addGameObject('Projectile', 
+    	self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), 
+    	table.merge({r = self.r, attack = self.attack, bounce = 4, color = table.random(default_colors)}, mods))
+    elseif self.attack == '2Split' then
+        self.area:addGameObject('Projectile', 
+    	self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), 
+    	table.merge({r = self.r, attack = self.attack, s = 4}, mods))
+    elseif self.attack == '4Split' then
+        self.area:addGameObject('Projectile', 
+    	self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), 
+    	table.merge({r = self.r, attack = self.attack, s = 4}, mods))
     elseif self.attack == 'Lightning' then
         local x1, y1 = self.x + d*math.cos(self.r), self.y + d*math.sin(self.r)
         local cx, cy = x1 + 24*math.cos(self.r), y1 + 24*math.sin(self.r)
@@ -477,7 +491,8 @@ function Player:shoot()
             self.ammo = self.prev_ammo
         end
     end
-    
+	end
+
     if self.ammo <= 0 then 
         self:setAttack('Neutral')
         self.ammo = self.max_ammo
