@@ -8,7 +8,7 @@ function EnemyProjectile:new(area, x, y, opts)
     self.v = opts.v or 200
     self.damage = 10
     
-    self.collider = self.area.world:newCircleCollider(self.x, self.y, self.s)
+    self.collider = self.area.world:newRectangleCollider(self.x, self.y, 4 * self.s, self.s)
     self.collider:setCollisionClass('EnemyProjectile')
     self.collider:setObject(self)
     self.collider:setLinearVelocity(self.v*math.cos(self.r), self.v*math.sin(self.r))

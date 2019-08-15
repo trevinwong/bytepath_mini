@@ -168,8 +168,6 @@ function Projectile:update(dt)
         local object = collision_data.collider:getObject()
         if object then
             object:hit(self.damage)
-            self:die()
-            if object.hp <= 0 then current_room.player:onKill({object.x, object.y}) end
 			self:onEnemyHit({object.x, object.y})
         end
         self:die()

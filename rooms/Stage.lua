@@ -44,7 +44,7 @@ function Stage:new()
         self.score = self.score * 10
     end)
     input:bind('q', function()
-        self.area:addGameObject('Explosion', self.player.x, self.player.y)
+        self.area:addGameObject('Laser', self.player.x, self.player.y, {end_point = {2000, self.player.y}})
     end)
 end
 
