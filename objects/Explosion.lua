@@ -35,6 +35,7 @@ function Explosion:new(area, x, y, opts)
 
 	for _, e in ipairs(enemies_in_radius) do
 		e:hit(200)
+		if object.hp <= 0 then current_room.player:onKill({object.x, object.y}) end
 	end
 end
 
