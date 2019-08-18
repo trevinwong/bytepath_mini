@@ -29,6 +29,7 @@ function Player:new(area, x, y, opts)
 	self.projectile_deceleration_multiplier = 1
 	self.projectile_duration_multiplier = 1
 	self.area_multiplier = 1
+	self.laser_width_multiplier = 1
     self.aspd_multiplier = Stat(1)
 	self.mvspd_multiplier = Stat(1)
 	self.pspd_multiplier = Stat(1)
@@ -127,7 +128,7 @@ function Player:new(area, x, y, opts)
     -- Attacks
     self.shoot_timer = 0
     self.shoot_cooldown = 0.24
-    self:setAttack('Explode')
+    self:setAttack('Laser')
 
     -- Test
 	self.dont_move = false
@@ -367,8 +368,8 @@ function Player:shoot()
     local d = 1.2*self.w
     
     if self.attack == 'Laser' then
-        self.area:addGameObject('ShootEffect', 
-        self.x + d*math.cos(self.r), self.y + d*math.sin(self.r), {player = self, d = d, w = 20, fade_to_color = hp_color})
+        self.area:addGameObject('LaserShootEffect', 
+        self.x + d*math.cos(self.r), self.y + d*math.sin(self.r), {player = self, d = d, w = 25, fade_to_color = hp_color})
     else
         self.area:addGameObject('ShootEffect', 
         self.x + d*math.cos(self.r), self.y + d*math.sin(self.r), {player = self, d = d})
@@ -511,7 +512,7 @@ function Player:shoot()
 		local x1, y1 = self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r) 
 		local x2, y2 = self.x + 1024*math.cos(self.r), self.y + 1024*math.sin(self.r)
         self.area:addGameObject('Laser',
-        x1, y1, {x2 = x2, y2 = y2, r = self.r})
+        x1, y1, {x2 = x2, y2 = y2, r = self.r, wm = self.laser_width_multiplier})
     end
 
     if self.ammo <= 0 then 

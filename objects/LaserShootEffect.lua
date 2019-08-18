@@ -1,0 +1,36 @@
+require "objects/GameObject"
+
+LaserShootEffect = GameObject:extend()
+
+function LaserShootEffect:new(area, x, y , opts)
+    LaserShootEffect.super.new(self, area, x, y, opts)
+    self.w = opts.w or 8
+    self.depth = 25
+    self.color = default_color
+    self.fade_to_color = opts.fade_to_color or default_color
+	self.alpha = 1
+    self.timer:tween(0.25, self, {alpha = 0}, 'linear', function() self.dead = true end)
+    self.timer:after(0.1, function()
+        self.color = self.fade_to_color
+    end)
+end
+
+function LaserShootEffect:update(dt)
+    LaserShootEffect.super.update(self, dt)
+    if self.player then 
+        self.x = self.player.x + self.d*math.cos(self.player.r) 
+    	self.y = self.player.y + self.d*math.sin(self.player.r) 
+    end
+end
+
+function LaserShootEffect:draw()
+	local r, g, b = unpack(self.color)
+    love.graphics.setColor(r, g, b, self.alpha)
+    pushRotate(self.x, self.y, self.player.r + math.pi/4)
+    love.graphics.rectangle('fill', self.x - self.w/2, self.y - self.w/2, self.w, self.w)
+    love.graphics.pop()
+end
+
+function LaserShootEffect:destroy()
+    LaserShootEffect.super.destroy(self)
+end

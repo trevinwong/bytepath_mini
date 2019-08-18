@@ -3,10 +3,10 @@ Laser = GameObject:extend()
 function Laser:new(area, x, y, opts)
     Laser.super.new(self, area, x, y, opts)
     self.middle_line_color = default_color
-    self.middle_line_width = 10
+    self.middle_line_width = 10 * self.wm
     self.side_line_color = opts.side_line_color or hp_color
-    self.side_line_width = 5
-    self.side_offset = 6
+    self.side_line_width = 5 * self.wm
+    self.side_offset = 6 * self.wm
     self.total_width = 2 * (self.side_offset + self.side_line_width/2)
     self.offset = self.total_width / 2
     
