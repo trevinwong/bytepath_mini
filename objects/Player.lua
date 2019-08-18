@@ -80,7 +80,8 @@ function Player:new(area, x, y, opts)
 	self.wavy_projectiles = false
 	self.fast_slow = false
 	self.slow_fast = false
-	self.additional_lightning_bolt = true
+	self.additional_lightning_bolt = false
+	self.increased_lightning_angle = true
 	
     -- Geometry
     self.x, self.y = x, y
@@ -468,6 +469,9 @@ function Player:shoot()
     elseif self.attack == 'Lightning' then
         local x1, y1 = self.x + d*math.cos(self.r), self.y + d*math.sin(self.r)
         local cx, cy = x1 + 24*math.cos(self.r), y1 + 24*math.sin(self.r)
+		if self.increased_lightning_angle then
+			cx, cy = self.x, self.y
+		end
         
         local nearby_enemies = self.area:getAllGameObjectsThat(function(e)
             for _, enemy in ipairs(enemies) do
