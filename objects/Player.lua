@@ -72,6 +72,7 @@ function Player:new(area, x, y, opts)
 	self.spawn_double_sp_chance = 0
 	self.gain_double_sp_chance = 0
     self.shield_projectile_chance = 0
+	self.split_projectiles_split_chance = 0
 	
 	-- Passives
 	self.increased_cycle_speed_while_boosting = false
@@ -85,7 +86,7 @@ function Player:new(area, x, y, opts)
 	self.additional_lightning_bolt = false
 	self.increased_lightning_angle = false
 	self.additional_bounce_projectiles = false
-	self.fixed_spin_attack_direction = true
+	self.fixed_spin_attack_direction = false
 	
     -- Geometry
     self.x, self.y = x, y
@@ -130,7 +131,7 @@ function Player:new(area, x, y, opts)
     -- Attacks
     self.shoot_timer = 0
     self.shoot_cooldown = 0.24
-    self:setAttack('Spin')
+    self:setAttack('2Split')
 
     -- Test
 	self.dont_move = false
