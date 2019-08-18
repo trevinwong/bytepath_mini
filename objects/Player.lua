@@ -95,6 +95,7 @@ function Player:new(area, x, y, opts)
 	self.additional_bounce_projectiles = 0
 	self.additional_homing_projectiles = 0
 	self.additional_barrage_projectiles = 0
+	self.barrage_nova = false
 
 	self.start_with_attack_passives = {}
 
@@ -828,6 +829,7 @@ function Player:barrage()
 	for i = 1, 8 + self.additional_barrage_projectiles do
 		self.timer:after((i-1)*0.05, function()
 				local random_angle = random(-math.pi/8, math.pi/8)
+				if self.barrage_nova then random_angle = random(-math.pi * 2, math.pi * 2) end
 				local d = 2.2*self.w
 				self.area:addGameObject('Projectile', 
 					self.x + d*math.cos(self.r + random_angle), 
