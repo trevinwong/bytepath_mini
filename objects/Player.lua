@@ -94,6 +94,12 @@ function Player:new(area, x, y, opts)
 	self.additional_bounce_projectiles = false
 	self.fixed_spin_attack_direction = false
 	
+	self.start_with_attack_passives = {}
+	
+	for _, name in ipairs(attackNames) do
+		self.start_with_attack_passives["start_with_" .. name] = false
+	end
+	
     -- Geometry
     self.x, self.y = x, y
     self.w, self.h = 12 * self.size_multiplier, 12 * self.size_multiplier
@@ -137,7 +143,9 @@ function Player:new(area, x, y, opts)
     -- Attacks
     self.shoot_timer = 0
     self.shoot_cooldown = 0.24
-    self:setAttack('2Split')
+	local startingAttack = self:returnRandomStartingAttack()
+	print(startingAttack)
+	if startingAttack then self:setAttack(startingAttack) else self:setAttack("Neutral") end
 
     -- Test
 	self.dont_move = false
@@ -852,4 +860,12 @@ function Player:applyStatus(base_seconds, name)
 	self.timer:after(base_seconds * self.stat_boost_duration_multiplier, function() 
 		self[name] = false
 	end)
+end
+
+function Player:returnRandomStartingAttack()
+	local start_withs = {}
+	for attackName, bool in pairs(self.start_with_attack_passives) do
+		if bool then table.insert(start_withs, attackName) end
+	end
+	if #start_withs == 0 then return false else return string.sub(start_withs[love.math.random(1, #start_withs)], string.len("start_with_") + 1) end
 end
