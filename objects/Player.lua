@@ -27,7 +27,8 @@ function Player:new(area, x, y, opts)
 	self.projectile_waviness_multiplier = 1
 	self.projectile_acceleration_multiplier = 1
 	self.projectile_deceleration_multiplier = 1
-	self.projectile_duration_multiplier = 2
+	self.projectile_duration_multiplier = 1
+	self.area_multiplier = 1
     self.aspd_multiplier = Stat(1)
 	self.mvspd_multiplier = Stat(1)
 	self.pspd_multiplier = Stat(1)
@@ -126,7 +127,7 @@ function Player:new(area, x, y, opts)
     -- Attacks
     self.shoot_timer = 0
     self.shoot_cooldown = 0.24
-    self:setAttack('Lightning')
+    self:setAttack('Explode')
 
     -- Test
 	self.dont_move = false
@@ -475,7 +476,7 @@ function Player:shoot()
         
         local nearby_enemies = self.area:getAllGameObjectsThat(function(e)
             for _, enemy in ipairs(enemies) do
-                if e:is(_G[enemy]) and (distance(e.x, e.y, cx, cy) < 64) then
+                if e:is(_G[enemy]) and (distance(e.x, e.y, cx, cy) < 64 * self.area_multiplier) then
                     return true
                 end
             end
