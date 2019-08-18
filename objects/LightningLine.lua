@@ -2,6 +2,7 @@ LightningLine = GameObject:extend()
 
 function LightningLine:new(area, x, y, opts)
     LightningLine.super.new(self, area, x, y, opts)
+    self.color = opts.color or boost_color
     self.lines = self:generate({self.start_point, self.end_point}, 3)
     self.alpha = 1
     self.timer:tween(random(0.15, 0.2), self, {alpha = 0}, 'in-out-cubic', function()
@@ -40,7 +41,7 @@ end
 
 function LightningLine:draw()
     for i, line in ipairs(self.lines) do 
-        local r, g, b = unpack(boost_color)
+        local r, g, b = unpack(self.color)
         love.graphics.setColor(r, g, b, self.alpha)
         love.graphics.setLineWidth(2.5)
         love.graphics.line(line[1].x, line[1].y, line[2].x, line[2].y) 

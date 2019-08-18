@@ -80,6 +80,7 @@ function Player:new(area, x, y, opts)
 	self.wavy_projectiles = false
 	self.fast_slow = false
 	self.slow_fast = false
+	self.additional_lightning_bolt = true
 	
     -- Geometry
     self.x, self.y = x, y
@@ -124,7 +125,7 @@ function Player:new(area, x, y, opts)
     -- Attacks
     self.shoot_timer = 0
     self.shoot_cooldown = 0.24
-    self:setAttack('Laser')
+    self:setAttack('Lightning')
 
     -- Test
 	self.dont_move = false
@@ -483,16 +484,18 @@ function Player:shoot()
         
         if closest_enemy then
             closest_enemy:hit()
-            local x2, y2 = closest_enemy.x, closest_enemy.y
-            self.area:addGameObject('LightningLine', 0, 0, {start_point = Vector(x1, y1), end_point = Vector(x2, y2)})
-            for i = 1, love.math.random(4, 8) do 
-      	        self.area:addGameObject('ExplodeParticle', x1, y1, 
-                {color = table.random({default_color, boost_color})}) 
-            end
-            for i = 1, love.math.random(4, 8) do 
-      	        self.area:addGameObject('ExplodeParticle', x2, y2, 
-                {color = table.random({default_color, boost_color})}) 
-            end
+			local x2, y2 = closest_enemy.x, closest_enemy.y
+			self:spawnLightning(x1, y1, x2, y2, boost_color)
+			
+			if self.additional_lightning_bolt then
+				local closest_enemy2 = nearby_enemies[2]
+				if closest_enemy2 then
+					closest_enemy2:hit()
+					x2, y2 = closest_enemy2.x, closest_enemy2.y
+					self:spawnLightning(self.x, self.y, x2, y2, hp_color)
+				    self.ammo = self.ammo - (attacks[self.attack].ammo * self.ammo_consumption_multiplier) / 2
+				end
+			end
         else
             self.ammo = self.prev_ammo
         end
@@ -813,6 +816,18 @@ function Player:launchHomingProjectile()
 	self.area:addGameObject('Projectile', 
 	self.x + d*math.cos(self.r), self.y + d*math.sin(self.r), 
 	{r = self.r, attack = 'Homing'})
+end
+
+function Player:spawnLightning(x1, y1, x2, y2, color)
+	self.area:addGameObject('LightningLine', 0, 0, {start_point = Vector(x1, y1), end_point = Vector(x2, y2), color = color})
+	for i = 1, love.math.random(4, 8) do 
+		self.area:addGameObject('ExplodeParticle', x1, y1, 
+		{color = table.random({default_color, boost_color})}) 
+	end
+	for i = 1, love.math.random(4, 8) do 
+		self.area:addGameObject('ExplodeParticle', x2, y2, 
+		{color = table.random({default_color, boost_color})}) 
+	end
 end
 
 function Player:applyStatus(base_seconds, name)
