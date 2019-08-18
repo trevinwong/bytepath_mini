@@ -84,7 +84,8 @@ function Player:new(area, x, y, opts)
 	self.slow_fast = false
 	self.additional_lightning_bolt = false
 	self.increased_lightning_angle = false
-	self.additional_bounce_projectiles = true
+	self.additional_bounce_projectiles = false
+	self.fixed_spin_attack_direction = true
 	
     -- Geometry
     self.x, self.y = x, y
@@ -129,7 +130,7 @@ function Player:new(area, x, y, opts)
     -- Attacks
     self.shoot_timer = 0
     self.shoot_cooldown = 0.24
-    self:setAttack('Bounce')
+    self:setAttack('Spin')
 
     -- Test
 	self.dont_move = false
