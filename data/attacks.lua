@@ -17,3 +17,5 @@ attacks = {
     ['Explode'] = {cooldown = 0.6, ammo = 4, abbreviation = 'E', color = hp_color},
     ['Laser'] = {cooldown = 0.8, ammo = 6, abbreviation = 'La', color = hp_color}
 }
+
+attackNames = returnAllKeys(attacks)

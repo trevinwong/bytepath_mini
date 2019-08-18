@@ -65,14 +65,9 @@ function Director:new(area, x, y, opts)
 	)
 	
 	-- Attacks
+	self:generateAttackSpawnChances()
 	self.timer:every(30/self.player.attack_spawn_rate_multiplier, function()
-			local i = 1
-			local selectAttackName = {}
-			for attackName, _ in pairs(attacks) do
-				selectAttackName[i] = attackName
-				i = i + 1
-			end
-			self.area:addGameObject('Attack', 0, 0, {attack = selectAttackName[love.math.random(1, #selectAttackName)]})
+			self.area:addGameObject('Attack', 0, 0, {attack = self.attack_spawn_chances:next()})
 		end
 	)
 	
@@ -106,6 +101,25 @@ function Director:setEnemySpawnsForThisRound()
             self.area:addGameObject(enemy_list[i])
         end)
     end
+end
+
+function Director:generateAttackSpawnChances()
+	local attack_spawn_chance_multipliers = self.player.attack_spawn_chance_multipliers
+	local attack_spawn_chance_definitions = {}
+	--[[
+		A side note: you should always define a custom function for returning the length of a table. To be honest, it's incredibly weird why Lua doesn't already
+		have this built in.
+		
+		Why? #table only returns the highest index of the array portion of the table - if your table consists entirely of the hashmap portion, it will return
+		nil, which lead to much confusion here...
+	]]--
+	local initial_chance = 1 / returnTableLength(attacks)
+	
+	for i, attackName in ipairs(attackNames) do
+		table.insert(attack_spawn_chance_definitions, {attackName, math.ceil(initial_chance * attack_spawn_chance_multipliers[attackName .. "_spawn_chance_multiplier"])})
+	end
+	
+	self.attack_spawn_chances = chanceList(unpack(attack_spawn_chance_definitions))
 end
 
 function Director:destroy()

@@ -42,6 +42,22 @@ function selectRandomKey(t)
 	return keys[love.math.random(1, #keys)]
 end
 
+function returnAllKeys(t)
+	local keys = {}
+	for key, _ in pairs(t) do
+		table.insert(keys, key)
+	end
+	return keys
+end
+
+function returnTableLength(t)
+	local i = 0
+	for _, _ in pairs(t) do
+		i = i + 1
+	end
+	return i
+end
+
 function table.merge(t1, t2)
     local new_table = {}
     for k, v in pairs(t2) do new_table[k] = v end

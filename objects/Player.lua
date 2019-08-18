@@ -4,7 +4,7 @@ Player = GameObject:extend()
 
 function Player:new(area, x, y, opts)
     Player.super.new(self, area, x, y, opts)
-	
+		
 	-- Multipliers
     self.hp_multiplier = 1
 	self.ammo_multiplier = 1
@@ -30,6 +30,12 @@ function Player:new(area, x, y, opts)
 	self.projectile_duration_multiplier = 1
 	self.area_multiplier = 1
 	self.laser_width_multiplier = 1
+	self.attack_spawn_chance_multipliers = {}
+	
+	for _, name in ipairs(attackNames) do
+		self.attack_spawn_chance_multipliers[name .. "_spawn_chance_multiplier"] = 1
+	end
+	
     self.aspd_multiplier = Stat(1)
 	self.mvspd_multiplier = Stat(1)
 	self.pspd_multiplier = Stat(1)
