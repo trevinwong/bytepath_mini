@@ -83,7 +83,8 @@ function Player:new(area, x, y, opts)
 	self.fast_slow = false
 	self.slow_fast = false
 	self.additional_lightning_bolt = false
-	self.increased_lightning_angle = true
+	self.increased_lightning_angle = false
+	self.additional_bounce_projectiles = true
 	
     -- Geometry
     self.x, self.y = x, y
@@ -128,7 +129,7 @@ function Player:new(area, x, y, opts)
     -- Attacks
     self.shoot_timer = 0
     self.shoot_cooldown = 0.24
-    self:setAttack('Laser')
+    self:setAttack('Bounce')
 
     -- Test
 	self.dont_move = false
@@ -457,9 +458,11 @@ function Player:shoot()
         self.x + 1.5*d*math.cos(self.r + random_angle), self.y + 1.5*d*math.sin(self.r + random_angle), 
         table.merge({r = self.r + random_angle, attack = self.attack, v = random(250, 300), back_color = skill_point_color}, mods))
 	elseif self.attack == 'Bounce' then
+		local bounces = 4
+		if self.additional_bounce_projectiles then bounces = 8 end
         self.area:addGameObject('Projectile', 
     	self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), 
-    	table.merge({r = self.r, attack = self.attack, bounce = 4, color = table.random(default_colors)}, mods))
+    	table.merge({r = self.r, attack = self.attack, bounce = bounces, color = table.random(default_colors)}, mods))
     elseif self.attack == '2Split' then
         self.area:addGameObject('Projectile', 
     	self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), 
