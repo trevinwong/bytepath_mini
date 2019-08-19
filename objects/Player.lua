@@ -104,6 +104,7 @@ function Player:new(area, x, y, opts)
   self.projectiles_explosion = false
   self.energy_shield = false
   self.change_attack_periodically = false
+  self.gain_sp_on_death = true
 
   self.start_with_attack_passives = {}
 
@@ -153,10 +154,6 @@ function Player:new(area, x, y, opts)
   -- Ammo
   self.max_ammo = 100
   self.ammo = self.max_ammo
-
-  -- SP
-  sp = 0
-  max_sp = 999
 
   -- Collision
   self.collider = self.area.world:newCircleCollider(self.x, self.y, self.w)
@@ -578,6 +575,8 @@ function Player:die()
   for i = 1, love.math.random(8, 12) do 
     self.area:addGameObject('ExplodeParticle', self.x, self.y) 
   end
+  
+  if self.gain_sp_on_death then self:addSP(20) end
 
   current_room:finish()
 end

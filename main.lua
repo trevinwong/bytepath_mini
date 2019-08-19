@@ -92,6 +92,11 @@ function love.load()
         end
     )
     
+    -- SP
+    sp = 0
+    max_sp = 999
+
+    
     current_room = Stage()
 end
 
