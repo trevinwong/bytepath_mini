@@ -277,7 +277,7 @@ function Projectile:die()
 	local death_color = (self.color == default_color) and hp_color or self.color
 
 	if self.attack == 'Explode' then
-		self.area:addGameObject('Explosion', self.x, self.y)
+		self:createExplosion()
 	else
 		self.area:addGameObject('ProjectileDeathEffect', self.x, self.y, 
 			{color = death_color, w = 3*self.s})
@@ -412,6 +412,25 @@ end
 
 function Projectile:onDurationExpired()
 	if current_room.player.projectiles_explode_on_expiration then
-		self.area:addGameObject('Explosion', self.x, self.y)
+		self:createExplosion()
+	end
+end
+
+function Projectile:createExplosion()
+	self.area:addGameObject('Explosion', self.x, self.y)
+	if current_room.player.projectiles_explosion then
+		self:barrage()
+	end
+end
+
+--[[
+	An interesting note: timer:after() doesn't work here.
+	Why? The projectile dies before the timer goes off, destroying the timer and thus never calling back the call to add the barrage projectile.
+	Something important to think about.
+]]-- 
+function Projectile:barrage()
+	for i = 1, 5 + current_room.player.additional_barrage_projectiles do
+		local random_angle = random(-math.pi * 2, math.pi * 2)
+		self.area:addGameObject('Projectile', self.x, self.y, {r = self.r + random_angle, attack = "Neutral"})
 	end
 end

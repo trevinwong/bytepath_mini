@@ -99,6 +99,7 @@ function Player:new(area, x, y, opts)
 	self.additional_barrage_projectiles = 0
 	self.barrage_nova = false
 	self.projectiles_explode_on_expiration = false
+	self.projectiles_explosion = false
 
 	self.start_with_attack_passives = {}
 
@@ -158,7 +159,7 @@ function Player:new(area, x, y, opts)
 	self.shoot_timer = 0
 	self.shoot_cooldown = 0.24
 	local startingAttack = self:returnRandomStartingAttack()
-	if startingAttack then self:setAttack(startingAttack) else self:setAttack("Neutral") end
+	if startingAttack then self:setAttack(startingAttack) else self:setAttack("Explode") end
 
 	-- Test
 	self.dont_move = false
@@ -865,7 +866,7 @@ function Player:barrage()
 				self.area:addGameObject('Projectile', 
 					self.x + d*math.cos(self.r + random_angle), 
 					self.y + d*math.sin(self.r + random_angle), 
-					{r = self.r + random_angle, attack = self.attack})
+					{r = self.r + random_angle, attack = "Neutral"})
 			end)
 	end
 end
