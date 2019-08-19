@@ -70,7 +70,7 @@ function Player:new(area, x, y, opts)
   self.regain_boost_on_kill_chance = 0
   self.spawn_boost_on_kill_chance = 0
   self.gain_aspd_boost_on_kill_chance = 0	
-  self.mvspd_boost_on_cycle_chance = 0
+  self.mvspd_boost_on_cycle_chance = 100
   self.pspd_boost_on_cycle_chance = 0
   self.pspd_inhibit_on_cycle_chance = 0
   self.launch_homing_projectile_while_boosting_chance = 0
@@ -106,12 +106,16 @@ function Player:new(area, x, y, opts)
   self.change_attack_periodically = false
   self.gain_sp_on_death = false
   self.convert_hp_to_sp_if_hp_full = false
+  self.mvspd_to_aspd = false
 
   self.start_with_attack_passives = {}
 
   for _, name in ipairs(attackNames) do
     self.start_with_attack_passives["start_with_" .. name] = false
   end
+  
+  -- Conversions
+  self.mvspd_to_aspd = 100
 
   -- Mines
   self.timer:every(0.5, function() 
@@ -165,7 +169,7 @@ function Player:new(area, x, y, opts)
   self.shoot_timer = 0
   self.shoot_cooldown = 0.24
   local startingAttack = self:returnRandomStartingAttack()
-  if startingAttack then self:setAttack(startingAttack) else self:setAttack("4Split") end
+  if startingAttack then self:setAttack(startingAttack) else self:setAttack("Neutral") end
   if self.change_attack_periodically then
     self.timer:every(10, function()
         self:setAttack(selectRandomKey(attacks))
@@ -304,6 +308,7 @@ function Player:update(dt)
   -- Passives
 
   -- Aspd
+  if self.mvspd_to_aspd > 0 then self.aspd_multiplier:increase((self.mvspd_to_aspd)*(self.mvspd_multiplier.value) - 100) end
   if self.inside_haste_area then self.aspd_multiplier:increase(100) end
   if self.aspd_boosting then self.aspd_multiplier:increase(100) end
   self.aspd_multiplier:update(dt)
