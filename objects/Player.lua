@@ -104,7 +104,8 @@ function Player:new(area, x, y, opts)
   self.projectiles_explosion = false
   self.energy_shield = false
   self.change_attack_periodically = false
-  self.gain_sp_on_death = true
+  self.gain_sp_on_death = false
+  self.convert_hp_to_sp_if_hp_full = false
 
   self.start_with_attack_passives = {}
 
@@ -575,8 +576,11 @@ function Player:die()
   for i = 1, love.math.random(8, 12) do 
     self.area:addGameObject('ExplodeParticle', self.x, self.y) 
   end
-  
-  if self.gain_sp_on_death then self:addSP(20) end
+
+  if self.gain_sp_on_death then 
+    self:addSP(20) 
+    self.area:addGameObject('InfoText', self.x, self.y, {text = '+20SP', w = self.w, h = self.h, color = skill_point_color})
+  end
 
   current_room:finish()
 end
@@ -720,6 +724,12 @@ function Player:onHPPickup()
   if self.chances.spawn_haste_area_on_hp_pickup_chance:next() then
     self.area:addGameObject('HasteArea', self.x, self.y)
     self.area:addGameObject('InfoText', self.x, self.y, {text = 'Haste Area!', w = self.w, h = self.h})
+  end
+  if self.convert_hp_to_sp_if_hp_full then
+    if self.hp == self.max_hp then 
+      self:addSP(3) 
+      self.area:addGameObject('InfoText', self.x, self.y, {text = '+3SP', w = self.w, h = self.h, color = skill_point_color})
+    end
   end
 end
 
