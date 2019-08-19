@@ -100,6 +100,7 @@ function Player:new(area, x, y, opts)
 	self.barrage_nova = false
 	self.projectiles_explode_on_expiration = false
 	self.projectiles_explosion = false
+	self.energy_shield = true
 
 	self.start_with_attack_passives = {}
 
@@ -141,6 +142,10 @@ function Player:new(area, x, y, opts)
 	-- Health
 	self.max_hp = 100
 	self.hp = self.max_hp
+
+	-- ES
+	self.energy_shield_recharge_cooldown = 2
+	self.energy_shield_recharge_amount = 1
 
 	-- Ammo
 	self.max_ammo = 100
@@ -246,6 +251,9 @@ function Player:setStats()
 	self.hp = self.max_hp
 	self.ammo = self.max_ammo
 	self.boost = self.max_boost
+    if self.energy_shield then
+        self.invulnerability_time_multiplier = self.invulnerability_time_multiplier/2
+    end
 end
 
 function Player:update(dt)
@@ -631,6 +639,16 @@ end
 function Player:hit(damage)
 	if self.invincible then return end
 	local damage = damage or 10
+	
+	if self.energy_shield then
+        damage = damage*2
+        self.timer:after('es_cooldown', self.energy_shield_recharge_cooldown, function()
+            self.timer:every('es_amount', 0.25, function()
+                self:addHP(self.energy_shield_recharge_amount)
+            end)
+        end)
+    end
+	
 	for i = 1, love.math.random(4, 8) do 
 		self.area:addGameObject('ExplodeParticle', self.x, self.y) 
 	end
