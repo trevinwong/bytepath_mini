@@ -30,6 +30,7 @@ function Player:new(area, x, y, opts)
 	self.projectile_duration_multiplier = 1
 	self.area_multiplier = 1
 	self.laser_width_multiplier = 1
+	self.energy_shield_recharge_amount_multiplier = 1
 	self.attack_spawn_chance_multipliers = {}
 
 	for _, name in ipairs(attackNames) do
@@ -644,7 +645,7 @@ function Player:hit(damage)
         damage = damage*2
         self.timer:after('es_cooldown', self.energy_shield_recharge_cooldown, function()
             self.timer:every('es_amount', 0.25, function()
-                self:addHP(self.energy_shield_recharge_amount)
+                self:addHP(self.energy_shield_recharge_amount * self.energy_shield_recharge_amount_multiplier)
             end)
         end)
     end
