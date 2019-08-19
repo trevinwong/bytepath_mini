@@ -75,6 +75,7 @@ function Projectile:new(area, x, y, opts)
 		if not self.shield then
 			self.timer:tween(random(0.4, 0.6) * current_room.player.projectile_duration_multiplier, self, {v = 0}, 'linear', function() 
 					self:die() 
+					self:onDurationExpired()
 				end)
 		end
 	end
@@ -88,7 +89,10 @@ function Projectile:new(area, x, y, opts)
 						color = self.color, s = self.s})
 			end)
 		if not self.shield then
-			self.timer:after(random(2.4, 3.2) * current_room.player.projectile_duration_multiplier, function() self:die() end)
+			self.timer:after(random(2.4, 3.2) * current_room.player.projectile_duration_multiplier, function() 
+					self:die() 
+					self:onDurationExpired()
+				end)
 		end
 	end
 
@@ -102,6 +106,7 @@ function Projectile:new(area, x, y, opts)
 		if not self.shield then
 			self.timer:tween(random(0.6, 0.8) * current_room.player.projectile_duration_multiplier, self, {v = 0}, 'linear', function() 
 					self:die() 
+					self:onDurationExpired()
 				end)
 		end
 	end
@@ -134,7 +139,10 @@ function Projectile:new(area, x, y, opts)
 
 		self.invisible = true
 		self.timer:after(0.05, function() self.invisible = false end)
-		self.timer:after(6 * current_room.player.projectile_duration_multiplier, function() self:die() end)
+		self.timer:after(6 * current_room.player.projectile_duration_multiplier, function() 
+				self:die() 
+				self:onDurationExpired()
+			end)
 	end
 
 	self.collider = self.area.world:newCircleCollider(self.x, self.y, self.s)
@@ -399,5 +407,11 @@ function Projectile:onEnemyHit(enemy_position)
 			self.area:addGameObject('Projectile', 
 				x, y, {r = angle_4, attack = 'Neutral', color = attacks[self.attack].color, back_color = attacks[self.attack].color})
 		end
+	end
+end
+
+function Projectile:onDurationExpired()
+	if current_room.player.projectiles_explode_on_expiration then
+		self.area:addGameObject('Explosion', self.x, self.y)
 	end
 end

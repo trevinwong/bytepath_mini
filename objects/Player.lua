@@ -97,6 +97,7 @@ function Player:new(area, x, y, opts)
 	self.additional_homing_projectiles = 0
 	self.additional_barrage_projectiles = 0
 	self.barrage_nova = false
+	self.projectiles_explode_on_expiration = false
 
 	self.start_with_attack_passives = {}
 
