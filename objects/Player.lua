@@ -80,6 +80,7 @@ function Player:new(area, x, y, opts)
 	self.shield_projectile_chance = 0
 	self.split_projectiles_split_chance = 0
 	self.drop_mines_chance = 0
+	self.explode_on_cycle_chance = 0
 
 	-- Passives
 	self.increased_cycle_speed_while_boosting = false
@@ -741,7 +742,28 @@ function Player:onCycle()
 		self.area:addGameObject('InfoText', self.x, self.y, 
 			{text = 'PSPD Inhibit!', color = skill_point_color, w = self.w, h = self.h})
 	end
-
+	if self.chances.explode_on_cycle_chance:next() then
+		-- This isn't totally like the author's explosion (his is a square), but I figured a circle would work just as good (and it's easier to implement)
+		local min_d = 2.5*self.w
+		local max_d = 3*self.w
+		local min_time = 0.1
+		local max_time = 0.3
+		local num_explosions = 12
+		local r = 0
+		local r_offset = 2*math.pi / num_explosions
+		local list_of_r = {}
+		for i = 1, num_explosions do
+			table.insert(list_of_r, r)
+			r = r + r_offset
+		end
+		for i = 1, num_explosions do
+			local time = random(min_time, max_time)
+			local d = random(min_d, max_d)
+			self.timer:after(time, function()
+					self.area:addGameObject('Explosion', self.x + 1.5*d*math.cos(list_of_r[i]), self.y + 1.5*d*math.sin(list_of_r[i]))
+				end)
+		end
+	end
 end
 
 function Player:onKill(enemy_death_location)
