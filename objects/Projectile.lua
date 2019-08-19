@@ -312,7 +312,7 @@ end
 
 function Projectile:onWallHit()
 	local x, y = self.x, self.y
-	if self.attack == '2Split' then
+	if self.attack == '2Split' or self.attack == '4Split' then
 		local angle_1 = 0
 		local angle_2 = 0
 		if self.x < 0 or self.x > gw then
@@ -333,37 +333,6 @@ function Projectile:onWallHit()
 				x, y, {r = angle_1, attack = 'Neutral', color = attacks[self.attack].color, back_color = attacks[self.attack].color})
 			self.area:addGameObject('Projectile', 
 				x, y, {r = angle_2, attack = 'Neutral', color = attacks[self.attack].color, back_color = attacks[self.attack].color})
-		end
-	elseif self.attack == '4Split' then
-		local angle_1 = 0
-		local angle_2 = 0
-		if self.x < 0 or self.x > gw then
-			angle_1 = math.pi - self.r
-			angle_2 = math.pi + self.r
-		end
-		if self.y < 0 or self.y > gh then
-			angle_1 = 2*math.pi - self.r
-			angle_2 = math.pi + self.r
-		end
-		if current_room.player.chances.split_projectiles_split_chance:next() then
-			self.area:addGameObject('Projectile', 
-				x, y, {r = angle_1, attack = self.attack, color = attacks[self.attack].color, back_color = attacks[self.attack].color})
-			self.area:addGameObject('Projectile', 
-				x, y, {r = angle_2, attack = self.attack, color = attacks[self.attack].color, back_color = attacks[self.attack].color})
-			self.area:addGameObject('Projectile', 
-				x, y, {r = angle_3, attack = self.attack, color = attacks[self.attack].color, back_color = attacks[self.attack].color})
-			self.area:addGameObject('Projectile', 
-				x, y, {r = angle_4, attack = self.attack, color = attacks[self.attack].color, back_color = attacks[self.attack].color})
-
-		else
-			self.area:addGameObject('Projectile', 
-				x, y, {r = angle_1, attack = 'Neutral', color = attacks[self.attack].color, back_color = attacks[self.attack].color})
-			self.area:addGameObject('Projectile', 
-				x, y, {r = angle_2, attack = 'Neutral', color = attacks[self.attack].color, back_color = attacks[self.attack].color})
-			self.area:addGameObject('Projectile', 
-				x, y, {r = angle_3, attack = 'Neutral', color = attacks[self.attack].color, back_color = attacks[self.attack].color})
-			self.area:addGameObject('Projectile', 
-				x, y, {r = angle_4, attack = 'Neutral', color = attacks[self.attack].color, back_color = attacks[self.attack].color})
 		end
 	end
 end
