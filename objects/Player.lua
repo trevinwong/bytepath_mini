@@ -30,7 +30,8 @@ function Player:new(area, x, y, opts)
 	self.projectile_duration_multiplier = 1
 	self.area_multiplier = 1
 	self.laser_width_multiplier = 1
-	self.energy_shield_recharge_amount_multiplier = 1
+	self.energy_shield_recharge_amount_multiplier = 2
+	self.energy_shield_recharge_cooldown_multiplier = 1
 	self.attack_spawn_chance_multipliers = {}
 
 	for _, name in ipairs(attackNames) do
@@ -643,7 +644,13 @@ function Player:hit(damage)
 	
 	if self.energy_shield then
         damage = damage*2
-        self.timer:after('es_cooldown', self.energy_shield_recharge_cooldown, function()
+		--[[
+			Something the author forgot to add: the 'es_amount' timer doesn't actually get cancelled until the timer call gets run, which doesn't make much sense
+			as it means there isn't actually a period of time in which the energy shield isn't regenerating. As you can imagine this is a little too good so it's important to add
+			the line to cancel the 'es_amount' timer.
+		]]--
+		self.timer:cancel('es_amount')
+        self.timer:after('es_cooldown', self.energy_shield_recharge_cooldown * self.energy_shield_recharge_cooldown_multiplier, function()
             self.timer:every('es_amount', 0.25, function()
                 self:addHP(self.energy_shield_recharge_amount * self.energy_shield_recharge_amount_multiplier)
             end)
