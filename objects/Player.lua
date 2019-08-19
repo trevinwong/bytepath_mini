@@ -79,6 +79,7 @@ function Player:new(area, x, y, opts)
 	self.gain_double_sp_chance = 0
 	self.shield_projectile_chance = 0
 	self.split_projectiles_split_chance = 0
+	self.drop_mines_chance = 0
 
 	-- Passives
 	self.increased_cycle_speed_while_boosting = false
@@ -102,6 +103,14 @@ function Player:new(area, x, y, opts)
 	for _, name in ipairs(attackNames) do
 		self.start_with_attack_passives["start_with_" .. name] = false
 	end
+
+	-- Mines
+	self.timer:every(0.5, function() 
+			if self.chances.drop_mines_chance:next() then
+				local d = 1.2*self.w
+				self.area:addGameObject('Projectile', self.x - 1.5*d*math.cos(self.r), self.y - 1.5*d*math.sin(self.r), {r = self.r, mine = true, attack = "Neutral"})
+			end
+		end)
 
 	-- Geometry
 	self.x, self.y = x, y
@@ -147,7 +156,6 @@ function Player:new(area, x, y, opts)
 	self.shoot_timer = 0
 	self.shoot_cooldown = 0.24
 	local startingAttack = self:returnRandomStartingAttack()
-	print(startingAttack)
 	if startingAttack then self:setAttack(startingAttack) else self:setAttack("Neutral") end
 
 	-- Test
@@ -399,7 +407,7 @@ function Player:shoot()
 	self.ammo = self.ammo - (attacks[self.attack].ammo * self.ammo_consumption_multiplier)
 
 	local mods = {
-		shield = self.chances.shield_projectile_chance:next()
+		shield = self.chances.shield_projectile_chance:next(),
 	}
 
 	if self.attack == 'Neutral' then
