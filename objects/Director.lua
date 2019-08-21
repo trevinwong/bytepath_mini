@@ -14,93 +14,97 @@ Director = GameObject:extend()
 
 function Director:new(area, x, y, opts)
 	Director.super.new(self, area, x, y, opts)
-    self.difficulty = 1
-	
-    self.difficulty_to_points = {}
-    self.difficulty_to_points[1] = 16
-    for i = 2, 1024, 4 do
-        self.difficulty_to_points[i] = self.difficulty_to_points[i-1] + 8
-        self.difficulty_to_points[i+1] = self.difficulty_to_points[i]
-        self.difficulty_to_points[i+2] = math.floor(self.difficulty_to_points[i+1]/1.5)
-        self.difficulty_to_points[i+3] = math.floor(self.difficulty_to_points[i+2]*2)
-    end
-	
+	self.difficulty = 1
+
+	self.difficulty_to_points = {}
+	self.difficulty_to_points[1] = 16
+	for i = 2, 1024, 4 do
+		self.difficulty_to_points[i] = self.difficulty_to_points[i-1] + 8
+		self.difficulty_to_points[i+1] = self.difficulty_to_points[i]
+		self.difficulty_to_points[i+2] = math.floor(self.difficulty_to_points[i+1]/1.5)
+		self.difficulty_to_points[i+3] = math.floor(self.difficulty_to_points[i+2]*2)
+	end
+
 	-- Enemies
 	self.enemy_to_points = {
-        ['Rock'] = 1,
-        ['Shooter'] = 2,
-    }
-	
+		['Rock'] = 1,
+		['Shooter'] = 2,
+	}
+
 	self.enemy_spawn_chances = {
-        [1] = chanceList({'Rock', 1}),
-        [2] = chanceList({'Rock', 8}, {'Shooter', 4}),
-        [3] = chanceList({'Rock', 8}, {'Shooter', 8}),
-        [4] = chanceList({'Rock', 4}, {'Shooter', 8}),
-    }
-	
+		[1] = chanceList({'Rock', 1}),
+		[2] = chanceList({'Rock', 8}, {'Shooter', 4}),
+		[3] = chanceList({'Rock', 8}, {'Shooter', 8}),
+		[4] = chanceList({'Rock', 4}, {'Shooter', 8}),
+	}
+
 	for i = 5, 1024 do
-        self.enemy_spawn_chances[i] = chanceList(
-      	    {'Rock', love.math.random(2, 12)}, 
-      	    {'Shooter', love.math.random(2, 12)}
-    	)
-    end
-	
+		self.enemy_spawn_chances[i] = chanceList(
+			{'Rock', love.math.random(2, 12)}, 
+			{'Shooter', love.math.random(2, 12)}
+		)
+	end
+
 	self.timer:every(22/self.player.enemy_spawn_rate_multiplier, function()
 			self.difficulty = self.difficulty + 1
 			self:setEnemySpawnsForThisRound()
 		end
 	)
-	
+
 	-- Spawn enemies immediately for Round 1
 	self:setEnemySpawnsForThisRound()
-	
+
 	-- Resources
-    self.resource_spawn_chances = chanceList({'Boost', 28*self.player.boost_spawn_chance_multiplier}, 
-    {'HP', 14*self.player.hp_spawn_chance_multiplier}, {'SP', 58*self.player.sp_spawn_chance_multiplier})
+	self.resource_spawn_chances = chanceList({'Boost', 28*self.player.boost_spawn_chance_multiplier}, 
+		{'HP', 14*self.player.hp_spawn_chance_multiplier}, {'SP', 58*self.player.sp_spawn_chance_multiplier})
 	self.timer:every(16/self.player.resource_spawn_rate_multiplier, function()
-			local resource_name = self.resource_spawn_chances:next()
-			self.area:addGameObject(resource_name)
-			self.player:onResourceSpawn(resource_name)
+			if self.player.only_spawn_boost then 
+				self.area:addGameObject('Boost') 
+			else
+				local resource_name = self.resource_spawn_chances:next()
+				self.area:addGameObject(resource_name)
+				self.player:onResourceSpawn(resource_name)
+			end
 		end
 	)
-	
+
 	-- Attacks
 	self:generateAttackSpawnChances()
 	self.timer:every(30/self.player.attack_spawn_rate_multiplier, function()
 			self.area:addGameObject('Attack', 0, 0, {attack = self.attack_spawn_chances:next()})
 		end
 	)
-	
+
 end
 
 function Director:update(dt)
-    Director.super.update(self, dt)
+	Director.super.update(self, dt)
 end
 
 function Director:setEnemySpawnsForThisRound()
-    local points = self.difficulty_to_points[self.difficulty]
+	local points = self.difficulty_to_points[self.difficulty]
 
-    -- Find enemies
-    local enemy_list = {}
-    while points > 0 do
-        local enemy = self.enemy_spawn_chances[self.difficulty]:next()
-        points = points - self.enemy_to_points[enemy]
-        table.insert(enemy_list, enemy)
-    end
-	
-    -- Find enemies spawn times
-    local enemy_spawn_times = {}
-    for i = 1, #enemy_list do 
-    	enemy_spawn_times[i] = random(0, self.round_duration) 
-    end
-    table.sort(enemy_spawn_times, function(a, b) return a < b end)
-	
-	
-    for i = 1, #enemy_spawn_times do
-        self.timer:after(enemy_spawn_times[i], function()
-            self.area:addGameObject(enemy_list[i])
-        end)
-    end
+	-- Find enemies
+	local enemy_list = {}
+	while points > 0 do
+		local enemy = self.enemy_spawn_chances[self.difficulty]:next()
+		points = points - self.enemy_to_points[enemy]
+		table.insert(enemy_list, enemy)
+	end
+
+	-- Find enemies spawn times
+	local enemy_spawn_times = {}
+	for i = 1, #enemy_list do 
+		enemy_spawn_times[i] = random(0, self.round_duration) 
+	end
+	table.sort(enemy_spawn_times, function(a, b) return a < b end)
+
+
+	for i = 1, #enemy_spawn_times do
+		self.timer:after(enemy_spawn_times[i], function()
+				self.area:addGameObject(enemy_list[i])
+			end)
+	end
 end
 
 function Director:generateAttackSpawnChances()
@@ -114,11 +118,11 @@ function Director:generateAttackSpawnChances()
 		nil, which lead to much confusion here...
 	]]--
 	local initial_chance = 1 / returnTableLength(attacks)
-	
+
 	for i, attackName in ipairs(attackNames) do
 		table.insert(attack_spawn_chance_definitions, {attackName, math.ceil(initial_chance * attack_spawn_chance_multipliers[attackName .. "_spawn_chance_multiplier"])})
 	end
-	
+
 	self.attack_spawn_chances = chanceList(unpack(attack_spawn_chance_definitions))
 end
 
