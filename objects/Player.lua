@@ -116,6 +116,7 @@ function Player:new(area, x, y, opts)
 	self.only_spawn_boost = false
 	self.only_spawn_attack = false
 	self.no_ammo_drop = false
+	self.infinite_ammo = true
 
 	self.start_with_attack_passives = {}
 
@@ -594,6 +595,10 @@ function Player:shoot()
 		self.area:addGameObject('Laser',
 			x1, y1, {x2 = x2, y2 = y2, r = self.r, wm = self.laser_width_multiplier})
 	end
+	
+	-- This would normally be set at the top, but the Lightning is different in that it subtracts ammo only if it hits an enemy.
+	-- Ideally, this should be re-factored in a way such that we don't have this nasty duplicated code, but given how little I'm touching this function, I think it's fine
+	if self.infinite_ammo then self.ammo = self.max_ammo end
 
 	if self.ammo <= 0 then 
 		self:setAttack('Neutral')
