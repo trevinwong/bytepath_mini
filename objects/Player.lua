@@ -115,6 +115,7 @@ function Player:new(area, x, y, opts)
 	self.refill_boost_if_hp_full = false
 	self.only_spawn_boost = false
 	self.only_spawn_attack = false
+	self.no_ammo_drop = false
 
 	self.start_with_attack_passives = {}
 
@@ -851,7 +852,7 @@ end
 
 function Player:onKill(enemy_death_location)
 	-- Enemies originally did not spawn Ammo upon death, so I added it.
-	self.area:addGameObject('Ammo', unpack(enemy_death_location))
+	if not self.no_ammo_drop then self.area:addGameObject('Ammo', unpack(enemy_death_location)) end
 	if self.chances.drop_double_ammo_chance:next() then
 		self.area:addGameObject('Ammo', unpack(enemy_death_location))
 		self.area:addGameObject('InfoText', self.x, self.y, {text = 'Double Ammo!', color = ammo_color, w = self.w, h = self.h})
