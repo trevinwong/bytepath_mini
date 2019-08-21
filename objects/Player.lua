@@ -111,6 +111,7 @@ function Player:new(area, x, y, opts)
 	self.half_ammo = false
 	self.half_hp = false
 	self.deals_damage_while_invulnerable = false
+	self.refill_ammo_if_hp_full = true
 
 	self.start_with_attack_passives = {}
 
@@ -176,7 +177,7 @@ function Player:new(area, x, y, opts)
 	self.shoot_timer = 0
 	self.shoot_cooldown = 0.24
 	local startingAttack = self:returnRandomStartingAttack()
-	if startingAttack then self:setAttack(startingAttack) else self:setAttack("Neutral") end
+	if startingAttack then self:setAttack(startingAttack) else self:setAttack("Explode") end
 	if self.change_attack_periodically then
 		self.timer:every(10, function()
 				self:setAttack(selectRandomKey(attacks))
@@ -269,11 +270,11 @@ function Player:setStats()
 	self.max_hp = (self.max_hp + self.flat_hp)*self.hp_multiplier	
 	self.max_ammo = (self.max_ammo + self.flat_ammo)*self.ammo_multiplier
 	self.max_boost = (self.max_boost + self.flat_boost)*self.boost_multiplier
-	
+
 	if self.no_boost then self.max_boost = 0 end
 	if self.half_ammo then self.max_ammo = self.max_ammo / 2 end
 	if self.half_hp then self.max_hp = self.max_hp / 2 end
-	
+
 	self.hp = self.max_hp
 	self.ammo = self.max_ammo
 	self.boost = self.max_boost
@@ -319,7 +320,7 @@ function Player:update(dt)
 	if self.collider:enter('Enemy') then
 		local collision_data = self.collider:getEnterCollisionData('Enemy')
 		local object = collision_data.collider:getObject()
-		
+
 		if self.invincible then 
 			-- Normally this means that the object would get shredded to pieces since this is on every tick, but since the player usually ends up pushing away the enemy, it feels balanced
 			if object then object:hit(30) end 
@@ -754,10 +755,14 @@ function Player:onHPPickup()
 		self.area:addGameObject('HasteArea', self.x, self.y)
 		self.area:addGameObject('InfoText', self.x, self.y, {text = 'Haste Area!', w = self.w, h = self.h})
 	end
-	if self.convert_hp_to_sp_if_hp_full then
-		if self.hp == self.max_hp then 
+	if self.hp == self.max_hp then 
+		if self.convert_hp_to_sp_if_hp_full then
 			self:addSP(3) 
 			self.area:addGameObject('InfoText', self.x, self.y, {text = '+3SP', w = self.w, h = self.h, color = skill_point_color})
+		end
+		if self.refill_ammo_if_hp_full then 
+			self.ammo = self.max_ammo 
+			self.area:addGameObject('InfoText', self.x, self.y, {text = 'MAX Ammo!', w = self.w, h = self.h, color = ammo_color})
 		end
 	end
 end
