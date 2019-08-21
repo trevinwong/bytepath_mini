@@ -116,7 +116,7 @@ function Player:new(area, x, y, opts)
 	self.only_spawn_boost = false
 	self.only_spawn_attack = false
 	self.no_ammo_drop = false
-	self.infinite_ammo = true
+	self.infinite_ammo = false
 
 	self.start_with_attack_passives = {}
 
@@ -182,7 +182,7 @@ function Player:new(area, x, y, opts)
 	self.shoot_timer = 0
 	self.shoot_cooldown = 0.24
 	local startingAttack = self:returnRandomStartingAttack()
-	if startingAttack then self:setAttack(startingAttack) else self:setAttack("Explode") end
+	if startingAttack then self:setAttack(startingAttack) else self:setAttack("Neutral") end
 	if self.change_attack_periodically then
 		self.timer:every(10, function()
 				self:setAttack(selectRandomKey(attacks))
@@ -326,7 +326,7 @@ function Player:update(dt)
 		local collision_data = self.collider:getEnterCollisionData('Enemy')
 		local object = collision_data.collider:getObject()
 
-		if self.invincible then 
+		if self.invincible and self.deals_damage_while_invulnerable then 
 			-- Normally this means that the object would get shredded to pieces since this is on every tick, but since the player usually ends up pushing away the enemy, it feels balanced
 			if object then object:hit(30) end 
 		end

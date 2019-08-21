@@ -15,4 +15,4 @@ negative_colors = {
 }
 all_colors = M.append(default_colors, negative_colors)
 
-enemies = {'Rock', 'Shooter'}
+enemies = {'Rock', 'Shooter', 'BigRock'}

@@ -5,18 +5,18 @@ Rock = GameObject:extend()
 function Rock:new(area, x, y, opts)
     Rock.super.new(self, area, x, y, opts)
 
-    local direction = table.random({-1, 1})
-    self.x = gw/2 + direction*(gw/2 + 48)
-    self.y = random(16, gh - 16)
+    self.direction = opts.direction or table.random({-1, 1})
+    self.x = opts.x or gw/2 + self.direction*(gw/2 + 48)
+    self.y = opts.y or random(16, gh - 16)
     self.hp = 100
 
     self.w, self.h = 8, 8
-    self.collider = self.area.world:newPolygonCollider(createIrregularPolygon(8))
+    self.collider = self.area.world:newPolygonCollider(self:createIrregularPolygon(8))
     self.collider:setPosition(self.x, self.y)
     self.collider:setObject(self)
     self.collider:setCollisionClass('Enemy')
     self.collider:setFixedRotation(false)
-    self.v = -direction*random(20, 40)
+    self.v = -self.direction*random(20, 40)
     self.collider:setLinearVelocity(self.v, 0)
     self.collider:applyAngularImpulse(random(-100, 100))
     self:getWidthAndHeight()
@@ -33,7 +33,7 @@ function Rock:draw()
     love.graphics.setColor(default_color)
 end
 
-function createIrregularPolygon(size, point_amount)
+function Rock:createIrregularPolygon(size, point_amount)
     local point_amount = point_amount or 8
     local points = {}
     for i = 1, point_amount do
@@ -67,10 +67,19 @@ function Rock:getWidthAndHeight()
 end
 
 function Rock:die()
-   self.dead = true
-   local width, height = self:getWidthAndHeight()
-   self.area:addGameObject('EnemyDeathEffect', self.x, self.y, 
-    {color = hp_color, w = 30, h = 30})
-    current_room.score = current_room.score + 100
-    current_room.player:onKill({self.x, self.y})
+    --[[
+        It is possible for enemies to be overkilled by two sources of damage in the same tick, which would trigger death events twice
+    ]]--
+    if not self.dead then
+        self.dead = true
+        local width, height = self:getWidthAndHeight()
+        self.area:addGameObject('EnemyDeathEffect', self.x, self.y, 
+            {color = hp_color, w = 30, h = 30})
+        current_room.score = current_room.score + 100
+        current_room.player:onKill({self.x, self.y})
+    end
+end
+
+function Rock:destroy()
+	Rock.super.destroy(self)
 end
