@@ -111,7 +111,8 @@ function Player:new(area, x, y, opts)
 	self.half_ammo = false
 	self.half_hp = false
 	self.deals_damage_while_invulnerable = false
-	self.refill_ammo_if_hp_full = true
+	self.refill_ammo_if_hp_full = false
+	self.refill_boost_if_hp_full = false
 
 	self.start_with_attack_passives = {}
 
@@ -763,6 +764,10 @@ function Player:onHPPickup()
 		if self.refill_ammo_if_hp_full then 
 			self.ammo = self.max_ammo 
 			self.area:addGameObject('InfoText', self.x, self.y, {text = 'MAX Ammo!', w = self.w, h = self.h, color = ammo_color})
+		end
+		if self.refill_boost_if_hp_full then
+			self.boost = self.max_boost
+			self.area:addGameObject('InfoText', self.x, self.y, {text = 'MAX Boost!', w = self.w, h = self.h, color = boost_color})
 		end
 	end
 end
