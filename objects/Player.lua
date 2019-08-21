@@ -108,6 +108,7 @@ function Player:new(area, x, y, opts)
 	self.convert_hp_to_sp_if_hp_full = false
 	self.mvspd_to_aspd = false
 	self.no_boost = false
+	self.half_ammo = false
 
 	self.start_with_attack_passives = {}
 
@@ -268,6 +269,7 @@ function Player:setStats()
 	self.max_boost = (self.max_boost + self.flat_boost)*self.boost_multiplier
 	
 	if self.no_boost then self.max_boost = 0 end
+	if self.half_ammo then self.max_ammo = self.max_ammo / 2 end
 	
 	self.hp = self.max_hp
 	self.ammo = self.max_ammo
