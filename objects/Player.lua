@@ -30,7 +30,7 @@ function Player:new(area, x, y, opts)
 	self.projectile_duration_multiplier = 1
 	self.area_multiplier = 1
 	self.laser_width_multiplier = 1
-	self.energy_shield_recharge_amount_multiplier = 2
+	self.energy_shield_recharge_amount_multiplier = 1
 	self.energy_shield_recharge_cooldown_multiplier = 1
 	self.attack_spawn_chance_multipliers = {}
 
@@ -70,7 +70,7 @@ function Player:new(area, x, y, opts)
 	self.regain_boost_on_kill_chance = 0
 	self.spawn_boost_on_kill_chance = 0
 	self.gain_aspd_boost_on_kill_chance = 0	
-	self.mvspd_boost_on_cycle_chance = 100
+	self.mvspd_boost_on_cycle_chance = 0
 	self.pspd_boost_on_cycle_chance = 0
 	self.pspd_inhibit_on_cycle_chance = 0
 	self.launch_homing_projectile_while_boosting_chance = 0
@@ -110,6 +110,7 @@ function Player:new(area, x, y, opts)
 	self.no_boost = false
 	self.half_ammo = false
 	self.half_hp = false
+	self.deals_damage_while_invulnerable = false
 
 	self.start_with_attack_passives = {}
 
@@ -318,6 +319,11 @@ function Player:update(dt)
 	if self.collider:enter('Enemy') then
 		local collision_data = self.collider:getEnterCollisionData('Enemy')
 		local object = collision_data.collider:getObject()
+		
+		if self.invincible then 
+			-- Normally this means that the object would get shredded to pieces since this is on every tick, but since the player usually ends up pushing away the enemy, it feels balanced
+			if object then object:hit(30) end 
+		end
 		self:hit(-30)
 	end
 
