@@ -114,6 +114,7 @@ function Player:new(area, x, y, opts)
 	self.refill_ammo_if_hp_full = false
 	self.refill_boost_if_hp_full = false
 	self.only_spawn_boost = false
+	self.only_spawn_attack = false
 
 	self.start_with_attack_passives = {}
 

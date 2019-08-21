@@ -58,7 +58,13 @@ function Director:new(area, x, y, opts)
 	self.resource_spawn_chances = chanceList({'Boost', 28*self.player.boost_spawn_chance_multiplier}, 
 		{'HP', 14*self.player.hp_spawn_chance_multiplier}, {'SP', 58*self.player.sp_spawn_chance_multiplier})
 	self.timer:every(16/self.player.resource_spawn_rate_multiplier, function()
-			if self.player.only_spawn_boost then 
+			--[[
+				What should happen if the player has both "only_spawn" passives enabled? Well, only_spawn_boost makes it so the only resources spawned are boosts, and
+				only_spawn_attack overrides the spawning of resources to spawn only attacks, so, it works out.
+			]]--
+			if self.player.only_spawn_attack then
+				self.area:addGameObject('Attack', 0, 0, {attack = self.attack_spawn_chances:next()})
+			elseif self.player.only_spawn_boost then 
 				self.area:addGameObject('Boost') 
 			else
 				local resource_name = self.resource_spawn_chances:next()
