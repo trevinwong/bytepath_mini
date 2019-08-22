@@ -88,7 +88,7 @@ function love.load()
         end
     )
     input:bind('6', function()
-            slow_amount = 5
+            slow_amount = 0
         end
     )
     
