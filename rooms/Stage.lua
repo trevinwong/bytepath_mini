@@ -44,7 +44,7 @@ function Stage:new()
             self.score = self.score * 10
         end)
     input:bind('q', function()
-            self.area:addGameObject('Waver')
+            self.area:addGameObject('Seeker')
         end)
 end
 
