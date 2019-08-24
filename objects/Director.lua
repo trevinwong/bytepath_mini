@@ -45,6 +45,7 @@ function Director:new(area, x, y, opts)
 		)
 	end
 
+--[[
 	self.timer:every(22/self.player.enemy_spawn_rate_multiplier, function()
 			self.difficulty = self.difficulty + 1
 			self:setEnemySpawnsForThisRound()
@@ -53,7 +54,7 @@ function Director:new(area, x, y, opts)
 
 	-- Spawn enemies immediately for Round 1
 	self:setEnemySpawnsForThisRound()
-
+]]--
 	-- Resources
 	self.resource_spawn_chances = chanceList({'Boost', 28*self.player.boost_spawn_chance_multiplier}, 
 		{'HP', 14*self.player.hp_spawn_chance_multiplier}, {'SP', 58*self.player.sp_spawn_chance_multiplier})
