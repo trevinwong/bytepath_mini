@@ -99,6 +99,7 @@ function Player:new(area, x, y, opts)
 	self.additional_bounce_projectiles = 0
 	self.additional_homing_projectiles = 0
 	self.additional_barrage_projectiles = 0
+	self.added_chance_to_all_on_kill_events = 0
 	self.barrage_nova = false
 	self.projectiles_explode_on_expiration = false
 	self.projectiles_explosion = false
@@ -143,7 +144,7 @@ function Player:new(area, x, y, opts)
 	self.w, self.h = 12 * self.size_multiplier, 12 * self.size_multiplier
 
 	-- Ship
-	self.ship = "Robo"
+	self.ship = "Fighter"
 	self.polygons = Ships[self.ship]["generatePolygons"](self.w)
 
 	-- Physics
@@ -262,6 +263,8 @@ function Player:new(area, x, y, opts)
 	-- Color
 	self.color = default_color
 
+	-- Stats
+	Ships[self.ship]["modifyPlayerStats"](self)
 	-- treeToPlayer(self)
 	self:setStats()
 	self:generateChances()
@@ -676,14 +679,18 @@ function Player:setAttack(attack)
 end
 
 function Player:generateChances()
-	self.chances = {}
-	for k, v in pairs(self) do
-		if k:find('_chance') and type(v) == 'number' then
-			self.chances[k] = chanceList(
-				{true, math.ceil(v*self.luck_multiplier.value)}, 
-				{false, 100-math.ceil(v*self.luck_multiplier.value)})
-		end
-	end
+    self.chances = {}
+    for k, v in pairs(self) do
+        if k:find('_chance') and type(v) == 'number' then
+            if k:find('_on_kill') and v > 0 then
+                self.chances[k] = chanceList(
+                {true, math.ceil(v+self.added_chance_to_all_on_kill_events)}, 
+                {false, 100-math.ceil(v+self.added_chance_to_all_on_kill_events)})
+            else
+                self.chances[k] = chanceList({true, math.ceil(v)}, {false, 100-math.ceil(v)})
+            end
+      	end
+    end
 end
 
 function Player:hit(damage)
