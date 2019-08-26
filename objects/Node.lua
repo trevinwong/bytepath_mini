@@ -3,6 +3,8 @@ Node = Object:extend()
 function Node:new(id, x, y, cost)
 	self.id = id
 	self.cost = cost
+	self.selected = false
+	self.bought = false
 	self.x, self.y = x, y
 	self.w = 16
 	self.h = self.w
@@ -20,7 +22,9 @@ function Node:update(dt)
         if current_room:canNodeBeBought(self.id) then
             if not M.any(bought_node_indexes, self.id) then
 				sp = sp - self.cost
-                table.insert(bought_node_indexes, self.id)
+				selected_sp = selected_sp + self.cost
+				self.selected = true
+                table.insert(selected_node_indexes, self.id)
             end
         end
     end
@@ -33,7 +37,7 @@ function Node:draw()
     local r, g, b = unpack(default_color)
     love.graphics.setColor(background_color)
 	draft:rhombus(self.x, self.y, self.w, self.h, 'fill')
-    if self.bought then love.graphics.setColor(r, g, b, 255/255)
+    if self.bought or self.selected then love.graphics.setColor(r, g, b, 255/255)
     else love.graphics.setColor(r, g, b, 32/255) end
 	draft:rhombus(self.x, self.y, self.w, self.h, 'line')	
     love.graphics.setColor(r, g, b, 255)

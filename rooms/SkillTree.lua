@@ -1,15 +1,13 @@
 SkillTree = Object:extend()
 
 --[[
-	TO-DO FOR EXERCISE 224:
-	- Show the amount of skill points that the player has on the top left. DONE!
-	- Show the number of nodes that have been bought and are active on the top right. DONE!
-	- Show the title of the node as the first line for each node. DONE!
-	- Show the SP cost, right justified, on the first line for each node. DONE!
-	- Only allow the player to buy a max of 50 nodes. DONE!
-	- Decrease player's SP points when a node is bought. DONE!
-	- Do not allow player to buy nodes if he does not have the required SP points. DONE!
-	- Change node's shape to diamonds. DONE!
+	TO-DO FOR EXERCISE 225:
+	- Clicking on nodes SELECTS them, taking skill points away, but not actually buying them. DONE!
+	- Pre-buying a node lights it up, but not the line. DONE!
+	- Having at least 1 tentative bought node brings up the Apply Points/Cancel button. DONE!
+	- Hovering over the buttons highlights them with a white outline. DONE!
+	- Cancel refunds all spend skill points and un-highlights all the pre-bought nodes. DONE!
+	- Buying officially spends skill points and lights up the lines. DONE!
 ]]--
 
 function SkillTree:new()
@@ -19,7 +17,9 @@ function SkillTree:new()
 	camera.smoother = Camera.smooth.damped(5)
 	self.font = fonts.m5x7_16
 
+	selected_node_indexes = {}
 	bought_node_indexes = {1, 2}
+	selected_sp = 0
 
 	self.tree = table.copy(tree)
 	for id, node in ipairs(self.tree) do
@@ -32,15 +32,25 @@ function SkillTree:new()
 			table.insert(self.tree[linked_node_id].links, id)
 		end
 	end
-	
-    for id, node in ipairs(self.tree) do
-        if node.links then
-            node.links = M.unique(node.links)
-        end
-    end
+
+	for id, node in ipairs(self.tree) do
+		if node.links then
+			node.links = M.unique(node.links)
+		end
+	end
 
 	self.nodes = {}
 	self.lines = {}
+
+	local apply_points_txt = "Apply Points"
+	local button_x, button_y = gw/2 - (16 + self.font:getWidth(apply_points_txt)) - 16, gh - self.font:getHeight() - 10
+	local button_w, button_h = 16 + self.font:getWidth(apply_points_txt), self.font:getHeight() + 4
+	local apply_points_button = Button(button_x, button_y, {w = button_w, h = button_h, text = apply_points_txt, font = self.font, center_justified = true, click = SkillTree.buySelectedNodes, click_args = self})
+	local cancel_points_txt = "Cancel"
+	button_x = gw/2 + 16
+	local cancel_points_button = Button(button_x, button_y, {w = button_w, h = button_h, text = cancel_points_txt, font = self.font, center_justified = true, click = SkillTree.cancelSelectedNodes, click_args = self})
+	self.select_nodes_buttons = {apply_points_button, cancel_points_button}
+
 	for id, node in ipairs(self.tree) do table.insert(self.nodes, Node(id, node.x, node.y, node.cost)) end
 	for id, node in ipairs(self.tree) do 
 		for _, linked_node_id in ipairs(node.links or {}) do
@@ -67,6 +77,12 @@ function SkillTree:update(dt)
 
 	for _, line in ipairs(self.lines) do
 		line:update()
+	end
+
+	if #selected_node_indexes > 0 then
+		for _, select_node_button in ipairs(self.select_nodes_buttons) do
+			select_node_button:update()
+		end
 	end
 
 	if input:down('left_click') then
@@ -101,8 +117,9 @@ function SkillTree:draw()
 	for _, node in ipairs(self.nodes) do
 		node:draw()
 	end
-	camera:detach()
 
+	camera:detach()
+	love.graphics.setBackgroundColor(0.04, 0.04, 0.04)
 	-- Stats rectangle
 	for _, node in ipairs(self.nodes) do
 		if node.hot then
@@ -120,7 +137,7 @@ function SkillTree:draw()
 			-- Draw rectangle
 			local mx, my = love.mouse.getPosition() 
 			mx, my = mx/sx, my/sy
-			love.graphics.setColor(0, 0, 0, 222)
+			love.graphics.setColor(0, 0, 0, 222/255)
 			love.graphics.rectangle('fill', mx, my, 16 + max_text_width, 
 				self.font:getHeight() + (1 + #stats/3)*self.font:getHeight())  
 
@@ -136,15 +153,21 @@ function SkillTree:draw()
 			love.graphics.print(sp_cost_txt, math.floor(mx + 8 + max_text_width - self.font:getWidth(sp_cost_txt)),  math.floor(my + 2))
 		end
 	end
-	
+
 	-- Player's SP
 	love.graphics.setColor(skill_point_color)
 	love.graphics.print(sp .. " SKILL POINTS", 12, self.font:getHeight() / 2)
-	
+
 	-- Player's Active Nodes
 	local active_nodes_txt = #bought_node_indexes .. " / " .. max_nodes .. " ACTIVE NODES"
 	love.graphics.print(active_nodes_txt, gw - self.font:getWidth(active_nodes_txt) - 12, self.font:getHeight() / 2)
 
+	-- If player has selected any nodes, display Apply Points and Cancel button
+	if #selected_node_indexes > 0 then
+		for _, select_node_button in ipairs(self.select_nodes_buttons) do
+			select_node_button:draw()
+		end
+	end
 	love.graphics.setCanvas()
 
 	love.graphics.setColor(255, 255, 255, 255)
@@ -163,10 +186,28 @@ end
 
 function SkillTree:canNodeBeBought(id)
 	-- You'll need to access the linked_node_id's from the node's links table if you've been adding id's to the links table.
-    for _, linked_node_id in ipairs(self.tree[id].links or {}) do
+	for _, linked_node_id in ipairs(self.tree[id].links or {}) do
 		local enoughSP = sp - self.tree[id].cost >= 0
-        if M.any(bought_node_indexes, linked_node_id) and enoughSP then return true end
-    end
+		if (M.any(bought_node_indexes, linked_node_id) or M.any(selected_node_indexes, linked_node_id)) and enoughSP then return true end
+	end
+end
+
+function SkillTree:buySelectedNodes()
+	bought_node_indexes = M.interleave(bought_node_indexes, selected_node_indexes)
+	selected_sp = 0
+	selected_node_indexes = {}
+end
+
+function SkillTree:cancelSelectedNodes()
+	local selected_nodes = M.select(self.nodes, function(node, _)
+			return node.selected
+		end)
+	M.invoke(selected_nodes, function(node, _)
+			node.selected = false
+		end)
+	sp = sp + selected_sp
+	selected_sp = 0
+	selected_node_indexes = {}
 end
 
 function SkillTree:destroy()

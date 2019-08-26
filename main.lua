@@ -96,7 +96,7 @@ function love.load()
     )
     
     -- SP
-    sp = 0
+    sp = 3
     max_sp = 999
     max_nodes = 50
 
