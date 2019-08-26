@@ -126,7 +126,7 @@ function Director:generateAttackSpawnChances()
 	local initial_chance = 1 / returnTableLength(attacks)
 
 	for i, attackName in ipairs(attackNames) do
-		table.insert(attack_spawn_chance_definitions, {attackName, math.ceil(initial_chance * attack_spawn_chance_multipliers[attackName .. "_spawn_chance_multiplier"])})
+		table.insert(attack_spawn_chance_definitions, {attackName, math.ceil(initial_chance * attack_spawn_chance_multipliers[attackName .. "atk_spawn_chance_multiplier"])})
 	end
 
 	self.attack_spawn_chances = chanceList(unpack(attack_spawn_chance_definitions))

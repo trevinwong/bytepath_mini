@@ -42,6 +42,9 @@ function love.load()
     input:bind('right', 'right')
     input:bind('up', 'up')
     input:bind('down', 'down')
+    input:bind('mouse1', 'left_click')
+    input:bind('wheelup', 'zoom_in')
+    input:bind('wheeldown', 'zoom_out')
     
     input:bind('f1', function()
         print("Before collection: " .. collectgarbage("count")/1024)
@@ -55,7 +58,7 @@ function love.load()
     end)
 
     input:bind('f2', function()
-            gotoRoom("Stage")
+            gotoRoom("SkillTree")
     end)
 
     input:bind('f3', function()
@@ -95,9 +98,10 @@ function love.load()
     -- SP
     sp = 0
     max_sp = 999
+    max_nodes = 50
 
     
-    current_room = Stage()
+    current_room = SkillTree()
 end
 
 --love.frame = 0

@@ -35,7 +35,7 @@ function Player:new(area, x, y, opts)
 	self.attack_spawn_chance_multipliers = {}
 
 	for _, name in ipairs(attackNames) do
-		self.attack_spawn_chance_multipliers[name .. "_spawn_chance_multiplier"] = 1
+		self.attack_spawn_chance_multipliers[name .. "atk_spawn_chance_multiplier"] = 1
 	end
 
 	self.aspd_multiplier = Stat(1)
@@ -265,9 +265,37 @@ function Player:new(area, x, y, opts)
 
 	-- Stats
 	Ships[self.ship]["modifyPlayerStats"](self)
-	-- treeToPlayer(self)
+	self:treeToPlayer()
 	self:setStats()
 	self:generateChances()
+end
+
+function Player:treeToPlayer()
+	for _, index in ipairs(bought_node_indexes) do
+		local stats = tree[index].stats
+		for i = 1, #stats, 3 do
+			local attribute, value = stats[i+1], stats[i+2]
+			if attribute:find("start_with") then
+				player["start_with_attack_passives"][attribute] = value
+			elseif attribute:find("_atk_spawn_chance_multiplier") then
+				player["attack_spawn_chance_multipliers"][attribute] = player["attack_spawn_chance_multipliers"][attribute] + value
+			elseif attribute:is(Stat) then
+				--[[
+					An interesting consideration for gameplay:
+					I've chosen to have the stat upgrades in the tree affect the player's base multiplier for that particular stat.
+					This is much stronger than a temporary stat boost, since temporary stat boosts multiply the base multiplier.
+					So whatever percentage increase we add onto the base we also be multiplied by the temporary stat boost.
+					
+					Is this good? Is this bad? I'm not sure - I'd have to dig into more how games balance this.
+				]]--
+				player[attribute].base = player[attribute].base + value
+			elseif type(attribute) == "boolean" then
+				player[attribute] = value
+			else
+				player[attribute] = player[attribute] + value
+			end
+		end
+	end
 end
 
 function Player:setStats()
@@ -598,7 +626,7 @@ function Player:shoot()
 		self.area:addGameObject('Laser',
 			x1, y1, {x2 = x2, y2 = y2, r = self.r, wm = self.laser_width_multiplier})
 	end
-	
+
 	-- This would normally be set at the top, but the Lightning is different in that it subtracts ammo only if it hits an enemy.
 	-- Ideally, this should be re-factored in a way such that we don't have this nasty duplicated code, but given how little I'm touching this function, I think it's fine
 	if self.infinite_ammo then self.ammo = self.max_ammo end
@@ -679,18 +707,18 @@ function Player:setAttack(attack)
 end
 
 function Player:generateChances()
-    self.chances = {}
-    for k, v in pairs(self) do
-        if k:find('_chance') and type(v) == 'number' then
-            if k:find('_on_kill') and v > 0 then
-                self.chances[k] = chanceList(
-                {true, math.ceil(v+self.added_chance_to_all_on_kill_events)}, 
-                {false, 100-math.ceil(v+self.added_chance_to_all_on_kill_events)})
-            else
-                self.chances[k] = chanceList({true, math.ceil(v)}, {false, 100-math.ceil(v)})
-            end
-      	end
-    end
+	self.chances = {}
+	for k, v in pairs(self) do
+		if k:find('_chance') and type(v) == 'number' then
+			if k:find('_on_kill') and v > 0 then
+				self.chances[k] = chanceList(
+					{true, math.ceil(v+self.added_chance_to_all_on_kill_events)}, 
+					{false, 100-math.ceil(v+self.added_chance_to_all_on_kill_events)})
+			else
+				self.chances[k] = chanceList({true, math.ceil(v)}, {false, 100-math.ceil(v)})
+			end
+		end
+	end
 end
 
 function Player:hit(damage)

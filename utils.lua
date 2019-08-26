@@ -13,8 +13,13 @@ function random(min, max)
     return (min > max and (love.math.random()*(min - max) + max)) or (love.math.random()*(max - min) + min)
 end
 
+-- Does not work with tables that do not use integers as keys!
 function table.random(t)
     return t[love.math.random(1, #t)]
+end
+
+function table.copy(org)
+  return {unpack(org)}
 end
 
 function chanceList(...)
