@@ -18,7 +18,7 @@ function SkillTree:new()
 	self.font = fonts.m5x7_16
 
 	selected_node_indexes = {}
-	bought_node_indexes = {1, 2}
+	bought_node_indexes = {1}
 	selected_sp = 0
 
 	self.tree = table.copy(tree)
@@ -51,7 +51,7 @@ function SkillTree:new()
 	local cancel_points_button = Button(button_x, button_y, {w = button_w, h = button_h, text = cancel_points_txt, font = self.font, center_justified = true, click = SkillTree.cancelSelectedNodes, click_args = self})
 	self.select_nodes_buttons = {apply_points_button, cancel_points_button}
 
-	for id, node in ipairs(self.tree) do table.insert(self.nodes, Node(id, node.x, node.y, node.cost)) end
+	for id, node in ipairs(self.tree) do table.insert(self.nodes, Node(id, node.x, node.y, node.cost, {no_description = node.no_description})) end
 	for id, node in ipairs(self.tree) do 
 		for _, linked_node_id in ipairs(node.links or {}) do
 			table.insert(self.lines, Line(id, linked_node_id))

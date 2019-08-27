@@ -1,6 +1,8 @@
 Node = Object:extend()
 
-function Node:new(id, x, y, cost)
+function Node:new(id, x, y, cost, opts)
+	local opts = opts or {}
+	if opts then for k, v in pairs(opts) do self[k] = v end end
 	self.id = id
 	self.cost = cost
 	self.selected = false
@@ -11,6 +13,7 @@ function Node:new(id, x, y, cost)
 end
 
 function Node:update(dt)
+	if self.no_description then return end
 	-- TO-DO: Is our hump.camera modified from the original? We have different syntax than the call
 	local mx, my = camera:getMousePosition(sx*camera.scale, sy*camera.scale, 0, 0, sx*gw, sy*gh)
 	if mx >= self.x - self.w/2 and mx <= self.x + self.w/2 and 
