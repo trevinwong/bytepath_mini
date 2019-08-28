@@ -25,6 +25,7 @@ function love.load()
     requireAllInFolder('data')
     requireAllInFolder('objects')
     requireAllInFolder('rooms')
+    requireAllInFolder('modules')
     fonts = {}
     loadFontsInFolderAsSize('resources/fonts', 16)
     love.graphics.setDefaultFilter('nearest', 'nearest')
@@ -45,6 +46,8 @@ function love.load()
     input:bind('mouse1', 'left_click')
     input:bind('wheelup', 'zoom_in')
     input:bind('wheeldown', 'zoom_out')
+    input:bind('return', 'return')
+    input:bind('backspace', 'backspace')
     
     input:bind('f1', function()
         print("Before collection: " .. collectgarbage("count")/1024)
@@ -101,7 +104,7 @@ function love.load()
     max_nodes = 50
 
     
-    current_room = SkillTree()
+    current_room = Console()
 end
 
 --love.frame = 0
@@ -182,4 +185,8 @@ end
 function resize(s)
     love.window.setMode(s*gw, s*gh) 
     sx, sy = s, s
+end
+
+function love.textinput(t)
+    if current_room.textinput then current_room:textinput(t) end
 end
