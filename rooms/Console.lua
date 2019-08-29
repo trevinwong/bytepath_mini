@@ -3,7 +3,7 @@ Console = Object:extend()
 function Console:new()
 	self.timer = Timer()	
 	self.lines = {}
-	self.line_y = gh - 36
+	self.line_y = 8
 	self.font = fonts.m5x7_16
 	-- Spawning a new camera avoids the weird shift as the camera is looking towards that location.
 	camera = Camera(gw/2, gh/2)
@@ -16,8 +16,7 @@ function Console:new()
 	self.input_text = {}
 	self.input_text_string = ""
 	self.modules = {}
-	self:addLine(0, {'test', boost_color, ' test'})
-	input:bind('a', function() self:addLine(0, {'test', boost_color, ' test'}) end)
+	self:addInputLine(0)
 end
 
 function Console:update(dt)
@@ -29,9 +28,10 @@ function Console:update(dt)
 			self.inputting = false
 			if input_text == 'resolution' then
 				table.insert(self.modules, ResolutionModule(self, self.line_y))
+			elseif input_text == 'clear' then
+				table.insert(self.modules, ClearModule(self, self.line_y))
 			end
 
-			print(input_text)
 
 			self.input_text = {}
 		end

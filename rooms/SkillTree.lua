@@ -1,13 +1,8 @@
 SkillTree = Object:extend()
 
 --[[
-	TO-DO FOR EXERCISE 225:
-	- Clicking on nodes SELECTS them, taking skill points away, but not actually buying them. DONE!
-	- Pre-buying a node lights it up, but not the line. DONE!
-	- Having at least 1 tentative bought node brings up the Apply Points/Cancel button. DONE!
-	- Hovering over the buttons highlights them with a white outline. DONE!
-	- Cancel refunds all spend skill points and un-highlights all the pre-bought nodes. DONE!
-	- Buying officially spends skill points and lights up the lines. DONE!
+	TO-DO FOR EXERCISE 229:
+		Put reset skill tree points in here (you shouldn't have to go to another screen to reset your points)
 ]]--
 
 function SkillTree:new()
