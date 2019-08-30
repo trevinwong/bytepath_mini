@@ -104,7 +104,7 @@ function love.load()
     max_nodes = 50
 
     
-    current_room = Console()
+    current_room = ChooseShip()
 end
 
 --love.frame = 0

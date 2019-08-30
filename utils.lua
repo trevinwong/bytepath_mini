@@ -114,6 +114,11 @@ end
 
 -- Graphics transformations
 
+function pushTranslate(x, y)
+	love.graphics.push()
+    love.graphics.translate(x, y)
+end
+
 function pushRotate(x, y, r)
     love.graphics.push()
     love.graphics.translate(x, y)
