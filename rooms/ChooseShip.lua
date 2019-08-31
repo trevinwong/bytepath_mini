@@ -4,7 +4,7 @@ ChooseShip = Object:extend()
 	TO-DO:
 		- Draw an empty box in the middle. DONE!
 		- Draw a ship in the middle. DONE!
-		- Draw arrows on the side.
+		- Draw arrows on the side. DONE!
 		- Draw title of the current ship
 		- Draw status of ship (unlocked or locked)
 		- Draw stats
@@ -18,8 +18,8 @@ function ChooseShip:new()
 	self.main_canvas = love.graphics.newCanvas(gw, gh)
 	
 	self.w = 12
-	self.ship = "Fighter"
-	self.polygons = Ships[self.ship]["generatePolygons"](self.w)
+	self.selected_ship = "Fighter"
+	self.polygons = Ships[self.selected_ship]["generatePolygons"](self.w)
 end
 
 function ChooseShip:update(dt)
@@ -39,6 +39,19 @@ function ChooseShip:draw()
 	love.graphics.polygon('line', self:createCurvedRectangle(half_w))
 	love.graphics.pop()
 	
+	-- Draw arrows
+	local left_arrow_x, left_arrow_y = box_x - half_w - 12, box_y
+	pushTranslate(left_arrow_x, left_arrow_y)
+
+	love.graphics.polygon('line', {0, -half_w/4, -half_w/4, 0, 0, half_w/4})
+	love.graphics.pop()
+	
+	local right_arrow_x, right_arrow_y = box_x + half_w + 12, box_y
+	pushTranslate(right_arrow_x, right_arrow_y)
+
+	love.graphics.polygon('line', {0, half_w/4, half_w/4, 0, 0, -half_w/4})
+	love.graphics.pop()
+
 	-- Draw ship in box
 	local ship_x, ship_y = box_x + self.w/2, box_y
 	pushTranslate(ship_x, ship_y)
@@ -55,6 +68,7 @@ function ChooseShip:draw()
 	end
 	love.graphics.pop()
 	love.graphics.pop()
+
 
 
 	love.graphics.setCanvas()
@@ -77,4 +91,8 @@ function ChooseShip:createCurvedRectangle(half_w)
 		-half_w, -half_w/3,
 		-7*half_w/8, -half_w/2
 	}
+end
+
+function ChooseShip:selectShip()
+	
 end
