@@ -10,7 +10,7 @@ Note: some of the commits aren't the cleanest, due to me occasionally fixing pre
 
 2. **To house the new code for the port.** 
 
-If you like **BYTEPATH Mini**, I suggest you buy the [original version](https://store.steampowered.com/app/760330/BYTEPATH/), which has way more content and is way more polished.
+If you like BYTEPATH Mini, I suggest you buy the [original version](https://store.steampowered.com/app/760330/BYTEPATH/), which has way more content and is way more polished.
 
 # Tips and Tricks and Lessons Learned
 - If you're using ZeroBrane Studio, beware of enabling `mobdebug`, as this can kill the performance of your game (usually enabling any sort of debugging tool will hurt performance)
