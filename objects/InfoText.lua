@@ -70,13 +70,6 @@ function InfoText:draw()
     love.graphics.setColor(default_color)
 end
 
-function InfoText:die()
-    self.dead = true
-    self.area:addGameObject('InfoTextEffect', self.x, self.y, 
-    {color = InfoText_color, w = self.w * 1.5, h = self.h * 1.5})
-    self.area:addGameObject('InfoText', self.x, self.y, {text = '+InfoText', color = InfoText_color})
-end
-
 function InfoText:destroy()
    InfoText.super.destroy(self) 
 end

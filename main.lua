@@ -37,6 +37,7 @@ function love.load()
 
     time = 0
     slow_amount = 1
+    screen_alpha = 1
     flash_frames = nil
     resize(3)
     input:bind('left', 'left')
@@ -104,7 +105,7 @@ function love.load()
     max_nodes = 50
 
     
-    current_room = SkillTree()
+    current_room = IntroSequence()
 end
 
 --love.frame = 0

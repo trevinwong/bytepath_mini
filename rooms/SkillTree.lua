@@ -1,9 +1,5 @@
 SkillTree = Object:extend()
 
---[[
-	- Fix middle node not being lit up
-]]--
-
 function SkillTree:new()
 	self.timer = Timer()
 	self.main_canvas = love.graphics.newCanvas(gw, gh)

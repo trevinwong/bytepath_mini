@@ -141,6 +141,36 @@ function slow(amount, duration)
     timer:tween('slow', duration, _G, {slow_amount = 1}, 'in-out-cubic')
 end
 
+-- Used to fade in the entire screen.
+function fade_in(duration)
+	screen_alpha = 0
+	timer:tween('fade_in', duration, _G, {screen_alpha = 1}, 'in-out-cubic')
+end
+
+-- Used to fade out the entire screen.
+function fade_out(duration)
+	screen_alpha = 1
+	timer:tween('fade_in', duration, _G, {screen_alpha = 0}, 'in-out-cubic')	
+end
+
+-- Use instead of love.graphics.setColor for fading in and fading out.
+function setColor(r, g, b, a)
+	--[[
+		If fading in ( from black) is happening:
+			- If screen alpha is lower than the given alpha, keep increasing it and set it to screen alpha
+			- If screen alpha is greater than or equal to the given alpha at this point, just set it to alpha
+			
+		If fading out ( to black) is happening:
+			- If screen alpha is greater than or equal to the given alpha, just set it to alpha
+			- If screen alpha is lower than the given alpha, keep decreasing it and set it to screen alpha
+	]]--
+	if screen_alpha < a then
+		love.graphics.setColor(r, g, b, screen_alpha)
+	else
+		love.graphics.setColor(r, g, b, a)
+	end
+end
+
 function flash(seconds)
     flash_seconds = seconds
 end

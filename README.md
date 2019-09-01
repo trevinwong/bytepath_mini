@@ -1,6 +1,6 @@
 # What is this?
 
-**BYTEPATH Mini** is the un-official Android port of adnzzzzZ's [BYTEPATH tutorial](https://github.com/adnzzzzZ/blog/issues/30). This repository serves two purposes:
+**BYTEPATH mini** is the un-official Android port of adnzzzzZ's [BYTEPATH tutorial](https://github.com/adnzzzzZ/blog/issues/30). This repository serves two purposes:
 
 1. **To help people following the tutorial.** Since LOVE has updated to 11.0 and libraries have changed, some of the code in the tutorial has been rendered obsolete. If you find yourself stuck on parts of the tutorial that mysteriously do not seem to work, you can refer to the appropriate commit in my repository to see what I've done to make it work (I have labelled each commit with the appropriate section and exercise number.)
 
@@ -10,7 +10,7 @@ Note: some of the commits aren't the cleanest, due to me occasionally fixing pre
 
 2. **To house the new code for the port.** 
 
-If you like BYTEPATH Mini, I suggest you buy the [original version](https://store.steampowered.com/app/760330/BYTEPATH/), which has way more content and is way more polished.
+If you like BYTEPATH mini, I suggest you buy the [original version](https://store.steampowered.com/app/760330/BYTEPATH/), which has way more content and is way more polished.
 
 # Tips and Tricks and Lessons Learned
 - If you're using ZeroBrane Studio, beware of enabling `mobdebug`, as this can kill the performance of your game (usually enabling any sort of debugging tool will hurt performance)
