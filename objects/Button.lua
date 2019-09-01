@@ -24,18 +24,18 @@ end
 
 function Button:draw()
 	if self.custom_draw then self.custom_draw() return end
-	love.graphics.setColor(0, 0, 0)
+	setColor(0, 0, 0, 1)
 	love.graphics.rectangle('fill', self.x, self.y, self.w, self.h)
 	if self.hot or self.always_hot then
-		love.graphics.setColor(1, 1, 1)
+		setColor(1, 1, 1, 1)
 		love.graphics.rectangle('line', self.x, self.y, self.w, self.h)
 	end
 	if self.text then
-		love.graphics.setColor(1, 1, 1)
+		setColor(1, 1, 1, 1)
 		if self.center_justified then
 			love.graphics.print(self.text, self.x + self.w/2 - self.font:getWidth(self.text)/2, self.y + self.h/2 - self.font:getHeight(self.text)/1.6)
 		end
 	end
 
-	love.graphics.setColor(1, 1, 1)
+	setColor(1, 1, 1, 1)
 end

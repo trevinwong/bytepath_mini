@@ -48,6 +48,12 @@ function SkillTree:new()
 			table.insert(self.lines, Line(id, linked_node_id))
 		end
 	end
+	
+	-- Bug when clicking on the skill trees button, previous_mx not initialized (we don't want to drag our camera anywhere when creating this room)
+	self.disable_input = true
+	self.timer:after(0.2, function()
+			self.disable_input = false
+		end)
 end
 
 function SkillTree:update(dt)
@@ -61,6 +67,7 @@ function SkillTree:update(dt)
 		You can modify your boipushy source code to use this commit: https://github.com/adnzzzzZ/boipushy/pull/29/commits/f7da44d6063ef2ffab6dde93051c9c958d67a00f
 		since it doesn't seem like the author hasn't noticed yet and thus has not yet merged it in.
 	]]--
+	self.timer:update(dt)
 
 	for _, node in ipairs(self.nodes) do
 		node:update()
@@ -77,6 +84,8 @@ function SkillTree:update(dt)
 	end
 	
 	self.active_nodes = #bought_node_indexes - 1 
+
+	if self.disable_input then return end
 
 	if input:down('left_click') then
 		local mx, my = camera:getMousePosition(sx, sy, 0, 0, sx*gw, sy*gh)
@@ -97,7 +106,6 @@ function SkillTree:update(dt)
 		self.timer:tween('zoom', 0.2, camera, {scale = new_scale}, 'in-out-cubic') 
 	end
 
-	self.timer:update(dt)
 end
 
 function SkillTree:draw()

@@ -10,7 +10,7 @@ function IntroSequence:new()
 	self.base_initializing_text = "root@your_phone: ~$ initializing BYTEPATH mini . . ."
 	self.initializing_text = CinematicInfoText(gw/2 - self.font:getWidth(self.base_initializing_text)/2, gh/2 - self.font:getHeight()/2, {text = self.base_initializing_text, print_character_by_character = true})
 
-	fade_in(0.5)
+	fade_in(1)
 	self.timer:after(1, function() fade_out(1) end)
 	self.timer:after(2, function() self.first_part = false fade_in(1) end)
 end
@@ -46,8 +46,8 @@ function IntroSequence:draw()
 end
 
 function IntroSequence:finish()
-	self.timer:after(1, function()
-			gotoRoom('SkillTree')
+	self.timer:after(0.5, function()
+			gotoRoom('MainMenu')
 		end)
 end
 

@@ -32,7 +32,7 @@ function ChooseShip:new()
 				self:switchShip()
 			end})
 	local right_arrow_w, right_arrow_h = self.half_w/4, self.half_w/2
-	self.right_arrow = Button(right_arrow_x + right_arrow_w, right_arrow_y - right_arrow_h/2, {w = right_arrow_w, h = right_arrow_h, 
+	self.right_arrow = Button(right_arrow_x, right_arrow_y - right_arrow_h/2, {w = right_arrow_w, h = right_arrow_h, 
 			custom_draw = function() 
 				pushTranslate(right_arrow_x, right_arrow_y)
 
