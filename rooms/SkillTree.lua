@@ -1,8 +1,7 @@
 SkillTree = Object:extend()
 
 --[[
-	TO-DO FOR EXERCISE 229:
-		Put reset skill tree points in here (you shouldn't have to go to another screen to reset your points)
+	- Fix middle node not being lit up
 ]]--
 
 function SkillTree:new()

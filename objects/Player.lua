@@ -144,7 +144,7 @@ function Player:new(area, x, y, opts)
 	self.w, self.h = 12 * self.size_multiplier, 12 * self.size_multiplier
 
 	-- Ship
-	self.ship = "Fighter"
+	self.ship = GameData.last_selected_ship 
 	self.polygons = Ships[self.ship]["generatePolygons"](self.w)
 
 	-- Physics
@@ -265,7 +265,7 @@ function Player:new(area, x, y, opts)
 
 	-- Stats
 	Ships[self.ship]["modifyPlayerStats"](self)
-	self:treeToPlayer()
+	--self:treeToPlayer()
 	self:setStats()
 	self:generateChances()
 end

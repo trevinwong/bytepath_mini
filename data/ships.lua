@@ -36,6 +36,9 @@ end
 Ships["Fighter"]["modifyPlayerStats"] = function(player)
     
 end
+Ships["Fighter"]["getDescription"] = function(player)
+   return {"+ No strengths", "- No weaknesses"}
+end
 
 Ships["Brick"] = {}
 Ships["Brick"]["generatePolygons"] = function(w)
@@ -59,9 +62,11 @@ Ships["Brick"]["modifyPlayerStats"] = function(player)
     player.turn_rate_multiplier = 0.6
     player.max_hp = 130
     player.resource_spawn_rate_multiplier = 1.5
-    player.size_multiplier = 1.2
+    player.size_multiplier = 1.5
 end
-
+Ships["Brick"]["getDescription"] = function(player)
+   return {"+ High health", "+ Spawns resources faster", "- Larger than usual", "- Not very agile"}
+end
 
 --[[
     Rockets are incredibly fast, but well known for only being able to fly in one direction. They're also well known for being weapons of mass destruction, so their
@@ -94,7 +99,9 @@ Ships["Rocket"]["modifyPlayerStats"] = function(player)
     player.pspd_multiplier = Stat(2)
     player.aspd_multiplier = Stat(2)
 end
-
+Ships["Rocket"]["getDescription"] = function(player)
+   return {"+ Very fast", "+ Shoots very fast", "- Too fast for it's own good", "- Doesn't turn very well"}
+end
 
 --[[
     This ship invokes the image of a stealthy spy sneaking through the night and assassinating political figureheads. As such, it is quite mobile, but also like spys, also
@@ -127,7 +134,9 @@ Ships["Night"]["modifyPlayerStats"] = function(player)
     player.size_multiplier = 0.9
     player.invulnerability_time_multiplier = 0.8
 end
-
+Ships["Night"]["getDescription"] = function(player)
+   return {"+ Very agile", "+ Smaller than usual", "+ High boost", "- Low health", "- Less invincibility time"}
+end
 
 --[[
     Crystals are associated with a lot of superstition due to their out of this world beauty. With so many people believing in it, how can supernatural events not occur around it?
@@ -154,9 +163,11 @@ Ships["Crystal"]["modifyPlayerStats"] = function(player)
     player.max_hp = 80
     player.max_boost = 90
     player.projectile_size_multiplier = 0.9
-    player.size_multiplier = 1.2
     player.invulnerability_time_multiplier = 0.6
     player.ammo_consumption_multiplier = 1.3
+end
+Ships["Crystal"]["getDescription"] = function(player)
+   return {"+ High luck", "- Low health and boost", "- Less invincibility time", "- Shots are smaller and consume more ammo"}
 end
 
 --[[
@@ -197,9 +208,10 @@ end
 Ships["Robo"]["modifyPlayerStats"] = function(player)
     player.energy_shield = true
     player.max_ammo = 130
-    player.aspd_multiplier = Stat(1.2)
     player.luck_multiplier = Stat(0.8)
-    player.max_boost = 80
+end
+Ships["Robo"]["getDescription"] = function(player)
+   return {"Energy Shield: ", "    Takes 2x damage", "    Health regenerates", "    Halved invincibility time", "+ High ammo", "- Low luck"}
 end
 
 
@@ -236,6 +248,9 @@ Ships["Freedom"]["modifyPlayerStats"] = function(player)
     player.aspd_multiplier = Stat(0.8)
     player.max_ammo = 90
 end
+Ships["Freedom"]["getDescription"] = function(player)
+   return {"+ Faster cycle speed", "+ Buffs last longer", "- Boost recharges slower", "- Shoots slower", "- Low ammo"}
+end
 
 --[[
     It also looks like a fork, but who want to pilot a ship named that? The Stabbinator sounds much cooler. Of course, this sounds extremely violent, so this ship revolves around
@@ -247,9 +262,9 @@ Ships["Stabbinator"]["generatePolygons"] = function(w)
     local polygons = {}
     polygons[1] = {
         0, w, -- 1
-        -w/2, w/3, -- 2
+        -w, w/3, -- 2
         0, 0, -- 3
-        -w/2, -w/3, -- 4
+        -w, -w/3, -- 4
         0, -w, -- 5
         w, 2*(-w/3),  -- 6
         w/2, -w/3,  -- 7
@@ -261,10 +276,12 @@ Ships["Stabbinator"]["generatePolygons"] = function(w)
 end
 Ships["Stabbinator"]["modifyPlayerStats"] = function(player)
     player.added_chance_to_all_on_kill_events = 10
-    player.barrage_on_kill_chance = 5
     player.max_hp = 80
     player.max_boost= 80
     player.max_ammo = 80
     player.enemy_spawn_rate_multiplier = 1.2
     player.invulnerability_time_multiplier = 0.8
+end
+Ships["Stabbinator"]["getDescription"] = function(player)
+   return {"+ 10% higher chance for On Kill effects to trigger", "- Low hp, boost and ammo", "- Enemies spawn faster", "- Less invincibility time"}
 end

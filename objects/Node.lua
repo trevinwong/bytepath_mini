@@ -23,7 +23,7 @@ function Node:update(dt)
 	
 	if self.hot and input:pressed('left_click') then
         if current_room:canNodeBeBought(self.id) then
-            if not M.any(bought_node_indexes, self.id) then
+            if not M.any(bought_node_indexes, self.id) and not M.any(selected_node_indexes, self.id) then
 				sp = sp - self.cost
 				selected_sp = selected_sp + self.cost
 				self.selected = true

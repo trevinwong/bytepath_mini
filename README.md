@@ -1,10 +1,16 @@
 # What is this?
 
-It's the [BYTEPATH tutorial](https://github.com/adnzzzzZ/blog/issues/30) but with my answers to the exercises.
+**BYTEPATH Mini** is the un-official Android port of adnzzzzZ's BYTEPATH tutorial. This repository serves two purposes:
 
-# What's the BYTEPATH tutorial?
+1. **To help people following the tutorial.** Since LOVE has updated to 11.0 and libraries have changed, some of the code in the tutorial has been rendered obsolete. If you find yourself stuck on parts of the tutorial that mysteriously do not seem to work, you can refer to the appropriate commit in my repository to see what I've done to make it work (I have labelled each commit with the appropriate section and exercise number.)
 
-An incredibly detailed tutorial on how to make the game [BYTEPATH](https://store.steampowered.com/app/760330/BYTEPATH/). I happen to be very fond of Love2D so I'm looking forward to learning more about how other game developers utilize it.
+As of *August 31, 2019*, all the exercises up to 227 have been completed successfully. I have chosen not to do the exercises past 227 since they are not applicable to the Android port.
+
+Note: some of the commits aren't the cleanest, due to me occasionally fixing previous blunders and randomly commenting on things. If you have any questions about the code, don't hesitate to email me at *trevinwong@gmail.com*.
+
+2. **To house the new code for the port.** 
+
+If you like **BYTEPATH Mini**, I suggest you buy the [original version](https://store.steampowered.com/app/760330/BYTEPATH/), which has way more content and is way more polished.
 
 # Tips and Tricks and Lessons Learned
 - If you're using ZeroBrane Studio, beware of enabling `mobdebug`, as this can kill the performance of your game (usually enabling any sort of debugging tool will hurt performance)
@@ -32,3 +38,5 @@ This way, you don't need to check whether or not the table exists. Why does this
 - *ZeroBrane-Specific:* `CTRL+I` re-formats the current file for you. Use this all the time to avoid wasting time on re-formatting text.
 - Handy simplification for operator precedence: numerical `>` comparison `>` boolean
 - Functions by default return `nil`, which is equivalent to `false`, so if you're designing a function that returns a `boolean`, you only need to insert the `true` case. Though it is probably much more clear if you explicitly return `false`.
+- Debug utilities are extremely useful. An example: adding the ability to slow down or pause your game using hotkeys. Very easy to implement, and helps a lot with debugging.
+  - Something I've wanted to do but haven't had the chance to: add a debug function to iterate through all game objects, and draw their bounding boxes (if they have self.w, self.h, self.x, self.y attributes, which every game object should.) Previously I had done this on an object by object basis and often removed the code after I fixed the bug (in which I would then re-add it shortly afterwards anyways), which is really inefficient.
