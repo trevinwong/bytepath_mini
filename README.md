@@ -1,6 +1,6 @@
 # What is this?
 
-**BYTEPATH Mini** is the un-official Android port of adnzzzzZ's BYTEPATH tutorial. This repository serves two purposes:
+**BYTEPATH Mini** is the un-official Android port of adnzzzzZ's [BYTEPATH tutorial](https://github.com/adnzzzzZ/blog/issues/30). This repository serves two purposes:
 
 1. **To help people following the tutorial.** Since LOVE has updated to 11.0 and libraries have changed, some of the code in the tutorial has been rendered obsolete. If you find yourself stuck on parts of the tutorial that mysteriously do not seem to work, you can refer to the appropriate commit in my repository to see what I've done to make it work (I have labelled each commit with the appropriate section and exercise number.)
 

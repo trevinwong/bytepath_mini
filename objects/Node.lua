@@ -13,6 +13,8 @@ function Node:new(id, x, y, cost, opts)
 end
 
 function Node:update(dt)
+	if M.any(bought_node_indexes, self.id) then self.bought = true else self.bought = false end
+
 	if self.no_description then return end
 	-- TO-DO: Is our hump.camera modified from the original? We have different syntax than the call
 	local mx, my = camera:getMousePosition(sx*camera.scale, sy*camera.scale, 0, 0, sx*gw, sy*gh)
@@ -32,8 +34,7 @@ function Node:update(dt)
         end
     end
 
-	if M.any(bought_node_indexes, self.id) then self.bought = true
-	else self.bought = false end
+
 end
 
 function Node:draw()

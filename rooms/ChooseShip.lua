@@ -1,17 +1,5 @@
 ChooseShip = Object:extend()
 
---[[
-	TO-DO:
-		- Draw an empty box in the middle. DONE!
-		- Draw a ship in the middle. DONE!
-		- Draw arrows on the side. DONE!
-		- Draw title of the current ship. DONE!
-		- Draw status of ship (unlocked or locked). DONE!
-		- Draw stats. DONE!
-		- Clicking left or right arrow changes your current ship (circular array) DONE!
-		- Clicking go starts the game with ur current ship. DONE!
-]]--
-
 function ChooseShip:new()
 	self.timer = Timer()	
 	self.font = fonts.m5x7_16
@@ -44,7 +32,7 @@ function ChooseShip:new()
 				self:switchShip()
 			end})
 	local right_arrow_w, right_arrow_h = self.half_w/4, self.half_w/2
-	self.right_arrow = Button(right_arrow_x, right_arrow_y - right_arrow_h/2, {w = right_arrow_w, h = right_arrow_h, 
+	self.right_arrow = Button(right_arrow_x + right_arrow_w, right_arrow_y - right_arrow_h/2, {w = right_arrow_w, h = right_arrow_h, 
 			custom_draw = function() 
 				pushTranslate(right_arrow_x, right_arrow_y)
 

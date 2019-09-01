@@ -15,6 +15,7 @@ function SkillTree:new()
 	bought_node_indexes = {1}
 	selected_sp = 0
 
+	self.active_nodes = 0
 	self.tree = table.copy(tree)
 	for id, node in ipairs(self.tree) do
 		--[[
@@ -78,6 +79,8 @@ function SkillTree:update(dt)
 			select_node_button:update()
 		end
 	end
+	
+	self.active_nodes = #bought_node_indexes - 1 
 
 	if input:down('left_click') then
 		local mx, my = camera:getMousePosition(sx, sy, 0, 0, sx*gw, sy*gh)
@@ -153,7 +156,7 @@ function SkillTree:draw()
 	love.graphics.print(sp .. " SKILL POINTS", 12, self.font:getHeight() / 2)
 
 	-- Player's Active Nodes
-	local active_nodes_txt = #bought_node_indexes .. " / " .. max_nodes .. " ACTIVE NODES"
+	local active_nodes_txt = self.active_nodes .. " / " .. max_nodes .. " ACTIVE NODES"
 	love.graphics.print(active_nodes_txt, gw - self.font:getWidth(active_nodes_txt) - 12, self.font:getHeight() / 2)
 
 	-- If player has selected any nodes, display Apply Points and Cancel button
@@ -182,7 +185,7 @@ function SkillTree:canNodeBeBought(id)
 	-- You'll need to access the linked_node_id's from the node's links table if you've been adding id's to the links table.
 	for _, linked_node_id in ipairs(self.tree[id].links or {}) do
 		local enoughSP = sp - self.tree[id].cost >= 0
-		if (M.any(bought_node_indexes, linked_node_id) or M.any(selected_node_indexes, linked_node_id)) and enoughSP then return true end
+		if (M.any(bought_node_indexes, linked_node_id) or M.any(selected_node_indexes, linked_node_id)) and enoughSP and self.active_nodes < max_nodes then return true end
 	end
 end
 

@@ -104,7 +104,7 @@ function love.load()
     max_nodes = 50
 
     
-    current_room = ChooseShip()
+    current_room = SkillTree()
 end
 
 --love.frame = 0
