@@ -100,12 +100,12 @@ function love.load()
     )
     
     -- SP
-    sp = 3
+    sp = 0
     max_sp = 999
     max_nodes = 50
 
     
-    current_room = IntroSequence()
+    current_room = Stage()
 end
 
 --love.frame = 0

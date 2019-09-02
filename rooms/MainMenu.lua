@@ -20,6 +20,7 @@ function MainMenu:new()
 end
 
 function MainMenu:update(dt)
+	if screen_alpha < 0.5 then return end
 	self.timer:update(dt)
 	self.play_button:update(dt)
 	self.skills_button:update(dt)

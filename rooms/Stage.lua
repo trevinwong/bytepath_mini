@@ -14,10 +14,20 @@ function Stage:new()
     self.player = self.area:addGameObject('Player', gw/2, gh/2)
     self.main_canvas = love.graphics.newCanvas(gw, gh)
     camera.smoother = Camera.smooth.damped(5)
+    self.old_sp = sp
 
     self.director = self.area:addGameObject('Director', 0, 0, {player = self.player})
     self.score = 0
     self.font = fonts.m5x7_16
+    self.game_over_font = fonts.Squarewave_16
+
+    local restart_button_w, restart_button_h  = self.game_over_font:getWidth("restart") * 1.3, self.game_over_font:getHeight() + 3
+    self.restart_button = Button(gw/2 - restart_button_w/2 - 30, gh/2 + 2*self.game_over_font:getHeight(), {text = "restart", w = restart_button_w, h = restart_button_h, center_justified = true, font = self.game_over_font, always_hot = true,
+            click = function() gotoRoom("Stage") end })
+
+    local menu_button_w, menu_button_h  = restart_button_w, restart_button_h
+    self.menu_button = Button(gw/2 - menu_button_w/2 + 30, gh/2 + 2*self.game_over_font:getHeight(), {text = "menu", w = menu_button_w, h = menu_button_h, center_justified = true, font = self.game_over_font, always_hot = true,
+            click = function() gotoRoom("MainMenu") end })
 
     input:bind('p', function() 
             self.area:addGameObject('Ammo', random(0, gw), random(0, gh)) 
@@ -44,7 +54,7 @@ function Stage:new()
             self.score = self.score * 10
         end)
     input:bind('q', function()
-            self.area:addGameObject('Orbitter')
+            self.player:die()
         end)
 end
 
@@ -53,9 +63,16 @@ function Stage:update(dt)
     camera:lockPosition(dt, gw/2, gh/2)
     self.timer:update(dt)
     self.area:update(dt)
+
+    if self.game_over then
+        self.restart_button:update(dt)
+        self.menu_button:update(dt)
+    end
 end
 
 function Stage:draw()
+    love.graphics.setFont(self.font)
+
     love.graphics.setCanvas(self.main_canvas)
     love.graphics.clear()
     camera:attach(0, 0, gw, gh)
@@ -65,7 +82,7 @@ function Stage:draw()
     -- HP/ES
 
     if self.player.energy_shield then
-                local r, g, b = unpack(default_color)
+        local r, g, b = unpack(default_color)
         local hp, max_hp = self.player.hp, self.player.max_hp
         love.graphics.setColor(r, g, b)
         love.graphics.rectangle('fill', gw/2 - 52, gh - 16, 48*(hp/max_hp), 4)
@@ -143,6 +160,24 @@ function Stage:draw()
         0, self.font:getHeight()/2)
     love.graphics.setColor(255, 255, 255)
 
+    if self.game_over then 
+        love.graphics.setFont(self.game_over_font)
+        local score = "SCORE: " .. current_room.score
+        local high_score = "HIGH SCORE: " .. GameData.high_score
+        local difficulty = "DIFFICULTY REACHED: " .. current_room.director.difficulty
+        local sp_gained = "SP GAINED: " .. self.old_sp - sp
+
+        local initial_y = gh/2 - 3*self.game_over_font:getHeight()
+        love.graphics.print(score, gw/2 - self.game_over_font:getWidth(score)/2, initial_y)
+        love.graphics.print(high_score, gw/2 - self.game_over_font:getWidth(high_score)/2, initial_y + self.game_over_font:getHeight())
+        love.graphics.print(difficulty, gw/2 - self.game_over_font:getWidth(difficulty)/2, initial_y + 2*self.game_over_font:getHeight())
+        love.graphics.print(sp_gained, gw/2 - self.game_over_font:getWidth(sp_gained)/2, initial_y + 3*self.game_over_font:getHeight())
+        
+        self.restart_button:draw()
+        self.menu_button:draw()
+    end
+
+
     love.graphics.setCanvas()
 
     love.graphics.setColor(255, 255, 255, 255)
@@ -150,14 +185,13 @@ function Stage:draw()
     love.graphics.draw(self.main_canvas, 0, 0, 0, sx, sy)
     love.graphics.setBlendMode('alpha')
 
-    love.graphics.setFont(self.font)
-
-
 end
 
 function Stage:finish()
-    timer:after(1, function()
-            gotoRoom('Stage')
+    self.director.dead = true -- Stop the director from spawning anything else. We'll let everything else tick as usual though when we display the death screen
+    self.timer:after(1, function()
+            if current_room.score > GameData.high_score then GameData.high_score = current_room.score end
+            self.game_over = true
         end)
 end
 
