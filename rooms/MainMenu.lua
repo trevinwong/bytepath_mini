@@ -8,11 +8,11 @@ function MainMenu:new()
 	fade_in(1)
 	local play_button_w, play_button_h  = self.font:getWidth("play") * 3, self.font:getHeight() + 3
 	self.play_button = Button(gw/2 - play_button_w/2, gh/2 - play_button_h/2 - 25, {text = "play", w = play_button_w, h = play_button_h, center_justified = true, font = self.font, always_hot = true,
-			click = function() gotoRoom("ChooseShip") end })
+			click = function() gotoRoomPutOnStack("ChooseShip") end })
 	
 	local skills_button_w, skills_button_h  = self.font:getWidth("skills") * 3, self.font:getHeight() + 3
 	self.skills_button = Button(gw/2 - skills_button_w/2, gh/2 - skills_button_h/2, {text = "skills", w = skills_button_w, h = skills_button_h, center_justified = true, font = self.font, always_hot = true,
-			click = function() gotoRoom("SkillTree") end })
+			click = function() gotoRoomPutOnStack("SkillTree") end })
 
 	local quit_button_w, quit_button_h = self.font:getWidth("quit") * 3, self.font:getHeight() + 3
 	self.quit_button = Button(gw/2 - quit_button_w/2, gh/2 - quit_button_h/2 + 25, {text = "quit", w = quit_button_w, h = quit_button_h, center_justified = true, font = self.font, always_hot = true,
@@ -47,9 +47,6 @@ function MainMenu:draw()
 end
 
 function MainMenu:finish()
-	self.timer:after(1, function()
-			gotoRoom('SkillTree')
-		end)
 end
 
 function MainMenu:destroy()

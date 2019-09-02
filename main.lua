@@ -16,12 +16,12 @@ require 'globals'
 require 'libraries/utf8'
 
 function love.load()
-    
-    
+
+
 --  love.profiler = require('libraries/profile') 
 --  love.profiler.hookall("Lua")
 --  love.profiler.start()
-  
+
     requireAllInFolder('data')
     requireAllInFolder('objects')
     requireAllInFolder('rooms')
@@ -39,6 +39,8 @@ function love.load()
     slow_amount = 1
     screen_alpha = 1
     flash_frames = nil
+    room_stack = {} -- highest index is the "top" of the stack
+
     resize(3)
     input:bind('left', 'left')
     input:bind('right', 'right')
@@ -49,28 +51,28 @@ function love.load()
     input:bind('wheeldown', 'zoom_out')
     input:bind('return', 'return')
     input:bind('backspace', 'backspace')
-    
+
     input:bind('f1', function()
-        print("Before collection: " .. collectgarbage("count")/1024)
-        
-        collectgarbage()
-        print("After collection: " .. collectgarbage("count")/1024)
-        print("Object count: ")
-        local counts = type_count()
-        for k, v in pairs(counts) do print(k, v) end
-        print("-------------------------------------")
-    end)
+            print("Before collection: " .. collectgarbage("count")/1024)
+
+            collectgarbage()
+            print("After collection: " .. collectgarbage("count")/1024)
+            print("Object count: ")
+            local counts = type_count()
+            for k, v in pairs(counts) do print(k, v) end
+            print("-------------------------------------")
+        end)
 
     input:bind('f2', function()
             gotoRoom("SkillTree")
-    end)
+        end)
 
     input:bind('f3', function()
-             current_room:destroy()
+            current_room:destroy()
             current_room = nil
         end
     )
-    
+
     --[[
         Useful time manipulation functions that I picked up during my time at Skybox :)
     ]]--
@@ -98,14 +100,27 @@ function love.load()
             slow_amount = 0
         end
     )
-    
+
     -- SP
     sp = 0
     max_sp = 999
     max_nodes = 50
 
-    
-    current_room = Stage()
+    -- Canvas
+    main_canvas = love.graphics.newCanvas(gw, gh)
+
+    local x, y, w, h = 40, gh - 20, 20, 50
+    back_button = Button(x - h/2, y - w/2, {w = h, h = w, custom_draw = function()
+                pushRotate(x, y, -math.pi/2)
+                draft:triangleIsosceles(x, y, w, h, 'line')
+                love.graphics.pop()
+                end,
+                click = function()
+                    popRoomStack()
+                end
+            })
+
+    gotoRoom("MainMenu")
 end
 
 --love.frame = 0
@@ -123,10 +138,23 @@ function love.update(dt)
         if flash_seconds < 0 then flash_seconds = nil end
     end
     if current_room then current_room:update(dt*slow_amount) end
+    if #room_stack > 1 then back_button:update() end
 end
 
 function love.draw()
     if current_room then current_room:draw() end
+
+    if #room_stack > 1 then
+        love.graphics.setCanvas(main_canvas)
+            back_button:draw()
+        love.graphics.setCanvas()
+
+        love.graphics.setColor(255, 255, 255, 255)
+        love.graphics.setBlendMode('alpha', 'premultiplied')
+        love.graphics.draw(main_canvas, 0, 0, 0, sx, sy)
+        love.graphics.setBlendMode('alpha')
+
+    end
 
     if flash_seconds then
         love.graphics.setColor(background_color)
@@ -138,7 +166,17 @@ end
 
 function gotoRoom(room_type, ...)
     if current_room and current_room.destroy then current_room:destroy() end
-    current_room = _G[room_type](...)
+    local new_room = _G[room_type](...)
+    room_stack = {}
+    table.insert(room_stack, new_room)
+    current_room = new_room
+end
+
+function gotoRoomPutOnStack(room_type, ...)
+    -- if current_room and current_room.destroy then current_room:destroy() end
+    local new_room = _G[room_type](...)
+    table.insert(room_stack, new_room)
+    current_room = new_room
 end
 
 function requireAllInFolder(folder)
@@ -190,4 +228,11 @@ end
 
 function love.textinput(t)
     if current_room.textinput then current_room:textinput(t) end
+end
+
+function popRoomStack()
+    if #room_stack > 1 then
+        table.remove(room_stack) 
+        current_room = room_stack[#room_stack]
+    end
 end
