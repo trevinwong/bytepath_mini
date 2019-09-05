@@ -19,3 +19,6 @@
 [submodule "libraries/draft"]
 	path = libraries/draft
 	url = git@github.com:pelevesque/draft.git
+[submodule "libraries/ripple"]
+	path = libraries/ripple
+	url = git@github.com:tesselode/ripple.git

@@ -334,20 +334,25 @@ function Player:update(dt)
 		local object = collision_data.collider:getObject()
 		object:die()
 		if object:is(Ammo) then
+			playGameAmmo()
 			self:addAmmo(5 + self.ammo_gain)
 			self:onAmmoPickup()
 			current_room.score = current_room.score + 50
 		elseif object:is(Boost) then
+			playGameItem()
 			self:addBoost(25)        
 			current_room.score = current_room.score + 150
 		elseif object:is(HP) then
+			playGameItem()
 			self:addHP(25)
 			self:onHPPickup()
 		elseif object:is(SP) then
+			playGameItem()
 			self:addSP(1)
 			self:onSPPickup()
 			current_room.score = current_room.score + 250
 		elseif object:is(Attack) then
+			playGameItem()
 			self:setAttack(object.attack)
 			current_room.score = current_room.score + 500
 		end
@@ -549,6 +554,7 @@ function Player:shoot()
 		local projectile = self.area:addGameObject('Projectile', 
 			self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), table.merge({r = self.r, attack = self.attack, s = 4}, mods))
 	elseif self.attack == 'Blast' then
+		playGameShoot2()
 		for i = 1, 12 do
 			local random_angle = random(-math.pi/6, math.pi/6)
 			self.area:addGameObject('Projectile', 
@@ -563,6 +569,7 @@ function Player:shoot()
 			self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), 
 			table.merge({r = self.r, attack = self.attack}, mods))
 	elseif self.attack == 'Flame' then
+		playGameFlame()
 		local random_angle = random(-math.pi/20, math.pi/20)
 		self.area:addGameObject('Projectile', 
 			self.x + 1.5*d*math.cos(self.r + random_angle), self.y + 1.5*d*math.sin(self.r + random_angle), 
@@ -601,11 +608,13 @@ function Player:shoot()
 		local closest_enemy = nearby_enemies[1]
 
 		if closest_enemy then
+			playGameLightning()
 			closest_enemy:hit()
 			local x2, y2 = closest_enemy.x, closest_enemy.y
 			self:spawnLightning(x1, y1, x2, y2, boost_color)
 
 			if self.additional_lightning_bolt then
+				playGameLightning()
 				local closest_enemy2 = nearby_enemies[2]
 				if closest_enemy2 then
 					closest_enemy2:hit()
@@ -621,6 +630,7 @@ function Player:shoot()
 		self.area:addGameObject('Projectile', 
 			self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), table.merge({r = self.r, attack = self.attack, s = 5}, mods))
 	elseif self.attack == 'Laser' then
+		playGameLaser()
 		local x1, y1 = self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r) 
 		local x2, y2 = self.x + 1024*math.cos(self.r), self.y + 1024*math.sin(self.r)
 		self.area:addGameObject('Laser',
@@ -746,6 +756,7 @@ function Player:hit(damage)
 	self:addHP(damage)
 
 	if damage <= -30 then
+		playGameHurt()
 		self.invincible = true
 		self.invisible = true
 		self.timer:after(2 * self.invulnerability_time_multiplier, function()
@@ -762,6 +773,7 @@ function Player:hit(damage)
 				end
 			end)
 	else 
+		playGameHurtSmall()
 		flash(0.03)
 		camera:shake(6, 60, 0.1)
 		slow(0.75, 0.25) 

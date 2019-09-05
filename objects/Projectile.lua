@@ -15,6 +15,8 @@ function Projectile:new(area, x, y, opts)
 	self:applyPspdMultiplier()
 	self:applySizeMultiplier()
 
+	if self.attack ~= "Flame" then playGameShoot1() end
+
 	if current_room.player.projectile_ninety_degree_change then
 		self.timer:after(0.2 / current_room.player.angle_change_frequency_multiplier, function()
 				self.ninety_degree_direction = table.random({-1, 1})

@@ -20,8 +20,11 @@ function CinematicInfoText:new(x, y, opts)
 	local time_per_character = self.print_duration / #self.characters
 	if self.print_character_by_character then
 		self.timer:after(time_per_character, function(f)
+				playKeystroke()
 				self.on_character = self.on_character + 1
-				if self.on_character < #self.characters then self.timer:after(time_per_character, f) else
+				if self.on_character < #self.characters then
+					self.timer:after(time_per_character, f) 
+				else
 					self:garbleText()
 					self.print_character_by_character = false
 				end

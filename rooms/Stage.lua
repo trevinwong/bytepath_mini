@@ -13,6 +13,7 @@ function Stage:new()
     self.timer = Timer()
     self.player = self.area:addGameObject('Player', gw/2, gh/2)
     self.main_canvas = love.graphics.newCanvas(gw, gh)
+    camera = Camera(gw/2, gh/2)
     camera.smoother = Camera.smooth.damped(5)
     self.old_sp = sp
 
@@ -56,6 +57,10 @@ function Stage:new()
     input:bind('q', function()
             self.player:die()
         end)
+    
+    fadeVolume('music', 5, 0.5)
+    fadeVolume('game', 5, 1.3)
+    playRandomSong()
 end
 
 function Stage:update(dt)
@@ -96,7 +101,7 @@ function Stage:draw()
             math.floor(self.font:getWidth(hp .. '/' .. max_hp)/2), math.floor(self.font:getHeight()/2))
     else
         local r, g, b = unpack(hp_color)
-        local hp, max_hp = self.player.hp, self.player.max_hp
+        local hp, max_hp = math.floor(self.player.hp), math.floor(self.player.max_hp)
         love.graphics.setColor(r, g, b)
         love.graphics.rectangle('fill', gw/2 - 52, gh - 16, 48*(hp/max_hp), 4)
         love.graphics.setColor(r - 32/255, g - 32/255, b - 32/255)
@@ -111,7 +116,7 @@ function Stage:draw()
 
     -- Ammo
     local r, g, b = unpack(ammo_color)
-    local ammo, max_ammo = self.player.ammo, self.player.max_ammo
+    local ammo, max_ammo = math.floor(self.player.ammo), math.floor(self.player.max_ammo)
     love.graphics.setColor(r, g, b)
     love.graphics.rectangle('fill', gw/2 - 52, 16, 48*(ammo/max_ammo), 4)
     love.graphics.setColor(r - 32/255, g - 32/255, b - 32/255)
@@ -125,7 +130,7 @@ function Stage:draw()
 
     -- Boost
     local r, g, b = unpack(boost_color)
-    local boost, max_boost = self.player.boost, self.player.max_boost
+    local boost, max_boost = math.floor(self.player.boost), math.floor(self.player.max_boost)
     love.graphics.setColor(r, g, b)
     love.graphics.rectangle('fill', gw/2 + 4, 16, 48*(boost/max_boost), 4)
     love.graphics.setColor(r - 32/255, g - 32/255, b - 32/255)
@@ -134,7 +139,7 @@ function Stage:draw()
     love.graphics.print('BOOST', gw/2 + 4 + 24, 8, 0, 1, 1,
         math.floor(self.font:getWidth('BOOST')/2), math.floor(self.font:getHeight()/2))
 
-    love.graphics.print(math.floor(boost) .. '/' .. max_boost, gw/2 + 4 + 24, 26, 0, 1, 1,
+    love.graphics.print(boost .. '/' .. max_boost, gw/2 + 4 + 24, 26, 0, 1, 1,
         math.floor(self.font:getWidth(math.floor(boost) .. '/' .. max_boost)/2), math.floor(self.font:getHeight()/2))
 
     -- Cycle

@@ -9,6 +9,7 @@ function Explosion:new(area, x, y, opts)
 	self.explosion_color = opts.color or hp_color
     self.s = (opts.s or random(35, 40)) * current_room.player.area_multiplier
 	
+	playGameExplosion()
 
     self.timer:tween(0.1, self, {s = self.s * 1.5}, 
     'in-out-cubic', function() 

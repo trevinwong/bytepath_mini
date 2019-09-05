@@ -11,6 +11,7 @@ Vector = require 'libraries/hump/vector'
 wf = require 'libraries/windfield/windfield'
 Draft = require('libraries/draft/draft')
 draft = Draft('line')
+ripple = require('libraries/ripple/ripple')
 require 'utils'
 require 'globals'
 require 'libraries/utf8'
@@ -30,6 +31,7 @@ function love.load()
     loadFontsInFolderAsSize('resources/fonts', 16)
     love.graphics.setDefaultFilter('nearest', 'nearest')
     love.graphics.setLineStyle('rough')
+    sound()
 
     input = Input()
     camera = Camera()
@@ -102,7 +104,7 @@ function love.load()
     )
 
     -- SP
-    sp = 0
+    sp = 5
     max_sp = 999
     max_nodes = 50
 
@@ -117,14 +119,16 @@ function love.load()
                 end,
                 click = function()
                     popRoomStack()
+                    playMenuBack()
                 end
             })
 
-    gotoRoom("MainMenu")
+    gotoRoom("IntroSequence")
 end
 
 --love.frame = 0
 function love.update(dt)
+    soundUpdate(dt)
 --      love.frame = love.frame + 1
 --  if love.frame%100 == 0 then
 --    love.report = love.profiler.report('time', 20)

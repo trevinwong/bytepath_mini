@@ -4,12 +4,14 @@ function IntroSequence:new()
 	self.timer = Timer()
 	self.font = fonts.m5x7_16
 	self.main_canvas = love.graphics.newCanvas(gw, gh)
-
 	self.first_part = true
 	
 	self.base_initializing_text = "root@your_phone: ~$ initializing BYTEPATH mini . . ."
 	self.initializing_text = CinematicInfoText(gw/2 - self.font:getWidth(self.base_initializing_text)/2, gh/2 - self.font:getHeight()/2, {text = self.base_initializing_text, print_character_by_character = true})
-
+	
+	fadeVolume('music', 5, 0.5)
+	playRandomSong()
+	
 	fade_in(1)
 	self.timer:after(1, function() fade_out(1) end)
 	self.timer:after(2, function() self.first_part = false fade_in(1) end)

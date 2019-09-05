@@ -87,6 +87,7 @@ function Shooter:die()
 			{color = hp_color, w = 30, h = 30})
 		current_room.score = current_room.score + 150
 		current_room.player:onKill({self.x, self.y})
+		playGameEnemyDie()
 	end
 end
 

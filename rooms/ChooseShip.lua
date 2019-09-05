@@ -12,12 +12,12 @@ function ChooseShip:new()
 	local right_arrow_x, right_arrow_y = self.box_x + self.half_w + 12, self.box_y
 
 	self.available_ships = {"Fighter", "Brick", "Rocket", "Night", "Crystal", "Robo", "Freedom", "Stabbinator"}
-	self.ships_locked_status = {Fighter = true, Brick = true, Rocket = true, Night = true, Crystal = true, Robo = true, Freedom = true, Stabbinator = true}
+	self.ships_locked_status = {Fighter = false, Brick = false, Rocket = false, Night = false, Crystal = false, Robo = false, Freedom = false, Stabbinator = false}
 	self.selected_ship_index = 1
 	self.selected_ship = self.available_ships[self.selected_ship_index]
 	self.polygons = Ships[self.selected_ship]["generatePolygons"](self.w)
 	self.go_button = Button(0, 0, {text = "GO!", w = self.font:getWidth("GO!") * 3, h = self.font:getHeight() + 3, center_justified = true, font = self.font, always_hot = true,
-			click = function() GameData.last_selected_ship = self.selected_ship gotoRoom('Stage') end})
+			click = function() GameData.last_selected_ship = self.selected_ship gotoRoom('Stage') playMenuSelect() end})
 	local left_arrow_w, left_arrow_h = self.half_w/4, self.half_w/2
 	self.left_arrow = Button(left_arrow_x - left_arrow_w, left_arrow_y - left_arrow_h/2, {w = left_arrow_w, h = left_arrow_h, 
 			custom_draw = function() 
@@ -27,9 +27,13 @@ function ChooseShip:new()
 				love.graphics.pop()
 			end,
 			click = function()
-				self.selected_ship_index = self.selected_ship_index - 1
-				if self.selected_ship_index <= 0 then self.selected_ship_index = 1 end
-				self:switchShip()
+				if self.selected_ship_index > 1 then 
+					self.selected_ship_index = self.selected_ship_index - 1
+					playMenuSelect()
+					self:switchShip()
+				else
+					playMenuError()
+				end
 			end})
 	local right_arrow_w, right_arrow_h = self.half_w/4, self.half_w/2
 	self.right_arrow = Button(right_arrow_x, right_arrow_y - right_arrow_h/2, {w = right_arrow_w, h = right_arrow_h, 
@@ -40,9 +44,13 @@ function ChooseShip:new()
 				love.graphics.pop()
 			end,
 			click = function()
-				self.selected_ship_index = self.selected_ship_index + 1
-				if self.selected_ship_index > #self.available_ships then self.selected_ship_index = #self.available_ships end
-				self:switchShip()
+				if self.selected_ship_index < #self.available_ships then 
+					self.selected_ship_index = self.selected_ship_index + 1
+					playMenuSelect()
+					self:switchShip()
+				else
+					playMenuError()
+				end
 			end})
 end
 

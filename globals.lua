@@ -16,3 +16,8 @@ negative_colors = {
 all_colors = M.append(default_colors, negative_colors)
 
 enemies = {'Rock', 'Shooter', 'BigRock', 'Waver', 'Seeker', 'Orbitter'}
+
+main_volume = 5
+sfx_volume = 5
+music_volume = 5
+muted = false
