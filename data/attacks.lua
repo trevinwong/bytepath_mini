@@ -18,4 +18,24 @@ attacks = {
     ['Laser'] = {cooldown = 0.8, ammo = 6, abbreviation = 'La', color = hp_color}
 }
 
+lowercaseToProper = {
+    ['neutral'] = 'Neutral',
+    ['double'] = 'Double',
+    ['triple'] = 'Triple',
+    ['rapid'] = 'Rapid',
+    ['spread'] = 'Spread',
+    ['back'] = 'Back',
+    ['side'] = 'Side',
+    ['homing'] = 'Homing',
+    ['blast'] = 'Blast',
+    ['spin'] = 'Spin',
+    ['flame'] = 'Flame',
+    ['bounce'] = 'Bounce',
+    ['2split'] = '2Split',
+    ['4split'] = '4Split',
+    ['lightning'] = 'Lightning',
+    ['explode'] = 'Explode',
+    ['laser'] = 'Laser'
+}
+
 attackNames = returnAllKeys(attacks)

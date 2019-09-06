@@ -114,22 +114,14 @@ function Director:setEnemySpawnsForThisRound()
 end
 
 function Director:generateAttackSpawnChances()
-	local attack_spawn_chance_multipliers = self.player.attack_spawn_chance_multipliers
-	local attack_spawn_chance_definitions = {}
-	--[[
-		A side note: you should always define a custom function for returning the length of a table. To be honest, it's incredibly weird why Lua doesn't already
-		have this built in.
-		
-		Why? #table only returns the highest index of the array portion of the table - if your table consists entirely of the hashmap portion, it will return
-		nil, which lead to much confusion here...
-	]]--
-	local initial_chance = 1 / returnTableLength(attacks)
-
-	for i, attackName in ipairs(attackNames) do
-		table.insert(attack_spawn_chance_definitions, {attackName, math.ceil(initial_chance * attack_spawn_chance_multipliers[attackName .. "atk_spawn_chance_multiplier"])})
-	end
-
-	self.attack_spawn_chances = chanceList(unpack(attack_spawn_chance_definitions))
+	self.attack_spawn_chances = chanceList(
+        {'Double', 10 + self.player.double_spawn_chance}, {'Triple', 10 + self.player.triple_spawn_chance}, {'Rapid', 10 + self.player.rapid_spawn_chance}, 
+        {'Spread', 10 + self.player.spread_spawn_chance}, {'Back', 10 + self.player.back_spawn_chance}, {'Side', 10 + self.player.side_spawn_chance}, 
+        {'Homing', 10 + self.player.homing_spawn_chance}, {'Blast', 10 + self.player.blast_spawn_chance}, {'Spin', 10 + self.player.spin_spawn_chance}, 
+        {'Bounce', 10 + self.player.bounce_spawn_chance}, {'Lightning', 10 + self.player.lightning_spawn_chance}, {'Flame', 10 + self.player.flame_spawn_chance},
+        {'2Split', 10 + self.player.twosplit_spawn_chance}, {'4Split', 10 + self.player.foursplit_spawn_chance}, {'Explode', 10 + self.player.explode_spawn_chance}, 
+        {'Laser', 10 + self.player.laser_spawn_chance}
+    )
 end
 
 function Director:destroy()

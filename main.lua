@@ -124,7 +124,7 @@ function love.load()
                 end
             })
 
-    gotoRoom("SkillTree")
+    gotoRoom("Stage")
 end
 
 --love.frame = 0

@@ -32,11 +32,6 @@ function Player:new(area, x, y, opts)
 	self.laser_width_multiplier = 1
 	self.energy_shield_recharge_amount_multiplier = 1
 	self.energy_shield_recharge_cooldown_multiplier = 1
-	self.attack_spawn_chance_multipliers = {}
-
-	for _, name in ipairs(attackNames) do
-		self.attack_spawn_chance_multipliers[name .. "atk_spawn_chance_multiplier"] = 1
-	end
 
 	self.aspd_multiplier = Stat(1)
 	self.mvspd_multiplier = Stat(1)
@@ -83,6 +78,22 @@ function Player:new(area, x, y, opts)
 	self.split_projectiles_split_chance = 0
 	self.drop_mines_chance = 0
 	self.explode_on_cycle_chance = 0
+	self.double_spawn_chance = 0 
+    self.triple_spawn_chance = 0 
+    self.rapid_spawn_chance = 0 
+    self.spread_spawn_chance = 0 
+    self.back_spawn_chance = 0 
+    self.side_spawn_chance = 0 
+    self.homing_spawn_chance = 0 
+    self.blast_spawn_chance = 0 
+    self.spin_spawn_chance = 0 
+    self.lightning_spawn_chance = 0
+    self.flame_spawn_chance = 0 
+    self.twosplit_spawn_chance = 0
+    self.foursplit_spawn_chance = 0
+    self.explode_spawn_chance = 0
+    self.laser_spawn_chance = 0 
+    self.bounce_spawn_chance = 0 
 
 	-- Passives
 	self.increased_cycle_speed_while_boosting = false
@@ -119,10 +130,8 @@ function Player:new(area, x, y, opts)
 	self.no_ammo_drop = false
 	self.infinite_ammo = false
 
-	self.start_with_attack_passives = {}
-
 	for _, name in ipairs(attackNames) do
-		self.start_with_attack_passives["start_with_" .. name] = false
+		self["start_with_" .. name:lower()] = false
 	end
 
 	-- Conversions
@@ -179,11 +188,9 @@ function Player:new(area, x, y, opts)
 	self.collider:setCollisionClass('Player')
 	self.collider:setObject(self)
 
-	-- Attacks
+	-- Shoot/Attacks
 	self.shoot_timer = 0
 	self.shoot_cooldown = 0.24
-	local startingAttack = self:returnRandomStartingAttack()
-	if startingAttack then self:setAttack(startingAttack) else self:setAttack("Neutral") end
 	if self.change_attack_periodically then
 		self.timer:every(10, function()
 				self:setAttack(selectRandomKey(attacks))
@@ -265,54 +272,58 @@ function Player:new(area, x, y, opts)
 
 	-- Stats
 	Ships[self.ship]["modifyPlayerStats"](self)
-	--self:treeToPlayer()
+	self:treeToPlayer()
 	self:setStats()
 	self:generateChances()
+	
+	-- Assign attack afterwards
+	local startingAttack = self:returnRandomStartingAttack()
+	if startingAttack then self:setAttack(startingAttack) else self:setAttack("Neutral") end
 end
 
 function Player:treeToPlayer()
-    local approved_list = {
-        'increased_cycle_speed_while_boosting', 'invulnerability_while_boosting', 'increased_luck_while_boosting', 'projectile_ninety_degree_change', 'projectile_random_degree_change', 'wavy_projectiles', 
-        'fast_slow', 'slow_fast', 'energy_shield', 'barrage_nova', 'projectiles_explode_on_expiration', 'lesser_increased_self_explosion_size', 'greater_increased_self_explosion_size', 
-        'projectiles_explosions', 'change_attack_periodically', 'gain_sp_on_death', 'convert_hp_to_sp_if_hp_full', 'no_boost', 'half_ammo', 'half_hp', 'deals_damage_while_invulnerable', 
-        'refill_ammo_if_hp_full', 'refill_boost_if_hp_full', 'only_spawn_boost', 'only_spawn_attack', 'no_ammo_drop', 'infinite_ammo', 'fixed_spin_direction', 'start_with_double', 'start_with_triple', 
-        'start_with_rapid', 'start_with_spread', 'start_with_back', 'start_with_side', 'start_with_homing', 'start_with_blast', 'start_with_spin', 'start_with_lightning', 'start_with_flame', 
-        'start_with_2split', 'start_with_4split', 'start_with_explode', 'start_with_laser', 'start_with_bounce'
-    }
+	local approved_list = {
+		'increased_cycle_speed_while_boosting', 'invulnerability_while_boosting', 'increased_luck_while_boosting', 'projectile_ninety_degree_change', 'projectile_random_degree_change', 'wavy_projectiles', 
+		'fast_slow', 'slow_fast', 'energy_shield', 'barrage_nova', 'projectiles_explode_on_expiration', 'lesser_increased_self_explosion_size', 'greater_increased_self_explosion_size', 
+		'projectiles_explosions', 'change_attack_periodically', 'gain_sp_on_death', 'convert_hp_to_sp_if_hp_full', 'no_boost', 'half_ammo', 'half_hp', 'deals_damage_while_invulnerable', 
+		'refill_ammo_if_hp_full', 'refill_boost_if_hp_full', 'only_spawn_boost', 'only_spawn_attack', 'no_ammo_drop', 'infinite_ammo', 'fixed_spin_direction', 'start_with_double', 'start_with_triple', 
+		'start_with_rapid', 'start_with_spread', 'start_with_back', 'start_with_side', 'start_with_homing', 'start_with_blast', 'start_with_spin', 'start_with_lightning', 'start_with_flame', 
+		'start_with_2split', 'start_with_4split', 'start_with_explode', 'start_with_laser', 'start_with_bounce'
+	}
 
-    local all_attributes = {}
-    local positives = {}
-    local negatives = {}
-    for _, index in ipairs(bought_node_indexes) do
-        if tree[index] then
-            local stats = tree[index].stats
-            for i = 1, #stats, 3 do
-                local attribute, value = stats[i+1], stats[i+2]
-                if not player[attribute] and not M.any(approved_list, attribute) then error('No attribute "' .. attribute .. '"') end
-                if not positives[attribute] then positives[attribute] = 0 end
-                if not negatives[attribute] then negatives[attribute] = 0 end
-                if type(player[attribute]) == 'number' then
-                    if value > 0 then positives[attribute] = positives[attribute] + value
-                    else negatives[attribute] = negatives[attribute] + value end
-                    player[attribute] = player[attribute] + value
-                elseif type(player[attribute]) == 'boolean' then
-                    player[attribute] = value
-                elseif player[attribute]:is(Stat) then
-                    if value > 0 then positives[attribute] = positives[attribute] + value
-                    else negatives[attribute] = negatives[attribute] + value end
-                    local v = player[attribute].value
-                    player[attribute] = Stat(v + value)
-                end
-                if not M.any(all_attributes, attribute) then table.insert(all_attributes, attribute) end
-            end
-        end
-    end
+	local all_attributes = {}
+	local positives = {}
+	local negatives = {}
+	for _, index in ipairs(bought_node_indexes) do
+		if tree[index] then
+			local stats = tree[index].stats
+			for i = 1, #stats, 3 do
+				local attribute, value = stats[i+1], stats[i+2]
+				if not self[attribute] and not M.any(approved_list, attribute) then error('No attribute "' .. attribute .. '"') end
+				if not positives[attribute] then positives[attribute] = 0 end
+				if not negatives[attribute] then negatives[attribute] = 0 end
+				if type(self[attribute]) == 'number' then
+					if value > 0 then positives[attribute] = positives[attribute] + value
+					else negatives[attribute] = negatives[attribute] + value end
+					self[attribute] = self[attribute] + value
+				elseif type(self[attribute]) == 'boolean' then
+					self[attribute] = value
+				elseif self[attribute]:is(Stat) then
+					if value > 0 then positives[attribute] = positives[attribute] + value
+					else negatives[attribute] = negatives[attribute] + value end
+					local v = self[attribute].value
+					self[attribute] = Stat(v + value)
+				end
+				if not M.any(all_attributes, attribute) then table.insert(all_attributes, attribute) end
+			end
+		end
+	end
 
-    for _, attribute in ipairs(all_attributes) do
-        if type(player[attribute]) == 'number' or type(player[attribute]) == 'boolean' then
-            print(attribute, player[attribute], positives[attribute], negatives[attribute])
-        else print(attribute, player[attribute].value, positives[attribute], negatives[attribute]) end
-    end
+	for _, attribute in ipairs(all_attributes) do
+		if type(self[attribute]) == 'number' or type(self[attribute]) == 'boolean' then
+			print(attribute, self[attribute], positives[attribute], negatives[attribute])
+		else print(attribute, self[attribute].value, positives[attribute], negatives[attribute]) end
+	end
 end
 
 function Player:setStats()
@@ -1053,8 +1064,12 @@ end
 
 function Player:returnRandomStartingAttack()
 	local start_withs = {}
-	for attackName, bool in pairs(self.start_with_attack_passives) do
-		if bool then table.insert(start_withs, attackName) end
+
+	for k, bool in pairs(self) do
+		if k:find('start_with_') then
+			if bool then table.insert(start_withs, k) end
+		end
 	end
-	if #start_withs == 0 then return false else return string.sub(start_withs[love.math.random(1, #start_withs)], string.len("start_with_") + 1) end
+
+	if #start_withs == 0 then return false else return lowercaseToProper[string.sub(start_withs[love.math.random(1, #start_withs)], string.len("start_with_") + 1)] end
 end

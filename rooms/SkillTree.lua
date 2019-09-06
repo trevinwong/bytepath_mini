@@ -7,8 +7,6 @@ function SkillTree:new()
 	camera.smoother = Camera.smooth.damped(5)
 	self.font = fonts.m5x7_16
 
-	selected_node_indexes = {}
-	bought_node_indexes = {1}
 	selected_sp = 0
 
 	self.active_nodes = 0
