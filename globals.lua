@@ -17,6 +17,20 @@ all_colors = M.append(default_colors, negative_colors)
 
 enemies = {'Rock', 'Shooter', 'BigRock', 'Waver', 'Seeker', 'Orbitter'}
 
+-- Skill tree colors
+white = {222/255, 222/255, 222/255}
+dark = {96/255, 96/255, 96/255}
+gray = {160/255, 160/255, 160/255}
+red = {222/255, 32/255, 32/255}
+green = {32/255, 222/255, 32/255}
+blue = {32/255, 32/255, 222/255}
+pink = {222/255, 32/255, 222/255}
+brown = {192/255, 96/255, 32/255}
+yellow = {222/255, 222/255, 32/255}
+orange = {222/255, 128/255, 32/255}
+bluegreen = {32/255, 222/255, 222/255}
+purple = {128/255, 32/255, 128/255}
+
 main_volume = 5
 sfx_volume = 5
 music_volume = 5

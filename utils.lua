@@ -18,8 +18,14 @@ function table.random(t)
     return t[love.math.random(1, #t)]
 end
 
-function table.copy(org)
-  return {unpack(org)}
+function table.copy(t)
+    local copy
+    if type(t) == 'table' then
+        copy = {}
+        for k, v in next, t, nil do copy[table.copy(k)] = table.copy(v) end
+        setmetatable(copy, table.copy(getmetatable(t)))
+    else copy = t end
+    return copy
 end
 
 function chanceList(...)

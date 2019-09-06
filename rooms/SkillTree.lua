@@ -3,7 +3,7 @@ SkillTree = Object:extend()
 function SkillTree:new()
 	self.timer = Timer()
 	self.main_canvas = love.graphics.newCanvas(gw, gh)
-	camera = Camera(0, 0)
+    camera:lookAt(32, 96)
 	camera.smoother = Camera.smooth.damped(5)
 	self.font = fonts.m5x7_16
 
@@ -42,8 +42,8 @@ function SkillTree:new()
 	local cancel_points_button = Button(button_x, button_y, {w = button_w, h = button_h, text = cancel_points_txt, font = self.font, center_justified = true, click = SkillTree.cancelSelectedNodes, click_args = self})
 	self.select_nodes_buttons = {apply_points_button, cancel_points_button}
 
-	for id, node in ipairs(self.tree) do table.insert(self.nodes, Node(id, node.x, node.y, node.cost, {no_description = node.no_description, size = node.size})) end
-	for id, node in ipairs(self.tree) do 
+	for id, node in pairs(self.tree) do table.insert(self.nodes, Node(id, node.x, node.y, node.cost, {no_description = node.no_description, size = node.size})) end
+	for id, node in pairs(self.tree) do 
 		for _, linked_node_id in ipairs(node.links or {}) do
 			table.insert(self.lines, Line(id, linked_node_id))
 		end
@@ -124,34 +124,32 @@ function SkillTree:draw()
 	-- Stats rectangle
 	for _, node in ipairs(self.nodes) do
 		if node.hot then
-			local title = self.tree[node.id].title or ""
 			local stats = self.tree[node.id].stats or {}
 			-- Figure out max_text_width to be able to set the proper rectangle width
 			local max_text_width = 0
-			if self.font:getWidth(title) > max_text_width then max_text_width = self.font:getWidth(title) end
 			for i = 1, #stats, 3 do
 				if self.font:getWidth(stats[i]) > max_text_width then
 					max_text_width = self.font:getWidth(stats[i])
 				end
 			end
+			max_text_width = max_text_width + 24
 
 			-- Draw rectangle
 			local mx, my = love.mouse.getPosition() 
 			mx, my = mx/sx, my/sy
 			love.graphics.setColor(0, 0, 0, 222/255)
 			love.graphics.rectangle('fill', mx, my, 16 + max_text_width, 
-				self.font:getHeight() + (1 + #stats/3)*self.font:getHeight())  
+				self.font:getHeight() + (#stats/3)*self.font:getHeight() - 6)  
 
 			-- Draw text
 			love.graphics.setColor(default_color)
-			love.graphics.print(title, math.floor(mx + 8), math.floor(my + 2))
 			for i = 1, #stats, 3 do
 				love.graphics.print(stats[i], math.floor(mx + 8), 
-					math.floor(my + self.font:getHeight()/2 + (1 + math.floor(i/3))*self.font:getHeight()))
+					math.floor(my + self.font:getHeight()/2 + (math.floor(i/3))*self.font:getHeight()) - 4)
 			end
 			love.graphics.setColor(skill_point_color)
-			local sp_cost_txt = "COST: " .. (self.tree[node.id].cost or 0) .. "SP"
-			love.graphics.print(sp_cost_txt, math.floor(mx + 8 + max_text_width - self.font:getWidth(sp_cost_txt)),  math.floor(my + 2))
+			local sp_cost_txt = (cost[tree[node.id].size] or 0) .. "SP"
+			love.graphics.print(sp_cost_txt, math.floor(mx + 8 + max_text_width - self.font:getWidth(sp_cost_txt)),  math.floor(my + self.font:getHeight()/2) - 4)
 		end
 	end
 
@@ -199,8 +197,9 @@ end
 
 function SkillTree:canNodeBeBought(id)
 	-- You'll need to access the linked_node_id's from the node's links table if you've been adding id's to the links table.
+	
 	for _, linked_node_id in ipairs(self.tree[id].links or {}) do
-		local enoughSP = sp - self.tree[id].cost >= 0
+		local enoughSP = sp - cost[self.tree[id].size] >= 0
 		local notMaxNodes = self.active_nodes < max_nodes
 		if not enoughSP then self.display_error_message = "Not enough SP." end
 		if not notMaxNodes then self.display_error_message = "Max nodes reached." end

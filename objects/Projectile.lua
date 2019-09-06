@@ -84,7 +84,7 @@ function Projectile:new(area, x, y, opts)
 
 	if self.attack == 'Spin' then
 		self.rv = table.random({random(-2*math.pi, -math.pi), random(math.pi, 2*math.pi)})
-		if current_room.player.fixed_spin_attack_direction then self.rv = random(math.pi, 2*math.pi) end
+		if current_room.player.fixed_spin_direction then self.rv = random(math.pi, 2*math.pi) end
 		self.timer:every(0.05, function()
 				self.area:addGameObject('ProjectileTrail', self.x, self.y, 
 					{r = Vector(self.collider:getLinearVelocity()):angleTo(), 
@@ -389,7 +389,7 @@ end
 
 function Projectile:createExplosion()
 	self.area:addGameObject('Explosion', self.x, self.y)
-	if current_room.player.projectiles_explosion then
+	if current_room.player.projectiles_explosions then
 		self:barrage()
 	end
 end

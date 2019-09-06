@@ -95,14 +95,14 @@ function Player:new(area, x, y, opts)
 	self.slow_fast = false
 	self.additional_lightning_bolt = false
 	self.increased_lightning_angle = false
-	self.fixed_spin_attack_direction = false
+	self.fixed_spin_direction = false
 	self.additional_bounce_projectiles = 0
 	self.additional_homing_projectiles = 0
 	self.additional_barrage_projectiles = 0
 	self.added_chance_to_all_on_kill_events = 0
 	self.barrage_nova = false
 	self.projectiles_explode_on_expiration = false
-	self.projectiles_explosion = false
+	self.projectiles_explosions = false
 	self.energy_shield = false
 	self.change_attack_periodically = false
 	self.gain_sp_on_death = false
@@ -271,31 +271,48 @@ function Player:new(area, x, y, opts)
 end
 
 function Player:treeToPlayer()
-	for _, index in ipairs(bought_node_indexes) do
-		local stats = tree[index].stats
-		for i = 1, #stats, 3 do
-			local attribute, value = stats[i+1], stats[i+2]
-			if attribute:find("start_with") then
-				player["start_with_attack_passives"][attribute] = value
-			elseif attribute:find("_atk_spawn_chance_multiplier") then
-				player["attack_spawn_chance_multipliers"][attribute] = player["attack_spawn_chance_multipliers"][attribute] + value
-			elseif attribute:is(Stat) then
-				--[[
-					An interesting consideration for gameplay:
-					I've chosen to have the stat upgrades in the tree affect the player's base multiplier for that particular stat.
-					This is much stronger than a temporary stat boost, since temporary stat boosts multiply the base multiplier.
-					So whatever percentage increase we add onto the base we also be multiplied by the temporary stat boost.
-					
-					Is this good? Is this bad? I'm not sure - I'd have to dig into more how games balance this.
-				]]--
-				player[attribute].base = player[attribute].base + value
-			elseif type(attribute) == "boolean" then
-				player[attribute] = value
-			else
-				player[attribute] = player[attribute] + value
-			end
-		end
-	end
+    local approved_list = {
+        'increased_cycle_speed_while_boosting', 'invulnerability_while_boosting', 'increased_luck_while_boosting', 'projectile_ninety_degree_change', 'projectile_random_degree_change', 'wavy_projectiles', 
+        'fast_slow', 'slow_fast', 'energy_shield', 'barrage_nova', 'projectiles_explode_on_expiration', 'lesser_increased_self_explosion_size', 'greater_increased_self_explosion_size', 
+        'projectiles_explosions', 'change_attack_periodically', 'gain_sp_on_death', 'convert_hp_to_sp_if_hp_full', 'no_boost', 'half_ammo', 'half_hp', 'deals_damage_while_invulnerable', 
+        'refill_ammo_if_hp_full', 'refill_boost_if_hp_full', 'only_spawn_boost', 'only_spawn_attack', 'no_ammo_drop', 'infinite_ammo', 'fixed_spin_direction', 'start_with_double', 'start_with_triple', 
+        'start_with_rapid', 'start_with_spread', 'start_with_back', 'start_with_side', 'start_with_homing', 'start_with_blast', 'start_with_spin', 'start_with_lightning', 'start_with_flame', 
+        'start_with_2split', 'start_with_4split', 'start_with_explode', 'start_with_laser', 'start_with_bounce'
+    }
+
+    local all_attributes = {}
+    local positives = {}
+    local negatives = {}
+    for _, index in ipairs(bought_node_indexes) do
+        if tree[index] then
+            local stats = tree[index].stats
+            for i = 1, #stats, 3 do
+                local attribute, value = stats[i+1], stats[i+2]
+                if not player[attribute] and not M.any(approved_list, attribute) then error('No attribute "' .. attribute .. '"') end
+                if not positives[attribute] then positives[attribute] = 0 end
+                if not negatives[attribute] then negatives[attribute] = 0 end
+                if type(player[attribute]) == 'number' then
+                    if value > 0 then positives[attribute] = positives[attribute] + value
+                    else negatives[attribute] = negatives[attribute] + value end
+                    player[attribute] = player[attribute] + value
+                elseif type(player[attribute]) == 'boolean' then
+                    player[attribute] = value
+                elseif player[attribute]:is(Stat) then
+                    if value > 0 then positives[attribute] = positives[attribute] + value
+                    else negatives[attribute] = negatives[attribute] + value end
+                    local v = player[attribute].value
+                    player[attribute] = Stat(v + value)
+                end
+                if not M.any(all_attributes, attribute) then table.insert(all_attributes, attribute) end
+            end
+        end
+    end
+
+    for _, attribute in ipairs(all_attributes) do
+        if type(player[attribute]) == 'number' or type(player[attribute]) == 'boolean' then
+            print(attribute, player[attribute], positives[attribute], negatives[attribute])
+        else print(attribute, player[attribute].value, positives[attribute], negatives[attribute]) end
+    end
 end
 
 function Player:setStats()

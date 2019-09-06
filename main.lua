@@ -29,6 +29,7 @@ function love.load()
     requireAllInFolder('modules')
     fonts = {}
     loadFontsInFolderAsSize('resources/fonts', 16)
+    loadFontsInFolderAsSize('resources/fonts', 8)
     love.graphics.setDefaultFilter('nearest', 'nearest')
     love.graphics.setLineStyle('rough')
     sound()
@@ -104,7 +105,7 @@ function love.load()
     )
 
     -- SP
-    sp = 5
+    sp = 50
     max_sp = 999
     max_nodes = 50
 
@@ -123,7 +124,7 @@ function love.load()
                 end
             })
 
-    gotoRoom("IntroSequence")
+    gotoRoom("SkillTree")
 end
 
 --love.frame = 0
