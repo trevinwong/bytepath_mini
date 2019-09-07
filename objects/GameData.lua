@@ -4,4 +4,4 @@ GameData.last_selected_ship = "Fighter"
 GameData.high_score = 0
 
 selected_node_indexes = {}
-bought_node_indexes = {1, 708}
+bought_node_indexes = {1}

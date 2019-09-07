@@ -77,23 +77,23 @@ function Player:new(area, x, y, opts)
 	self.shield_projectile_chance = 0
 	self.split_projectiles_split_chance = 0
 	self.drop_mines_chance = 0
-	self.explode_on_cycle_chance = 0
+	self.explode_on_cycle_chance = 100
 	self.double_spawn_chance = 0 
-    self.triple_spawn_chance = 0 
-    self.rapid_spawn_chance = 0 
-    self.spread_spawn_chance = 0 
-    self.back_spawn_chance = 0 
-    self.side_spawn_chance = 0 
-    self.homing_spawn_chance = 0 
-    self.blast_spawn_chance = 0 
-    self.spin_spawn_chance = 0 
-    self.lightning_spawn_chance = 0
-    self.flame_spawn_chance = 0 
-    self.twosplit_spawn_chance = 0
-    self.foursplit_spawn_chance = 0
-    self.explode_spawn_chance = 0
-    self.laser_spawn_chance = 0 
-    self.bounce_spawn_chance = 0 
+	self.triple_spawn_chance = 0 
+	self.rapid_spawn_chance = 0 
+	self.spread_spawn_chance = 0 
+	self.back_spawn_chance = 0 
+	self.side_spawn_chance = 0 
+	self.homing_spawn_chance = 0 
+	self.blast_spawn_chance = 0 
+	self.spin_spawn_chance = 0 
+	self.lightning_spawn_chance = 0
+	self.flame_spawn_chance = 0 
+	self.twosplit_spawn_chance = 0
+	self.foursplit_spawn_chance = 0
+	self.explode_spawn_chance = 0
+	self.laser_spawn_chance = 0 
+	self.bounce_spawn_chance = 0 
 
 	-- Passives
 	self.increased_cycle_speed_while_boosting = false
@@ -129,6 +129,8 @@ function Player:new(area, x, y, opts)
 	self.only_spawn_attack = false
 	self.no_ammo_drop = false
 	self.infinite_ammo = false
+	self.lesser_increased_self_explosion_size = false
+	self.greater_increased_self_explosion_size = false
 
 	for _, name in ipairs(attackNames) do
 		self["start_with_" .. name:lower()] = false
@@ -275,7 +277,7 @@ function Player:new(area, x, y, opts)
 	self:treeToPlayer()
 	self:setStats()
 	self:generateChances()
-	
+
 	-- Assign attack afterwards
 	local startingAttack = self:returnRandomStartingAttack()
 	if startingAttack then self:setAttack(startingAttack) else self:setAttack("Neutral") end
@@ -908,13 +910,30 @@ function Player:onCycle()
 	end
 	if self.chances.explode_on_cycle_chance:next() then
 		-- This isn't totally like the author's explosion (his is a square), but I figured a circle would work just as good (and it's easier to implement)
-		local min_d = 2.5*self.w
-		local max_d = 3*self.w
-		local min_time = 0.1
+		local min_d, max_d, num_explosions, s
+		if self.lesser_increased_self_explosion_size and not self.greater_increased_self_explosion_size then
+			min_d = 2.8 * self.w
+			max_d = 3.3 * self.w
+			num_explosions = 15
+			s = random(40, 45)
+		elseif self.lesser_increased_self_explosion_size and self.greater_increased_self_explosion_size then
+			min_d = 3*self.w
+			max_d = 3.5*self.w
+			num_explosions = 20
+			s = random(45, 50)
+		elseif not self.lesser_increased_self_explosion_size and not self.greater_increased_self_explosion_size then
+			min_d = 2.5*self.w
+			max_d = 3*self.w
+			num_explosions = 12
+			s = random(35, 40)
+		end
+		-- If user has greater increased self explosion size, but not lesser, program will crash.
+		-- Check if it is possible to get greater without lesser.
+		local min_time = 0.1	
 		local max_time = 0.3
-		local num_explosions = 12
 		local r = 0
 		local r_offset = 2*math.pi / num_explosions
+
 		local list_of_r = {}
 		for i = 1, num_explosions do
 			table.insert(list_of_r, r)
@@ -924,7 +943,7 @@ function Player:onCycle()
 			local time = random(min_time, max_time)
 			local d = random(min_d, max_d)
 			self.timer:after(time, function()
-					self.area:addGameObject('Explosion', self.x + 1.5*d*math.cos(list_of_r[i]), self.y + 1.5*d*math.sin(list_of_r[i]))
+					self.area:addGameObject('Explosion', self.x + 1.5*d*math.cos(list_of_r[i]), self.y + 1.5*d*math.sin(list_of_r[i]), {s = s})
 				end)
 		end
 	end
