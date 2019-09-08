@@ -18,12 +18,12 @@ function Projectile:new(area, x, y, opts)
 	if self.attack ~= "Flame" then playGameShoot1() end
 
 	if current_room.player.projectile_ninety_degree_change then
-		self.timer:after(0.2 / current_room.player.angle_change_frequency_multiplier, function()
+		self.timer:after(0.2 / current_room.player.projectile_angle_change_frequency_multiplier, function()
 				self.ninety_degree_direction = table.random({-1, 1})
 				self.r = self.r + self.ninety_degree_direction*math.pi/2
-				self.timer:every('ninety_degree_first', 0.25 / current_room.player.angle_change_frequency_multiplier, function()
+				self.timer:every('ninety_degree_first', 0.25 / current_room.player.projectile_angle_change_frequency_multiplier, function()
 						self.r = self.r - self.ninety_degree_direction*math.pi/2
-						self.timer:after('ninety_degree_second', 0.1 / current_room.player.angle_change_frequency_multiplier, function()
+						self.timer:after('ninety_degree_second', 0.1 / current_room.player.projectile_angle_change_frequency_multiplier, function()
 								self.r = self.r - self.ninety_degree_direction*math.pi/2
 								self.ninety_degree_direction = -1*self.ninety_degree_direction
 							end)
@@ -40,7 +40,7 @@ function Projectile:new(area, x, y, opts)
 	end
 
 	if current_room.player.projectile_random_degree_change then
-		self.timer:every(0.2 / current_room.player.angle_change_frequency_multiplier, function()
+		self.timer:every(0.2 / current_room.player.projectile_angle_change_frequency_multiplier, function()
 				self.r = self.r + random(-math.pi, math.pi)
 			end)
 	end
@@ -66,7 +66,7 @@ function Projectile:new(area, x, y, opts)
 
 	if current_room.player.slow_fast then
 		local initial_v = self.v
-		self.timer:tween('slow_fast_first', 0.2/current_rooom.player.projectile_deceleration_multiplier, self, {v = initial_v/2}, 'in-out-cubic', function()
+		self.timer:tween('slow_fast_first', 0.2/current_room.player.projectile_deceleration_multiplier, self, {v = initial_v/2}, 'in-out-cubic', function()
 				self.timer:tween('slow_fast_second', 0.3/current_room.player.projectile_acceleration_multiplier, self, {v = 2*initial_v}, 'linear')
 			end)
 	end
@@ -400,7 +400,7 @@ end
 	Something important to think about.
 ]]-- 
 function Projectile:barrage()
-	for i = 1, 5 + current_room.player.additional_barrage_projectiles do
+	for i = 1, 5 + current_room.player.additional_barrage_projectile do
 		local random_angle = random(-math.pi * 2, math.pi * 2)
 		self.area:addGameObject('Projectile', self.x, self.y, {r = self.r + random_angle, attack = "Neutral"})
 	end

@@ -124,7 +124,7 @@ function love.load()
                 end
             })
 
-    gotoRoom("Stage")
+    gotoRoom("IntroSequence")
 end
 
 --love.frame = 0

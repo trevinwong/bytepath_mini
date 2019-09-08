@@ -23,20 +23,22 @@ function Player:new(area, x, y, opts)
 	self.ammo_consumption_multiplier = 1
 	self.size_multiplier = 1
 	self.stat_boost_duration_multiplier = 1
-	self.angle_change_frequency_multiplier = 1
+	self.projectile_angle_change_frequency_multiplier = 1
 	self.projectile_waviness_multiplier = 1
 	self.projectile_acceleration_multiplier = 1
 	self.projectile_deceleration_multiplier = 1
 	self.projectile_duration_multiplier = 1
+	self.item_spawn_rate_multiplier = 1
 	self.area_multiplier = 1
 	self.laser_width_multiplier = 1
 	self.energy_shield_recharge_amount_multiplier = 1
 	self.energy_shield_recharge_cooldown_multiplier = 1
+	self.lightning_trigger_distance_multiplier = 1
 
 	self.aspd_multiplier = Stat(1)
 	self.mvspd_multiplier = Stat(1)
 	self.pspd_multiplier = Stat(1)
-	self.cycle_speed_multiplier = Stat(1)
+	self.cycle_multiplier = Stat(1)
 	self.luck_multiplier = Stat(1)
 
 	-- Flats
@@ -46,11 +48,12 @@ function Player:new(area, x, y, opts)
 	self.ammo_gain = 0
 
 	-- Chances
-	self.launch_homing_projectile_on_ammo_pickup_chance = 0
-	self.regain_hp_on_ammo_pickup_chance = 0
+	self.launch_homing_projectile_on_item_pickup_chance = 0
+	self.regain_hp_on_item_pickup_chance = 0
 	self.regain_hp_on_sp_pickup_chance = 0
 	self.spawn_haste_area_on_hp_pickup_chance = 0
 	self.spawn_haste_area_on_sp_pickup_chance = 0
+	self.spawn_haste_area_on_item_pickup_chance = 0
 	self.spawn_sp_on_cycle_chance = 0
 	self.barrage_on_kill_chance = 0
 	self.spawn_hp_on_cycle_chance = 0
@@ -64,10 +67,10 @@ function Player:new(area, x, y, opts)
 	self.launch_homing_projectile_on_kill_chance = 0
 	self.regain_boost_on_kill_chance = 0
 	self.spawn_boost_on_kill_chance = 0
-	self.gain_aspd_boost_on_kill_chance = 0	
-	self.mvspd_boost_on_cycle_chance = 0
-	self.pspd_boost_on_cycle_chance = 0
-	self.pspd_inhibit_on_cycle_chance = 0
+	self.gain_aspd_boost_on_kill_chance = 0
+	self.gain_mvspd_boost_on_cycle_chance = 0
+	self.gain_pspd_boost_on_cycle_chance = 0
+	self.gain_pspd_inhibit_on_cycle_chance = 0
 	self.launch_homing_projectile_while_boosting_chance = 0
 	self.drop_double_ammo_chance = 0
 	self.attack_twice_chance = 0
@@ -77,7 +80,7 @@ function Player:new(area, x, y, opts)
 	self.shield_projectile_chance = 0
 	self.split_projectiles_split_chance = 0
 	self.drop_mines_chance = 0
-	self.explode_on_cycle_chance = 100
+	self.self_explode_on_cycle_chance = 0
 	self.double_spawn_chance = 0 
 	self.triple_spawn_chance = 0 
 	self.rapid_spawn_chance = 0 
@@ -93,7 +96,10 @@ function Player:new(area, x, y, opts)
 	self.foursplit_spawn_chance = 0
 	self.explode_spawn_chance = 0
 	self.laser_spawn_chance = 0 
-	self.bounce_spawn_chance = 0 
+	self.bounce_spawn_chance = 0
+	self.attack_from_sides_chance = 0
+	self.attack_from_back_chance = 0
+	self.additional_lightning_bolt = 0
 
 	-- Passives
 	self.increased_cycle_speed_while_boosting = false
@@ -104,12 +110,11 @@ function Player:new(area, x, y, opts)
 	self.wavy_projectiles = false
 	self.fast_slow = false
 	self.slow_fast = false
-	self.additional_lightning_bolt = false
 	self.increased_lightning_angle = false
 	self.fixed_spin_direction = false
-	self.additional_bounce_projectiles = 0
-	self.additional_homing_projectiles = 0
-	self.additional_barrage_projectiles = 0
+	self.additional_bounce = 0
+	self.additional_homing_projectile = 0
+	self.additional_barrage_projectile = 0
 	self.added_chance_to_all_on_kill_events = 0
 	self.barrage_nova = false
 	self.projectiles_explode_on_expiration = false
@@ -184,6 +189,69 @@ function Player:new(area, x, y, opts)
 	-- Ammo
 	self.max_ammo = 100
 	self.ammo = self.max_ammo
+
+	-- Item
+	self.permanent_buffs = {
+		['stat_buffs'] = {
+			['flat_hp'] = {chanceList({10, 10}, {25, 4}, {50, 1}), 'HP'},
+			['flat_ammo'] = {chanceList({10, 10}, {25, 4}, {50, 1}), 'Ammo'},
+			['flat_boost'] = {chanceList({10, 10}, {25, 4}, {50, 1}), 'Boost'},
+			['ammo_gain'] = {chanceList({0.5, 10}, {1, 4}, {1.5, 1}), 'Ammo Gain'},
+			['hp_multiplier'] = {chanceList({0.1, 10}, {0.2, 4}, {0.3, 1}), 'HP'},
+			['ammo_multiplier'] = {chanceList({0.1, 10}, {0.2, 4}, {0.3, 1}), 'Ammo'},
+			['mvspd_multiplier'] = {chanceList({0.1, 10}, {0.2, 4}, {0.3, 1}), 'MVPSD'},
+			['pspd_multiplier'] = {chanceList({0.1, 10}, {0.2, 4}, {0.3, 1}), 'PSPD'},
+			['cycle_multiplier'] = {chanceList({0.1, 10}, {0.2, 4}, {0.3, 1}), 'Cycle Speed'},
+			['luck_multiplier'] = {chanceList({0.1, 10}, {0.2, 4}, {0.3, 1}), 'Luck'},
+			['turn_rate_multiplier'] = {chanceList({0.1, 10}, {0.2, 4}, {0.3, 1}), 'Turn Rate'},
+			['projectile_size_multiplier'] = {chanceList({0.1, 10}, {0.25, 4}, {0.5, 1}), 'Projectile Size'},
+			['invulnerability_time_multiplier'] = {chanceList({0.1, 10}, {0.25, 4}, {0.5, 1}), 'Invulnerability Time'},
+			['stat_boost_duration_multiplier'] = {chanceList({0.1, 10}, {0.25, 4}, {0.5, 1}), 'Stat Boost Duration'},
+			['ammo_consumption_multiplier'] = {chanceList({-0.1, 10}, {-0.2, 4}, {-0.3, 1}), 'Ammo Consumption'},
+			['projectile_waviness_multiplier'] = {chanceList({0.1, 10}, {0.25, 4}, {0.5, 1}), 'Projectile Waviness'},
+			['projectile_duration_multiplier'] = {chanceList({0.1, 10}, {0.25, 4}, {0.5, 1}), 'Projectile Duration'},
+			['projectile_angle_change_frequency_multiplier'] = {chanceList({0.1, 10}, {0.25, 4}, {0.5, 1}), 'Projectile Angle Change Frequency'},
+			['projectile_acceleration_multiplier'] = {chanceList({0.1, 10}, {0.25, 4}, {0.5, 1}), 'Projectile Acceleration'},
+			['projectile_deceleration_multiplier'] = {chanceList({0.1, 10}, {0.25, 4}, {0.5, 1}), 'Projectile Deceleration'},
+			['area_multiplier'] = {chanceList({0.1, 10}, {0.25, 4}, {0.5, 1}), 'Area'},
+			['energy_shield_recharge_amount_multiplier'] = {chanceList({0.1, 10}, {0.2, 4}, {0.3, 1}), 'Energy Shield Recharge Amount'},
+			['energy_shield_recharge_cooldown_multiplier'] = {chanceList({0.1, 10}, {0.2, 4}, {0.3, 1}), 'Energy Shield Recharge Cooldown'},
+			['barrage_on_cycle_chance'] = {chanceList({2, 10}, {4, 4}, {8, 1}), 'Barrage on Cycle Chance'},
+			['launch_homing_projectile_on_cycle_chance'] = {chanceList({2, 10}, {4, 4}, {8, 1}), 'Launch Homing Projectile on Cycle Chance'},
+			['launch_homing_projectile_on_kill_chance'] = {chanceList({1, 10}, {2, 4}, {4, 1}), 'Launch Homing Projectile on Kill Chance'},
+			['change_attack_on_cycle_chance'] = {chanceList({10, 10}, {25, 4}, {50, 1}), 'Change Attack on Cycle Chance'},
+			['barrage_on_kill_chance'] = {chanceList({2, 10}, {4, 4}, {8, 1}), 'Barrage on Kill Chance'},
+			['shield_projectile_chance'] = {chanceList({10, 10}, {25, 4}, {50, 1}), 'Shield Projectile Chance'},
+			['added_chance_to_all_on_kill_events'] = {chanceList({1, 10}, {2, 4}, {3, 1}), 'Added Chance to All "On Kill" Events'},
+			['drop_mines_chance'] = {chanceList({2, 10}, {4, 4}, {8, 1}), 'Drop Mines Chance'},
+			['self_explode_on_cycle_chance'] = {chanceList({8, 10}, {16, 4}, {24, 1}), 'Self Explode on Cycle Chance'},
+			['attack_twice_chance'] = {chanceList({10, 10}, {20, 4}, {30, 1}), 'Attack Twice Chance'},
+			['attack_from_sides_chance'] = {chanceList({10, 10}, {15, 4}, {20, 1}), 'Attack from Sides Chance'},
+			['attack_from_back_chance'] = {chanceList({10, 10}, {15, 4}, {20, 1}), 'Attack from Back Chance'},
+			['additional_barrage_projectile'] = {chanceList({1, 10}, {2, 4}, {3, 1}), 'Additional Barrage Projectile'},
+			['additional_homing_projectile'] = {chanceList({1, 10}, {2, 1}), 'Additional Homing Projectile'},
+			['additional_lightning_bolt'] = {chanceList({1, 10}, {2, 1}), 'Additional Lightning Bolt'},
+			['additional_bounce'] = {chanceList({1, 10}, {2, 4}, {4, 1}), 'Additional Bounce'},
+		},
+
+		['modifier_buffs'] = {
+			['projectile_ninety_degree_change'] = {true, 'Projectile 90 Degree Change'},
+			['projectile_random_degree_change'] = {true, 'Projectile Random Degree Change'},
+			['increased_cycle_speed_while_boosting'] = {true, 'Increased Cycle Speed While Boosting'},
+			['fast_slow'] = {true, 'Fast -> Slow Projectiles'},
+			['slow_fast'] = {true, 'Slow -> Fast Projectiles'},
+			['barrage_nova'] = {true, 'Barrage Nova'},
+			['projectiles_explode_on_expiration'] = {true, 'Projectiles Explode on Expiration'},
+			['projectiles_explosions'] = {true, 'Explosions Create Projectiles Instead'},
+			['change_attack_periodically'] = {true, 'Change Attack Every 10 Seconds'},
+			['deals_damage_while_invulnerable'] = {true, 'Deals Damage While Invulnerable'}
+		},
+
+		['attack_change'] = {
+			['attack_change'] = {true, 'Attack Change'}
+		},
+	}
+	self.item_type_chance_list = chanceList({'stat_buffs', 30}, {'modifier_buffs', 10}, {'attack_change', 8})
 
 	-- Collision
 	self.collider = self.area.world:newCircleCollider(self.x, self.y, self.w)
@@ -290,7 +358,7 @@ function Player:treeToPlayer()
 		'projectiles_explosions', 'change_attack_periodically', 'gain_sp_on_death', 'convert_hp_to_sp_if_hp_full', 'no_boost', 'half_ammo', 'half_hp', 'deals_damage_while_invulnerable', 
 		'refill_ammo_if_hp_full', 'refill_boost_if_hp_full', 'only_spawn_boost', 'only_spawn_attack', 'no_ammo_drop', 'infinite_ammo', 'fixed_spin_direction', 'start_with_double', 'start_with_triple', 
 		'start_with_rapid', 'start_with_spread', 'start_with_back', 'start_with_side', 'start_with_homing', 'start_with_blast', 'start_with_spin', 'start_with_lightning', 'start_with_flame', 
-		'start_with_2split', 'start_with_4split', 'start_with_explode', 'start_with_laser', 'start_with_bounce'
+		'start_with_2split', 'start_with_4split', 'start_with_explode', 'start_with_laser', 'start_with_bounce', 'additional_lightning_bolt'
 	}
 
 	local all_attributes = {}
@@ -385,6 +453,44 @@ function Player:update(dt)
 			playGameItem()
 			self:setAttack(object.attack)
 			current_room.score = current_room.score + 500
+		elseif object:is(Item) then
+			playGameItem()
+			self:onItemPickup()
+
+			local buff_type = self.item_type_chance_list:next()
+			local buff = selectRandomKey(self.permanent_buffs[buff_type])
+			if buff_type == 'attack_change' then
+				self:setAttack(table.random(attackNames))
+				self.area:addGameObject('InfoText', self.x, self.y, {text = 'Attack Change!', w = self.w, h = self.h})
+
+			elseif type(self.permanent_buffs[buff_type][buff][1]) == 'table' then
+				print(buff)
+				local n = self.permanent_buffs[buff_type][buff][1]:next()
+				if buff == 'aspd_multiplier' or buff == 'mvspd_multiplier' or buff == 'pspd_multiplier' or buff == 'cycle_multiplier' or buff == 'luck_multiplier' then self[buff] = Stat(self[buff].value + n)
+				elseif buff == 'hp_multiplier' then self.max_hp = self.max_hp*(1+n)
+				elseif buff == 'ammo_multiplier' then self.max_ammo = self.max_ammo*(1+n)
+				elseif buff == 'boost_multiplier' then self.max_boost = self.max_boost*(1+n)
+				elseif buff == 'flat_hp' then self.max_hp = self.max_hp + n
+				elseif buff == 'flat_ammo' then self.max_ammo = self.max_ammo + n
+				elseif buff == 'flat_boost' then self.max_boost = self.max_boost + n
+				else self[buff] = self[buff] + n end
+				if self.projectile_waviness_multiplier > 1 then self.wavy_projectiles = true end
+				if self.pspd_multiplier.value < 0 then self.pspd_multiplier.base = 0 end
+				self:generateChances()
+				local text = ''
+				if n < 1 then text = text .. '+' .. n*100 .. '% ' .. self.permanent_buffs[buff_type][buff][2] .. '!'
+				else 
+					if self.permanent_buffs[buff_type][buff][2]:find('Chance') then text = text .. '+' .. n .. '% ' .. self.permanent_buffs[buff_type][buff][2] .. '!'
+					else text = text .. '+' .. n .. ' ' .. self.permanent_buffs[buff_type][buff][2] .. '!' end
+				end
+				self.area:addGameObject('InfoText', object.x, object.y, {text = text, w = self.w, h = self.h})
+
+			elseif type(self.permanent_buffs[buff_type][buff][1]) == 'boolean' then
+				self[buff] = true
+				local text = self.permanent_buffs[buff_type][buff][2] .. '!'
+				self:generateChances()
+				self.area:addGameObject('InfoText', object.x, object.y, {text = text, w = self.w, h = self.h})
+			end
 		end
 	end
 
@@ -419,8 +525,8 @@ function Player:update(dt)
 	self.pspd_multiplier:update(dt)
 
 	-- Cycle
-	if self.cycle_boosting then self.cycle_speed_multiplier:increase(200) end
-	self.cycle_speed_multiplier:update(dt)
+	if self.cycle_boosting then self.cycle_multiplier:increase(200) end
+	self.cycle_multiplier:update(dt)
 
 	-- Luck
 	if self.luck_boosting then 
@@ -483,7 +589,7 @@ function Player:update(dt)
 	self.collider:setLinearVelocity(self.v*math.cos(self.r), self.v*math.sin(self.r))
 
 	-- Cycle
-	self.cycle_timer = self.cycle_timer + (dt * self.cycle_speed_multiplier.value)
+	self.cycle_timer = self.cycle_timer + (dt * self.cycle_multiplier.value)
 	if self.cycle_timer >= self.cycle_cooldown then
 		self:cycle()
 		self.cycle_timer = 0
@@ -521,17 +627,16 @@ function Player:shoot()
 			self.x + d*math.cos(self.r), self.y + d*math.sin(self.r), {player = self, d = d})
 	end
 
-	self.prev_ammo = self.ammo
-	self.ammo = self.ammo - (attacks[self.attack].ammo * self.ammo_consumption_multiplier)
-
 	local mods = {
 		shield = self.chances.shield_projectile_chance:next(),
 	}
 
 	if self.attack == 'Neutral' then
+		self.ammo = self.ammo - (attacks[self.attack].ammo * self.ammo_consumption_multiplier)
 		self.area:addGameObject('Projectile', 
 			self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), table.merge({r = self.r, attack = self.attack}, mods))
 	elseif self.attack == 'Double' then
+		self.ammo = self.ammo - (attacks[self.attack].ammo * self.ammo_consumption_multiplier)
 		self.area:addGameObject('Projectile', 
 			self.x + 1.5*d*math.cos(self.r + math.pi/12), 
 			self.y + 1.5*d*math.sin(self.r + math.pi/12), 
@@ -542,6 +647,7 @@ function Player:shoot()
 			self.y + 1.5*d*math.sin(self.r - math.pi/12), 
 			table.merge({r = self.r - math.pi/12, attack = self.attack}, mods))
 	elseif self.attack == 'Triple' then
+		self.ammo = self.ammo - (attacks[self.attack].ammo * self.ammo_consumption_multiplier)
 		self.area:addGameObject('Projectile', 
 			self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), table.merge({r = self.r, attack = self.attack}, mods))
 
@@ -555,14 +661,17 @@ function Player:shoot()
 			self.y + 1.5*d*math.sin(self.r - math.pi/12), 
 			table.merge({r = self.r - math.pi/12, attack = self.attack}, mods))       
 	elseif self.attack == 'Rapid' then
+			self.ammo = self.ammo - (attacks[self.attack].ammo * self.ammo_consumption_multiplier)
 		self.area:addGameObject('Projectile', 
 			self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), table.merge({r = self.r, attack = self.attack}, mods))
 	elseif self.attack == 'Spread' then
+			self.ammo = self.ammo - (attacks[self.attack].ammo * self.ammo_consumption_multiplier)
 		local t = love.math.random()
 		local r = (t * (-math.pi/8)) + ((1-t) * (math.pi/8))
 		self.area:addGameObject('Projectile', 
 			self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), table.merge({r = self.r + r, attack = self.attack, color = table.random(all_colors)}, mods))
 	elseif self.attack == 'Back' then
+			self.ammo = self.ammo - (attacks[self.attack].ammo * self.ammo_consumption_multiplier)
 		self.area:addGameObject('Projectile', 
 			self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), table.merge({r = self.r, attack = self.attack}, mods))
 
@@ -570,6 +679,7 @@ function Player:shoot()
 		self.area:addGameObject('Projectile', 
 			self.x + 1.5*d*math.cos(back_r), self.y + 1.5*d*math.sin(back_r), table.merge({r = back_r, attack = self.attack}, mods))
 	elseif self.attack == 'Side' then
+			self.ammo = self.ammo - (attacks[self.attack].ammo * self.ammo_consumption_multiplier)
 		self.area:addGameObject('Projectile', 
 			self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), table.merge({r = self.r, attack = self.attack}, mods))
 
@@ -581,9 +691,11 @@ function Player:shoot()
 		self.area:addGameObject('Projectile', 
 			self.x + 1.5*d*math.cos(side2_r), self.y + 1.5*d*math.sin(side2_r), table.merge({r = side2_r, attack = self.attack}, mods))
 	elseif self.attack == 'Homing' then
+			self.ammo = self.ammo - (attacks[self.attack].ammo * self.ammo_consumption_multiplier)
 		local projectile = self.area:addGameObject('Projectile', 
 			self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), table.merge({r = self.r, attack = self.attack, s = 4}, mods))
 	elseif self.attack == 'Blast' then
+			self.ammo = self.ammo - (attacks[self.attack].ammo * self.ammo_consumption_multiplier)
 		playGameShoot2()
 		for i = 1, 12 do
 			local random_angle = random(-math.pi/6, math.pi/6)
@@ -595,39 +707,51 @@ function Player:shoot()
 		end
 		camera:shake(4, 60, 0.4)
 	elseif self.attack == 'Spin' then
+			self.ammo = self.ammo - (attacks[self.attack].ammo * self.ammo_consumption_multiplier)
 		self.area:addGameObject('Projectile', 
 			self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), 
 			table.merge({r = self.r, attack = self.attack}, mods))
 	elseif self.attack == 'Flame' then
+			self.ammo = self.ammo - (attacks[self.attack].ammo * self.ammo_consumption_multiplier)
 		playGameFlame()
 		local random_angle = random(-math.pi/20, math.pi/20)
 		self.area:addGameObject('Projectile', 
 			self.x + 1.5*d*math.cos(self.r + random_angle), self.y + 1.5*d*math.sin(self.r + random_angle), 
 			table.merge({r = self.r + random_angle, attack = self.attack, v = random(250, 300), back_color = skill_point_color}, mods))
 	elseif self.attack == 'Bounce' then
-		local bounces = 4 + self.additional_bounce_projectiles
+			self.ammo = self.ammo - (attacks[self.attack].ammo * self.ammo_consumption_multiplier)
+		local bounces = 4 + self.additional_bounce
 		self.area:addGameObject('Projectile', 
 			self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), 
 			table.merge({r = self.r, attack = self.attack, bounce = bounces, color = table.random(default_colors)}, mods))
 	elseif self.attack == '2Split' then
+			self.ammo = self.ammo - (attacks[self.attack].ammo * self.ammo_consumption_multiplier)
 		self.area:addGameObject('Projectile', 
 			self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), 
 			table.merge({r = self.r, attack = self.attack, s = 4}, mods))
 	elseif self.attack == '4Split' then
+			self.ammo = self.ammo - (attacks[self.attack].ammo * self.ammo_consumption_multiplier)
 		self.area:addGameObject('Projectile', 
 			self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), 
 			table.merge({r = self.r, attack = self.attack, s = 4}, mods))
 	elseif self.attack == 'Lightning' then
 		local x1, y1 = self.x + d*math.cos(self.r), self.y + d*math.sin(self.r)
 		local cx, cy = x1 + 24*math.cos(self.r), y1 + 24*math.sin(self.r)
+		local enemy_amount_to_attack = 1 + self.additional_lightning_bolt
 		if self.increased_lightning_angle then
 			cx, cy = self.x, self.y
 		end
 
 		local nearby_enemies = self.area:getAllGameObjectsThat(function(e)
 				for _, enemy in ipairs(enemies) do
-					if e:is(_G[enemy]) and (distance(e.x, e.y, cx, cy) < 64 * self.area_multiplier) then
-						return true
+					if self.lightning_targets_projectiles then
+						if (e:is(_G[enemy]) or e:is(EnemyProjectile)) and (distance(e.x, e.y, cx, cy) < 64*self.lightning_trigger_distance_multiplier) then
+							return true
+						end
+					else
+						if e:is(_G[enemy]) and (distance(e.x, e.y, cx, cy) < 64*self.lightning_trigger_distance_multiplier) then
+							return true
+						end
 					end
 				end
 			end)
@@ -635,31 +759,27 @@ function Player:shoot()
 		table.sort(nearby_enemies, function(a, b) 
 				return distance(a.x, a.y, cx, cy) < distance(b.x, b.y, cx, cy) 
 			end)
-		local closest_enemy = nearby_enemies[1]
 
-		if closest_enemy then
-			playGameLightning()
-			closest_enemy:hit()
-			local x2, y2 = closest_enemy.x, closest_enemy.y
-			self:spawnLightning(x1, y1, x2, y2, boost_color)
+		local closest_enemies = M.first(nearby_enemies, enemy_amount_to_attack)
 
-			if self.additional_lightning_bolt then
-				playGameLightning()
-				local closest_enemy2 = nearby_enemies[2]
-				if closest_enemy2 then
-					closest_enemy2:hit()
-					x2, y2 = closest_enemy2.x, closest_enemy2.y
-					self:spawnLightning(self.x, self.y, x2, y2, hp_color)
-					self.ammo = self.ammo - (attacks[self.attack].ammo * self.ammo_consumption_multiplier) / 2
-				end
-			end
-		else
-			self.ammo = self.prev_ammo
+		-- Attack closest enemies
+		for i, closest_enemy in ipairs(closest_enemies) do
+			self.timer:after((i-1)*0.05, function()
+					if closest_enemy then
+						playGameLightning()
+						if not closest_enemy:is(EnemyProjectile) then self.ammo = self.ammo - attacks[self.attack].ammo*self.ammo_consumption_multiplier end
+						closest_enemy:hit()
+						local x2, y2 = closest_enemy.x, closest_enemy.y
+						self:spawnLightning(x1, y1, x2, y2, boost_color)
+					end
+				end)
 		end
 	elseif self.attack == 'Explode' then
+			self.ammo = self.ammo - (attacks[self.attack].ammo * self.ammo_consumption_multiplier)
 		self.area:addGameObject('Projectile', 
 			self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), table.merge({r = self.r, attack = self.attack, s = 5}, mods))
 	elseif self.attack == 'Laser' then
+			self.ammo = self.ammo - (attacks[self.attack].ammo * self.ammo_consumption_multiplier)
 		playGameLaser()
 		local x1, y1 = self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r) 
 		local x2, y2 = self.x + 1024*math.cos(self.r), self.y + 1024*math.sin(self.r)
@@ -667,8 +787,6 @@ function Player:shoot()
 			x1, y1, {x2 = x2, y2 = y2, r = self.r, wm = self.laser_width_multiplier})
 	end
 
-	-- This would normally be set at the top, but the Lightning is different in that it subtracts ammo only if it hits an enemy.
-	-- Ideally, this should be re-factored in a way such that we don't have this nasty duplicated code, but given how little I'm touching this function, I think it's fine
 	if self.infinite_ammo then self.ammo = self.max_ammo end
 
 	if self.ammo <= 0 then 
@@ -811,14 +929,7 @@ function Player:hit(damage)
 end
 
 function Player:onAmmoPickup()
-	if self.chances.launch_homing_projectile_on_ammo_pickup_chance:next() then
-		self:launchHomingProjectile()
-		self.area:addGameObject('InfoText', self.x, self.y, {text = 'Homing Projectile!', w = self.w, h = self.h})
-	end
-	if self.chances.regain_hp_on_ammo_pickup_chance:next() then
-		self:addHP(25)
-		self.area:addGameObject('InfoText', self.x, self.y, {text = 'HP Regain!', w = self.w, h = self.h})
-	end
+
 end
 
 function Player:onSPPickup()
@@ -857,6 +968,21 @@ function Player:onHPPickup()
 	end
 end
 
+function Player:onItemPickup()
+	if self.chances.launch_homing_projectile_on_item_pickup_chance:next() then
+		self:launchHomingProjectile()
+		self.area:addGameObject('InfoText', self.x, self.y, {text = 'Homing Projectile!', w = self.w, h = self.h})
+	end
+	if self.chances.regain_hp_on_item_pickup_chance:next() then
+		self:addHP(25)
+		self.area:addGameObject('InfoText', self.x, self.y, {text = 'HP Regain!', w = self.w, h = self.h})
+	end
+	if self.chances.spawn_haste_area_on_item_pickup_chance:next() then
+		self.area:addGameObject('HasteArea', self.x, self.y)
+		self.area:addGameObject('InfoText', self.x, self.y, {text = 'Haste Area!', w = self.w, h = self.h})
+	end
+end
+
 function Player:onCycle()
 	if self.chances.spawn_sp_on_cycle_chance:next() then
 		self.area:addGameObject('SP')
@@ -892,23 +1018,23 @@ function Player:onCycle()
 		self:launchHomingProjectile()
 		self.area:addGameObject('InfoText', self.x, self.y, {text = 'Homing Projectile!', w = self.w, h = self.h})
 	end
-	if self.chances.mvspd_boost_on_cycle_chance:next() then
+	if self.chances.gain_mvspd_boost_on_cycle_chance:next() then
 		self:applyStatus(4, "mvspd_boosting")
 		self.area:addGameObject('InfoText', self.x, self.y, 
 			{text = 'MVSPD Boost!', color = boost_color, w = self.w, h = self.h})
 	end
-	if self.chances.pspd_boost_on_cycle_chance:next() then
+	if self.chances.gain_pspd_boost_on_cycle_chance:next() then
 		self:applyStatus(4, "pspd_boosting")
 		self.area:addGameObject('InfoText', self.x, self.y, 
 			{text = 'PSPD Boost!', color = skill_point_color, w = self.w, h = self.h})
 	end
-	if self.chances.pspd_inhibit_on_cycle_chance:next() then
+	if self.chances.gain_pspd_inhibit_on_cycle_chance:next() then
 		self:applyStatus(4, "pspd_inhibiting")
-		self.timer:after(4, function() self.pspd_inhibiting = false end)
+		if self.timer then self.timer:after(4, function() self.pspd_inhibiting = false end) end
 		self.area:addGameObject('InfoText', self.x, self.y, 
 			{text = 'PSPD Inhibit!', color = skill_point_color, w = self.w, h = self.h})
 	end
-	if self.chances.explode_on_cycle_chance:next() then
+	if self.chances.self_explode_on_cycle_chance:next() then
 		-- This isn't totally like the author's explosion (his is a square), but I figured a circle would work just as good (and it's easier to implement)
 		local min_d, max_d, num_explosions, s
 		if self.lesser_increased_self_explosion_size and not self.greater_increased_self_explosion_size then
@@ -942,11 +1068,12 @@ function Player:onCycle()
 		for i = 1, num_explosions do
 			local time = random(min_time, max_time)
 			local d = random(min_d, max_d)
-			self.timer:after(time, function()
+			if self.timer then self.timer:after(time, function()
 					self.area:addGameObject('Explosion', self.x + 1.5*d*math.cos(list_of_r[i]), self.y + 1.5*d*math.sin(list_of_r[i]), {s = s})
 				end)
 		end
 	end
+end
 end
 
 function Player:onKill(enemy_death_location)
@@ -979,17 +1106,25 @@ function Player:onKill(enemy_death_location)
 	end
 	if self.chances.gain_aspd_boost_on_kill_chance:next() then
 		self.aspd_boosting = true
-		self.timer:after(4, function() self.aspd_boosting = false end)
+		if self.timer then self.timer:after(4, function() self.aspd_boosting = false end) end
 		self.area:addGameObject('InfoText', self.x, self.y, 
 			{text = 'ASPD Boost!', color = ammo_color, w = self.w, h = self.h})
 	end
 end
 
 function Player:onShoot()
+	local d = 1.2*self.w
 	if self.chances.attack_twice_chance:next() then
 		self:shoot()
 		self.area:addGameObject('InfoText', self.x, self.y, 
 			{text = 'Double Attack!', w = self.w, h = self.h})
+	end
+	if self.chances.attack_from_sides_chance:next() then
+		self.area:addGameObject('Projectile', self.x + 1.5*d*math.cos(self.r - math.pi/2), self.y + 1.5*d*math.sin(self.r - math.pi/2), {r = self.r - math.pi/2, attack = self.attack})
+		self.area:addGameObject('Projectile', self.x + 1.5*d*math.cos(self.r + math.pi/2), self.y + 1.5*d*math.sin(self.r + math.pi/2), {r = self.r + math.pi/2, attack = self.attack})
+	end
+	if self.chances.attack_from_back_chance:next() then
+		self.area:addGameObject('Projectile', self.x + 1.5*d*math.cos(self.r - math.pi), self.y + 1.5*d*math.sin(self.r - math.pi), {r = self.r - math.pi, attack = self.attack})
 	end
 end
 
@@ -1040,8 +1175,8 @@ function Player:onBoostEnd()
 end
 
 function Player:barrage()
-	for i = 1, 8 + self.additional_barrage_projectiles do
-		self.timer:after((i-1)*0.05, function()
+	for i = 1, 8 + self.additional_barrage_projectile do
+		if self.timer then self.timer:after((i-1)*0.05, function()
 				local random_angle = random(-math.pi/8, math.pi/8)
 				if self.barrage_nova then random_angle = random(-math.pi * 2, math.pi * 2) end
 				local d = 2.2*self.w
@@ -1052,10 +1187,11 @@ function Player:barrage()
 			end)
 	end
 end
+end
 
 function Player:launchHomingProjectile()
 	local d = 1.2*self.w
-	for i = 1, 1+self.additional_homing_projectiles do
+	for i = 1, 1+self.additional_homing_projectile do
 		self.area:addGameObject('Projectile', 
 			self.x + d*math.cos(self.r), self.y + d*math.sin(self.r), 
 			{r = self.r, attack = 'Homing'})
@@ -1076,9 +1212,10 @@ end
 
 function Player:applyStatus(base_seconds, name)
 	self[name] = true
-	self.timer:after(base_seconds * self.stat_boost_duration_multiplier, function() 
+	if self.timer then self.timer:after(base_seconds * self.stat_boost_duration_multiplier, function() 
 			self[name] = false
 		end)
+end
 end
 
 function Player:returnRandomStartingAttack()

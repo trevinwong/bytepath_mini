@@ -13,9 +13,17 @@ function random(min, max)
     return (min > max and (love.math.random()*(min - max) + max)) or (love.math.random()*(max - min) + min)
 end
 
+function returnTableLength(t)
+	local i = 0
+	for _, _ in pairs(t) do
+		i = i + 1
+	end
+	return i
+end
+
 -- Does not work with tables that do not use integers as keys!
 function table.random(t)
-    return t[love.math.random(1, #t)]
+    return t[love.math.random(1, returnTableLength(t))]
 end
 
 function table.copy(t)
@@ -59,14 +67,6 @@ function returnAllKeys(t)
 		table.insert(keys, key)
 	end
 	return keys
-end
-
-function returnTableLength(t)
-	local i = 0
-	for _, _ in pairs(t) do
-		i = i + 1
-	end
-	return i
 end
 
 function table.merge(t1, t2)

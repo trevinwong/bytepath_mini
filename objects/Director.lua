@@ -18,31 +18,86 @@ function Director:new(area, x, y, opts)
 
 	self.difficulty_to_points = {}
 	self.difficulty_to_points[1] = 16
-	for i = 2, 1024, 4 do
+	self.difficulty_to_points[2] = 24
+	self.difficulty_to_points[3] = 24
+	self.difficulty_to_points[4] = 16
+	self.difficulty_to_points[5] = 32
+	self.difficulty_to_points[6] = 40
+	self.difficulty_to_points[7] = 40 
+	self.difficulty_to_points[8] = 26
+	self.difficulty_to_points[9] = 52
+	self.difficulty_to_points[10] = 60
+	self.difficulty_to_points[11] = 60 
+	self.difficulty_to_points[12] = 52
+	self.difficulty_to_points[13] = 78
+	self.difficulty_to_points[14] = 70
+	self.difficulty_to_points[15] = 70 
+	self.difficulty_to_points[16] = 62 
+	self.difficulty_to_points[17] = 98
+	self.difficulty_to_points[18] = 98 
+	self.difficulty_to_points[19] = 90 
+	self.difficulty_to_points[20] = 108
+	self.difficulty_to_points[21] = 128
+	self.difficulty_to_points[22] = 72 
+	self.difficulty_to_points[23] = 80
+	self.difficulty_to_points[24] = 140 
+	self.difficulty_to_points[25] = 92
+	self.difficulty_to_points[26] = 128
+	self.difficulty_to_points[27] = 86
+	self.difficulty_to_points[28] = 94 
+	self.difficulty_to_points[29] = 142
+	self.difficulty_to_points[30] = 88
+	self.difficulty_to_points[31] = 96
+	self.difficulty_to_points[32] = 104 
+	self.difficulty_to_points[33] = 112 
+	self.difficulty_to_points[34] = 142
+	self.difficulty_to_points[35] = 158
+	self.difficulty_to_points[36] = 178
+	self.difficulty_to_points[37] = 128
+	self.difficulty_to_points[38] = 96
+	self.difficulty_to_points[39] = 160
+	for i = 40, 1024, 4 do
 		self.difficulty_to_points[i] = self.difficulty_to_points[i-1] + 8
 		self.difficulty_to_points[i+1] = self.difficulty_to_points[i]
 		self.difficulty_to_points[i+2] = math.floor(self.difficulty_to_points[i+1]/1.5)
-		self.difficulty_to_points[i+3] = math.floor(self.difficulty_to_points[i+2]*2)
+		self.difficulty_to_points[i+3] = math.ceil(self.difficulty_to_points[i+2]*1.66)
 	end
 
-	-- Enemies
 	self.enemy_to_points = {
 		['Rock'] = 1,
+		['BigRock'] = 2,
 		['Shooter'] = 2,
+		['Waver'] = 4,
+		['Seeker'] = 6,
+		['Orbitter'] = 12,
 	}
 
 	self.enemy_spawn_chances = {
 		[1] = chanceList({'Rock', 1}),
-		[2] = chanceList({'Rock', 8}, {'Shooter', 4}),
-		[3] = chanceList({'Rock', 8}, {'Shooter', 8}),
-		[4] = chanceList({'Rock', 4}, {'Shooter', 8}),
+		[2] = chanceList({'Rock', 8}, {'BigRock', 4}),
+		[3] = chanceList({'Rock', 7}, {'BigRock', 3}, {'Shooter', 3}),
+		[4] = chanceList({'Rock', 6}, {'BigRock', 3}, {'Shooter', 3}, {'Seeker', 3}),
+		[5] = chanceList({'Rock', 5}, {'BigRock', 3}, {'Shooter', 3}, {'Waver', 4}),
+		[6] = chanceList({'Rock', 4}, {'BigRock', 4}, {'Seeker', 1}, {'Waver', 1}),
+		[7] = chanceList({'Rock', 4}, {'BigRock', 3}, {'Shooter', 3}, {'Seeker', 2}, {'Waver', 2}),
+		[8] = chanceList({'Rock', 4}, {'BigRock', 3}, {'Shooter', 3}, {'Seeker', 2}, {'Waver', 2}),
+		[9] = chanceList({'Rock', 4}, {'BigRock', 4}, {'Shooter', 2}),
+		[10] = chanceList({'Rock', 4}, {'BigRock', 4}, {'Shooter', 4}), --{'Rotator', 2}),
+		[11] = chanceList({'Rock', 6}, {'BigRock', 6}),
+		[12] = chanceList({'Rock', 4}, {'BigRock', 4}, {'Shooter', 4}, {'Seeker', 4}, {'Waver', 4}),
+		[13] = chanceList({'Rock', 4}, {'BigRock', 4}),
+		[14] = chanceList({'Rock', 2}, {'BigRock', 2}, {'Shooter', 2}, {'Waver', 2}),
+		[15] = chanceList({'Rock', 4}, {'BigRock', 4}),
+		[16] = chanceList({'Rock', 4}, {'BigRock', 2}, {'Shooter', 2}), --{'Rotator', 2}),
+		[17] = chanceList({'Rock', 4}, {'BigRock', 4}, {'Shooter', 3}, {'Orbitter', 4}),
+		[18] = chanceList({'Rock', 4}, {'BigRock', 4}, {'Shooter', 3}),
+		[19] = chanceList({'Rock', 4}, {'BigRock', 4}, {'Shooter', 3}),
+		[20] = chanceList({'Orbitter', 1}),
 	}
-
-	for i = 5, 1024 do
-		self.enemy_spawn_chances[i] = chanceList(
-			{'Rock', love.math.random(2, 12)}, 
-			{'Shooter', love.math.random(2, 12)}
-		)
+	for i = 21, 1024 do 
+		self.enemy_spawn_chances[i] = chanceList({'Rock', love.math.random(2, 12)}, {'BigRock', love.math.random(2, 12)}, {'Shooter', love.math.random(2, 12)}, 
+			{'Seeker', love.math.random(2, 12)}, {'Waver', love.math.random(2, 12)},
+			{'Orbitter', love.math.random(2, 12)}) 
 	end
 
 	self.timer:every(22/self.player.enemy_spawn_rate_multiplier, function()
@@ -51,8 +106,14 @@ function Director:new(area, x, y, opts)
 		end
 	)
 
-	-- Spawn enemies immediately for Round 1
+	self:generateAttackSpawnChances()
+
+	-- Spawn enemies, item and attack immediately for Round 1
 	self:setEnemySpawnsForThisRound()
+	self.timer:after(1, function() 
+			self.area:addGameObject('Attack', 0, 0, {attack = self.attack_spawn_chances:next()}) 
+			self.area:addGameObject('Item') 
+		end)
 
 	-- Resources
 	self.resource_spawn_chances = chanceList({'Boost', 28*self.player.boost_spawn_chance_multiplier}, 
@@ -75,12 +136,15 @@ function Director:new(area, x, y, opts)
 	)
 
 	-- Attacks
-	self:generateAttackSpawnChances()
 	self.timer:every(30/self.player.attack_spawn_rate_multiplier, function()
 			self.area:addGameObject('Attack', 0, 0, {attack = self.attack_spawn_chances:next()})
 		end
 	)
 
+	-- Item
+	self.timer:every(62/(self.player.item_spawn_rate_multiplier), function()
+			self.area:addGameObject('Item')
+		end)
 end
 
 function Director:update(dt)
@@ -115,13 +179,13 @@ end
 
 function Director:generateAttackSpawnChances()
 	self.attack_spawn_chances = chanceList(
-        {'Double', 10 + self.player.double_spawn_chance}, {'Triple', 10 + self.player.triple_spawn_chance}, {'Rapid', 10 + self.player.rapid_spawn_chance}, 
-        {'Spread', 10 + self.player.spread_spawn_chance}, {'Back', 10 + self.player.back_spawn_chance}, {'Side', 10 + self.player.side_spawn_chance}, 
-        {'Homing', 10 + self.player.homing_spawn_chance}, {'Blast', 10 + self.player.blast_spawn_chance}, {'Spin', 10 + self.player.spin_spawn_chance}, 
-        {'Bounce', 10 + self.player.bounce_spawn_chance}, {'Lightning', 10 + self.player.lightning_spawn_chance}, {'Flame', 10 + self.player.flame_spawn_chance},
-        {'2Split', 10 + self.player.twosplit_spawn_chance}, {'4Split', 10 + self.player.foursplit_spawn_chance}, {'Explode', 10 + self.player.explode_spawn_chance}, 
-        {'Laser', 10 + self.player.laser_spawn_chance}
-    )
+		{'Double', 10 + self.player.double_spawn_chance}, {'Triple', 10 + self.player.triple_spawn_chance}, {'Rapid', 10 + self.player.rapid_spawn_chance}, 
+		{'Spread', 10 + self.player.spread_spawn_chance}, {'Back', 10 + self.player.back_spawn_chance}, {'Side', 10 + self.player.side_spawn_chance}, 
+		{'Homing', 10 + self.player.homing_spawn_chance}, {'Blast', 10 + self.player.blast_spawn_chance}, {'Spin', 10 + self.player.spin_spawn_chance}, 
+		{'Bounce', 10 + self.player.bounce_spawn_chance}, {'Lightning', 10 + self.player.lightning_spawn_chance}, {'Flame', 10 + self.player.flame_spawn_chance},
+		{'2Split', 10 + self.player.twosplit_spawn_chance}, {'4Split', 10 + self.player.foursplit_spawn_chance}, {'Explode', 10 + self.player.explode_spawn_chance}, 
+		{'Laser', 10 + self.player.laser_spawn_chance}
+	)
 end
 
 function Director:destroy()

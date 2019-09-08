@@ -55,7 +55,7 @@ function Stage:new()
             self.score = self.score * 10
         end)
     input:bind('q', function()
-            self.player:die()
+            self.area:addGameObject('Item')
         end)
     
     fadeVolume('music', 5, 0.5)
@@ -88,7 +88,7 @@ function Stage:draw()
 
     if self.player.energy_shield then
         local r, g, b = unpack(default_color)
-        local hp, max_hp = self.player.hp, self.player.max_hp
+        local hp, max_hp = math.floor(self.player.hp), math.floor(self.player.max_hp)
         love.graphics.setColor(r, g, b)
         love.graphics.rectangle('fill', gw/2 - 52, gh - 16, 48*(hp/max_hp), 4)
         love.graphics.setColor(r - 32/255, g - 32/255, b - 32/255)
@@ -170,7 +170,7 @@ function Stage:draw()
         local score = "SCORE: " .. current_room.score
         local high_score = "HIGH SCORE: " .. GameData.high_score
         local difficulty = "DIFFICULTY REACHED: " .. current_room.director.difficulty
-        local sp_gained = "SP GAINED: " .. self.old_sp - sp
+        local sp_gained = "SP GAINED: " .. sp - self.old_sp
 
         local initial_y = gh/2 - 3*self.game_over_font:getHeight()
         love.graphics.print(score, gw/2 - self.game_over_font:getWidth(score)/2, initial_y)
