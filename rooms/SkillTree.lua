@@ -228,3 +228,7 @@ end
 
 function SkillTree:destroy()
 end
+
+function SkillTree:onBack()
+	self:cancelSelectedNodes()
+end

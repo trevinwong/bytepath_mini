@@ -140,3 +140,7 @@ function ChooseShip:switchShip()
 	self.selected_ship = self.available_ships[self.selected_ship_index]
 	self.polygons = Ships[self.selected_ship]["generatePolygons"](self.w)
 end
+
+function ChooseShip:onBack()
+	
+end

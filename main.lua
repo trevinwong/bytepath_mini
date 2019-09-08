@@ -119,6 +119,7 @@ function love.load()
                 love.graphics.pop()
                 end,
                 click = function()
+                    current_room:onBack()
                     popRoomStack()
                     playMenuBack()
                 end
