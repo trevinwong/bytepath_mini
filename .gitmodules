@@ -22,3 +22,12 @@
 [submodule "libraries/ripple"]
 	path = libraries/ripple
 	url = git@github.com:tesselode/ripple.git
+[submodule "bitser"]
+	path = bitser
+	url = git@github.com:gvx/bitser.git
+[submodule "libraries/bitser"]
+	path = libraries/bitser
+	url = git@github.com:gvx/bitser.git
+[submodule "libraries/scaleinator"]
+	path = libraries/scaleinator
+	url = https://gitlab.com/Zatherz/scaleinator.git

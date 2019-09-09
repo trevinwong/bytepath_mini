@@ -8,6 +8,7 @@ function SkillTree:new()
 	self.font = fonts.m5x7_16
 
 	selected_sp = 0
+	selected_node_indexes = {}
 
 	self.active_nodes = 0
 	self.tree = table.copy(tree)
@@ -81,11 +82,13 @@ function SkillTree:update(dt)
 		end
 	end
 
-	self.active_nodes = #bought_node_indexes - 1 
+	self.active_nodes = #GameData.bought_node_indexes - 1 
 
 	if self.disable_input then return end
 
 	if input:down('left_click') then
+		-- Holding down left click can immediately hit this case when entering the SkillTree. Alternative solution: update the previous_mx and previous_my first before running this.
+		if self.previous_mx == nil or self.previous_my == nil then return end
 		local mx, my = camera:getMousePosition(sx, sy, 0, 0, sx*gw, sy*gh)
 		local dx, dy = mx - self.previous_mx, my - self.previous_my
 		camera:move(-dx, -dy)
@@ -153,7 +156,7 @@ function SkillTree:draw()
 
 	-- Player's SP
 	love.graphics.setColor(skill_point_color)
-	love.graphics.print(sp .. " SKILL POINTS", 12, self.font:getHeight() / 2)
+	love.graphics.print(GameData.sp .. " SKILL POINTS", 12, self.font:getHeight() / 2)
 
 	-- Player's Active Nodes
 	local active_nodes_txt = self.active_nodes .. " / " .. max_nodes .. " ACTIVE NODES"
@@ -197,18 +200,19 @@ function SkillTree:canNodeBeBought(id)
 	-- You'll need to access the linked_node_id's from the node's links table if you've been adding id's to the links table.
 	
 	for _, linked_node_id in ipairs(self.tree[id].links or {}) do
-		local enoughSP = sp - cost[self.tree[id].size] >= 0
+		local enoughSP = GameData.sp - cost[self.tree[id].size] >= 0
 		local notMaxNodes = self.active_nodes < max_nodes
 		if not enoughSP then self.display_error_message = "Not enough SP." end
 		if not notMaxNodes then self.display_error_message = "Max nodes reached." end
 		if not enoughSP or not notMaxNodes then self.timer:after('error_message', 1, function() self.display_error_message = false end) playMenuError() return end
-		if (M.any(bought_node_indexes, linked_node_id) or M.any(selected_node_indexes, linked_node_id)) and enoughSP and notMaxNodes then return true end
+		if (M.any(GameData.bought_node_indexes, linked_node_id) or M.any(selected_node_indexes, linked_node_id)) and enoughSP and notMaxNodes then return true end
 	end
 end
 
 function SkillTree:buySelectedNodes()
 	playMenuSelect()
-	bought_node_indexes = M.interleave(bought_node_indexes, selected_node_indexes)
+	GameData.bought_node_indexes = M.interleave(GameData.bought_node_indexes, selected_node_indexes)
+	saveGameData()
 	selected_sp = 0
 	selected_node_indexes = {}
 end
@@ -221,7 +225,7 @@ function SkillTree:cancelSelectedNodes()
 	M.invoke(selected_nodes, function(node, _)
 			node.selected = false
 		end)
-	sp = sp + selected_sp
+	GameData.sp = GameData.sp + selected_sp
 	selected_sp = 0
 	selected_node_indexes = {}
 end

@@ -29,7 +29,7 @@ function Node:update(dt)
 	if cx < -40 or cx > gw + 40 then return end
 	if cy < -40 or cy > gh + 40 then return end
 
-	if M.any(bought_node_indexes, self.id) then self.bought = true else self.bought = false end
+	if M.any(GameData.bought_node_indexes, self.id) then self.bought = true else self.bought = false end
 
 	local r, g, b = unpack(default_color)
 	if self.bought or self.selected then self.color = {r, g, b, 255/255}
@@ -51,9 +51,9 @@ function Node:update(dt)
 
 	if self.hot and input:pressed('left_click') then
 		if current_room:canNodeBeBought(self.id) then
-			if not M.any(bought_node_indexes, self.id) and not M.any(selected_node_indexes, self.id) then
+			if not M.any(GameData.bought_node_indexes, self.id) and not M.any(selected_node_indexes, self.id) then
 				playMenuClick()
-				sp = sp - cost[tree[self.id].size]
+				GameData.sp = GameData.sp - cost[tree[self.id].size]
 				selected_sp = selected_sp + cost[tree[self.id].size]
 				self.selected = true
 				table.insert(selected_node_indexes, self.id)

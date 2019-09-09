@@ -15,7 +15,7 @@ function Stage:new()
     self.main_canvas = love.graphics.newCanvas(gw, gh)
     camera = Camera(gw/2, gh/2)
     camera.smoother = Camera.smooth.damped(5)
-    self.old_sp = sp
+    self.old_sp = GameData.sp
 
     self.director = self.area:addGameObject('Director', 0, 0, {player = self.player})
     self.score = 0
@@ -161,7 +161,7 @@ function Stage:draw()
 
     -- SP
     love.graphics.setColor(skill_point_color)
-    love.graphics.print(sp .. "SP", 20, 10, 0, 1, 1,
+    love.graphics.print(GameData.sp .. "SP", 20, 10, 0, 1, 1,
         0, self.font:getHeight()/2)
     love.graphics.setColor(255, 255, 255)
 
@@ -170,7 +170,7 @@ function Stage:draw()
         local score = "SCORE: " .. current_room.score
         local high_score = "HIGH SCORE: " .. GameData.high_score
         local difficulty = "DIFFICULTY REACHED: " .. current_room.director.difficulty
-        local sp_gained = "SP GAINED: " .. sp - self.old_sp
+        local sp_gained = "SP GAINED: " .. GameData.sp - self.old_sp
 
         local initial_y = gh/2 - 3*self.game_over_font:getHeight()
         love.graphics.print(score, gw/2 - self.game_over_font:getWidth(score)/2, initial_y)
@@ -193,6 +193,7 @@ function Stage:draw()
 end
 
 function Stage:finish()
+    saveGameData()
     self.director.dead = true -- Stop the director from spawning anything else. We'll let everything else tick as usual though when we display the death screen
     self.timer:after(1, function()
             if current_room.score > GameData.high_score then GameData.high_score = current_room.score end

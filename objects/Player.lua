@@ -253,6 +253,10 @@ function Player:new(area, x, y, opts)
 	}
 	self.item_type_chance_list = chanceList({'stat_buffs', 30}, {'modifier_buffs', 10}, {'attack_change', 8})
 
+	-- Mouse
+	self.distanceTillNoBoost = 65
+	self.noBoostZoneThickness = 55
+
 	-- Collision
 	self.collider = self.area.world:newCircleCollider(self.x, self.y, self.w)
 	self.collider:setCollisionClass('Player')
@@ -364,7 +368,7 @@ function Player:treeToPlayer()
 	local all_attributes = {}
 	local positives = {}
 	local negatives = {}
-	for _, index in ipairs(bought_node_indexes) do
+	for _, index in ipairs(GameData.bought_node_indexes) do
 		if tree[index] then
 			local stats = tree[index].stats
 			for i = 1, #stats, 3 do
@@ -552,31 +556,83 @@ function Player:update(dt)
 	self.max_v = self.base_max_v
 	self.boosting = false
 
+	if input:pressed('left_click') then
+		local temp_x, temp_y = camera:getMousePosition(sx, sy, self.x*sx, self.y*sy, sx*gw, sy*gh)
+		local mouse_vector = Vector(temp_x, -temp_y)
+
+		if mouse_vector:len() <= self.distanceTillNoBoost - self.noBoostZoneThickness/2 and self.boost > 1 and self.can_boost then 
+			self:onBoostStart() 
+			self.movementMode = "slowDown"
+		elseif mouse_vector:len() >= self.distanceTillNoBoost + self.noBoostZoneThickness/2 and self.boost > 1 and self.can_boost then 
+			self:onBoostStart() 
+			self.movementMode = "speedUp"
+		else
+			self.movementMode = "neutral"
+		end
+
+		self.last_mouse_vector = mouse_vector
+		self.previous_x, self.previous_y = camera:getMousePosition(sx, sy, 0, 0, sx*gw, sy*gh)
+	end
+
+	if input:down('left_click') then
+		-- Step 1: Make ship vector
+		local ship_vector = Vector(math.cos(self.r), math.sin(self.r))
+		ship_vector.y = -ship_vector.y
+		print("ship vector: " .. ship_vector.x .. "," .. ship_vector.y)
+		-- Step 2: Take orthogonal of ship vector. Note that this method returns the CCW orthogonal vector
+		local orthogonal_ship_vector = ship_vector:perpendicular()
+		print("Orthogonal ship vector: " .. orthogonal_ship_vector.x .. "," .. orthogonal_ship_vector.y)
+		-- Step 3: Take mouse vector but we need to be in ship coordinate space. We do this by offsetting 0, 0 to the position of the ship (scaled ofc)
+		-- To get to a regular cartesian coordinate system but centered at ship coordinate space we also need to mirror Y since increasing Y goes down and increasing X goes right in games
+		-- We also need to rotate our vector appropriately as the ship coordinate space will be rotated as well
+		local temp_x, temp_y = camera:getMousePosition(sx, sy, self.x*sx, self.y*sy, sx*gw, sy*gh)
+		local mouse_vector = Vector(temp_x, -temp_y)
+		
+		if (mouse_vector:len() <= self.distanceTillNoBoost - self.noBoostZoneThickness/2) and self.boost > 1 and self.can_boost then 
+			if self.movementMode == "slowDown" then 
+				self:slowDown(dt) 
+			else
+				self.movementMode = "slowDown"
+				self:onBoostEnd()
+				self:onBoostStart()
+			end
+		end
+		if (mouse_vector:len() >= self.distanceTillNoBoost + self.noBoostZoneThickness/2) and self.boost > 1 and self.can_boost then 
+			if self.movementMode == "speedUp" then 
+				self:speedUp(dt) 
+			else
+				self.movementMode = "speedUp"
+				self:onBoostEnd()
+				self:onBoostStart()
+			end
+		end
+
+		local x, y = camera:getMousePosition(sx, sy, 0, 0, sx*gw, sy*gh)
+		if math.abs(x - self.previous_x) >= 2 or math.abs(y - self.previous_y) >= 2 then
+			self.previous_x, self.previous_y = x, y
+			self.last_mouse_vector = mouse_vector
+		end
+
+		-- Step 4: Take dot of orthogonal and our mouse vector. Divides the space into two half spaces, where the cut is along the ship vector
+		local dot = orthogonal_ship_vector * self.last_mouse_vector
+
+		if dot > 0 then
+			self.r = self.r - self.rv*self.turn_rate_multiplier*dt
+		else
+			self.r = self.r + self.rv*self.turn_rate_multiplier*dt
+		end
+
+	end
+
 	if input:pressed('up') and self.boost > 1 and self.can_boost then self:onBoostStart() end
 	if input:released('up') then self:onBoostEnd() end
 	if input:down('up') and self.boost > 1 and self.can_boost then         
-		self.boosting = true
-		self.max_v = 1.5*self.base_max_v*self.boost_effectiveness_multiplier
-		self.boost = self.boost - 50*dt
-		if self.boost <= 1 then
-			self.boosting = false
-			self.can_boost = false
-			self.boost_timer = 0
-			self:onBoostEnd()
-		end
+		self:speedUp(dt)
 	end
 	if input:pressed('down') and self.boost > 1 and self.can_boost then self:onBoostStart() end
 	if input:released('down') then self:onBoostEnd() end
 	if input:down('down') and self.boost > 1 and self.can_boost then 
-		self.boosting = true
-		self.max_v = 0.5*self.base_max_v/self.boost_effectiveness_multiplier
-		self.boost = self.boost - 50*dt
-		if self.boost <= 1 then
-			self.boosting = false
-			self.can_boost = false
-			self.boost_timer = 0
-			self:onBoostEnd()
-		end
+		self:slowDown(dt)
 	end
 	self.trail_color = skill_point_color 
 	if self.boosting then self.trail_color = boost_color end
@@ -600,6 +656,10 @@ end
 
 function Player:draw()
 	if self.invisible then return end
+	love.graphics.setColor(1, 1, 1)
+	love.graphics.circle('fill', self.x, self.y, self.distanceTillNoBoost + self.noBoostZoneThickness/2)
+	love.graphics.setColor(0, 0, 0)
+	love.graphics.circle('fill', self.x, self.y, self.distanceTillNoBoost - self.noBoostZoneThickness/2)
 
 	pushRotate(self.x, self.y, self.r)
 	love.graphics.setColor(self.color)
@@ -661,17 +721,17 @@ function Player:shoot()
 			self.y + 1.5*d*math.sin(self.r - math.pi/12), 
 			table.merge({r = self.r - math.pi/12, attack = self.attack}, mods))       
 	elseif self.attack == 'Rapid' then
-			self.ammo = self.ammo - (attacks[self.attack].ammo * self.ammo_consumption_multiplier)
+		self.ammo = self.ammo - (attacks[self.attack].ammo * self.ammo_consumption_multiplier)
 		self.area:addGameObject('Projectile', 
 			self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), table.merge({r = self.r, attack = self.attack}, mods))
 	elseif self.attack == 'Spread' then
-			self.ammo = self.ammo - (attacks[self.attack].ammo * self.ammo_consumption_multiplier)
+		self.ammo = self.ammo - (attacks[self.attack].ammo * self.ammo_consumption_multiplier)
 		local t = love.math.random()
 		local r = (t * (-math.pi/8)) + ((1-t) * (math.pi/8))
 		self.area:addGameObject('Projectile', 
 			self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), table.merge({r = self.r + r, attack = self.attack, color = table.random(all_colors)}, mods))
 	elseif self.attack == 'Back' then
-			self.ammo = self.ammo - (attacks[self.attack].ammo * self.ammo_consumption_multiplier)
+		self.ammo = self.ammo - (attacks[self.attack].ammo * self.ammo_consumption_multiplier)
 		self.area:addGameObject('Projectile', 
 			self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), table.merge({r = self.r, attack = self.attack}, mods))
 
@@ -679,7 +739,7 @@ function Player:shoot()
 		self.area:addGameObject('Projectile', 
 			self.x + 1.5*d*math.cos(back_r), self.y + 1.5*d*math.sin(back_r), table.merge({r = back_r, attack = self.attack}, mods))
 	elseif self.attack == 'Side' then
-			self.ammo = self.ammo - (attacks[self.attack].ammo * self.ammo_consumption_multiplier)
+		self.ammo = self.ammo - (attacks[self.attack].ammo * self.ammo_consumption_multiplier)
 		self.area:addGameObject('Projectile', 
 			self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), table.merge({r = self.r, attack = self.attack}, mods))
 
@@ -691,11 +751,11 @@ function Player:shoot()
 		self.area:addGameObject('Projectile', 
 			self.x + 1.5*d*math.cos(side2_r), self.y + 1.5*d*math.sin(side2_r), table.merge({r = side2_r, attack = self.attack}, mods))
 	elseif self.attack == 'Homing' then
-			self.ammo = self.ammo - (attacks[self.attack].ammo * self.ammo_consumption_multiplier)
+		self.ammo = self.ammo - (attacks[self.attack].ammo * self.ammo_consumption_multiplier)
 		local projectile = self.area:addGameObject('Projectile', 
 			self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), table.merge({r = self.r, attack = self.attack, s = 4}, mods))
 	elseif self.attack == 'Blast' then
-			self.ammo = self.ammo - (attacks[self.attack].ammo * self.ammo_consumption_multiplier)
+		self.ammo = self.ammo - (attacks[self.attack].ammo * self.ammo_consumption_multiplier)
 		playGameShoot2()
 		for i = 1, 12 do
 			local random_angle = random(-math.pi/6, math.pi/6)
@@ -707,30 +767,30 @@ function Player:shoot()
 		end
 		camera:shake(4, 60, 0.4)
 	elseif self.attack == 'Spin' then
-			self.ammo = self.ammo - (attacks[self.attack].ammo * self.ammo_consumption_multiplier)
+		self.ammo = self.ammo - (attacks[self.attack].ammo * self.ammo_consumption_multiplier)
 		self.area:addGameObject('Projectile', 
 			self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), 
 			table.merge({r = self.r, attack = self.attack}, mods))
 	elseif self.attack == 'Flame' then
-			self.ammo = self.ammo - (attacks[self.attack].ammo * self.ammo_consumption_multiplier)
+		self.ammo = self.ammo - (attacks[self.attack].ammo * self.ammo_consumption_multiplier)
 		playGameFlame()
 		local random_angle = random(-math.pi/20, math.pi/20)
 		self.area:addGameObject('Projectile', 
 			self.x + 1.5*d*math.cos(self.r + random_angle), self.y + 1.5*d*math.sin(self.r + random_angle), 
 			table.merge({r = self.r + random_angle, attack = self.attack, v = random(250, 300), back_color = skill_point_color}, mods))
 	elseif self.attack == 'Bounce' then
-			self.ammo = self.ammo - (attacks[self.attack].ammo * self.ammo_consumption_multiplier)
+		self.ammo = self.ammo - (attacks[self.attack].ammo * self.ammo_consumption_multiplier)
 		local bounces = 4 + self.additional_bounce
 		self.area:addGameObject('Projectile', 
 			self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), 
 			table.merge({r = self.r, attack = self.attack, bounce = bounces, color = table.random(default_colors)}, mods))
 	elseif self.attack == '2Split' then
-			self.ammo = self.ammo - (attacks[self.attack].ammo * self.ammo_consumption_multiplier)
+		self.ammo = self.ammo - (attacks[self.attack].ammo * self.ammo_consumption_multiplier)
 		self.area:addGameObject('Projectile', 
 			self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), 
 			table.merge({r = self.r, attack = self.attack, s = 4}, mods))
 	elseif self.attack == '4Split' then
-			self.ammo = self.ammo - (attacks[self.attack].ammo * self.ammo_consumption_multiplier)
+		self.ammo = self.ammo - (attacks[self.attack].ammo * self.ammo_consumption_multiplier)
 		self.area:addGameObject('Projectile', 
 			self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), 
 			table.merge({r = self.r, attack = self.attack, s = 4}, mods))
@@ -775,11 +835,11 @@ function Player:shoot()
 				end)
 		end
 	elseif self.attack == 'Explode' then
-			self.ammo = self.ammo - (attacks[self.attack].ammo * self.ammo_consumption_multiplier)
+		self.ammo = self.ammo - (attacks[self.attack].ammo * self.ammo_consumption_multiplier)
 		self.area:addGameObject('Projectile', 
 			self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r), table.merge({r = self.r, attack = self.attack, s = 5}, mods))
 	elseif self.attack == 'Laser' then
-			self.ammo = self.ammo - (attacks[self.attack].ammo * self.ammo_consumption_multiplier)
+		self.ammo = self.ammo - (attacks[self.attack].ammo * self.ammo_consumption_multiplier)
 		playGameLaser()
 		local x1, y1 = self.x + 1.5*d*math.cos(self.r), self.y + 1.5*d*math.sin(self.r) 
 		local x2, y2 = self.x + 1024*math.cos(self.r), self.y + 1024*math.sin(self.r)
@@ -852,9 +912,9 @@ end
 
 function Player:addSP(amount)
 	if amount > 0 then
-		sp = math.min(sp + amount, max_sp)
+		GameData.sp = math.min(GameData.sp + amount, max_sp)
 	else
-		sp = math.max(sp + amount, 0)
+		GameData.sp = math.max(GameData.sp + amount, 0)
 	end    
 end
 
@@ -1228,4 +1288,28 @@ function Player:returnRandomStartingAttack()
 	end
 
 	if #start_withs == 0 then return false else return lowercaseToProper[string.sub(start_withs[love.math.random(1, #start_withs)], string.len("start_with_") + 1)] end
+end
+
+function Player:slowDown(dt)
+	self.boosting = true
+	self.max_v = 0.5*self.base_max_v/self.boost_effectiveness_multiplier
+	self.boost = self.boost - 50*dt
+	if self.boost <= 1 then
+		self.boosting = false
+		self.can_boost = false
+		self.boost_timer = 0
+		self:onBoostEnd()
+	end
+end
+
+function Player:speedUp(dt)
+	self.boosting = true
+	self.max_v = 1.5*self.base_max_v*self.boost_effectiveness_multiplier
+	self.boost = self.boost - 50*dt
+	if self.boost <= 1 then
+		self.boosting = false
+		self.can_boost = false
+		self.boost_timer = 0
+		self:onBoostEnd()
+	end
 end

@@ -6,8 +6,8 @@ function Line:new(node_1_id, node_2_id)
 end
 
 function Line:update(dt)
-    if M.any(bought_node_indexes, self.node_1_id) and 
-       M.any(bought_node_indexes, self.node_2_id) then 
+    if M.any(GameData.bought_node_indexes, self.node_1_id) and 
+       M.any(GameData.bought_node_indexes, self.node_2_id) then 
       	self.active = true 
     else self.active = false end
 end

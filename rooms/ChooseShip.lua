@@ -23,7 +23,7 @@ function ChooseShip:new()
 			custom_draw = function() 
 				pushTranslate(left_arrow_x, left_arrow_y)
 
-				love.graphics.polygon('line', {0, -self.half_w/4, -self.half_w/4, 0, 0, self.half_w/4})
+				love.graphics.polygon('fill', {0, -self.half_w/4, -self.half_w/4, 0, 0, self.half_w/4})
 				love.graphics.pop()
 			end,
 			click = function()
@@ -40,7 +40,7 @@ function ChooseShip:new()
 			custom_draw = function() 
 				pushTranslate(right_arrow_x, right_arrow_y)
 
-				love.graphics.polygon('line', {0, -self.half_w/4, self.half_w/4, 0, 0, self.half_w/4})
+				love.graphics.polygon('fill', {0, -self.half_w/4, self.half_w/4, 0, 0, self.half_w/4})
 				love.graphics.pop()
 			end,
 			click = function()

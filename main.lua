@@ -12,6 +12,7 @@ wf = require 'libraries/windfield/windfield'
 Draft = require('libraries/draft/draft')
 draft = Draft('line')
 ripple = require('libraries/ripple/ripple')
+bitser = require('libraries/bitser/bitser')
 require 'utils'
 require 'globals'
 require 'libraries/utf8'
@@ -22,7 +23,6 @@ function love.load()
 --  love.profiler = require('libraries/profile') 
 --  love.profiler.hookall("Lua")
 --  love.profiler.start()
-
     requireAllInFolder('data')
     requireAllInFolder('objects')
     requireAllInFolder('rooms')
@@ -33,18 +33,20 @@ function love.load()
     love.graphics.setDefaultFilter('nearest', 'nearest')
     love.graphics.setLineStyle('rough')
     sound()
+    scaleResolution()
 
     input = Input()
     camera = Camera()
     timer = Timer()
 
+    loadGameData()
     time = 0
     slow_amount = 1
     screen_alpha = 1
     flash_frames = nil
     room_stack = {} -- highest index is the "top" of the stack
 
-    resize(3)
+    --resize(3)
     input:bind('left', 'left')
     input:bind('right', 'right')
     input:bind('up', 'up')
@@ -105,9 +107,8 @@ function love.load()
     )
 
     -- SP
-    sp = 50
     max_sp = 999
-    max_nodes = 50
+    max_nodes = 200
 
     -- Canvas
     main_canvas = love.graphics.newCanvas(gw, gh)
@@ -115,22 +116,22 @@ function love.load()
     local x, y, w, h = 40, gh - 20, 20, 50
     back_button = Button(x - h/2, y - w/2, {w = h, h = w, custom_draw = function()
                 pushRotate(x, y, -math.pi/2)
-                draft:triangleIsosceles(x, y, w, h, 'line')
+                draft:triangleIsosceles(x, y, w, h, 'fill')
                 love.graphics.pop()
-                end,
-                click = function()
-                    current_room:onBack()
-                    popRoomStack()
-                    playMenuBack()
-                end
-            })
-
-    gotoRoom("IntroSequence")
+            end,
+            click = function()
+                current_room:onBack()
+                popRoomStack()
+                playMenuBack()
+            end
+        })
+    slow_amount = 0.2
+    gotoRoom("Stage")
 end
 
 --love.frame = 0
 function love.update(dt)
-    soundUpdate(dt)
+ --   soundUpdate(dt)
 --      love.frame = love.frame + 1
 --  if love.frame%100 == 0 then
 --    love.report = love.profiler.report('time', 20)
@@ -152,7 +153,7 @@ function love.draw()
 
     if #room_stack > 1 then
         love.graphics.setCanvas(main_canvas)
-            back_button:draw()
+        back_button:draw()
         love.graphics.setCanvas()
 
         love.graphics.setColor(255, 255, 255, 255)
@@ -167,6 +168,8 @@ function love.draw()
         love.graphics.rectangle('fill', 0, 0, sx*gw, sy*gh)
         love.graphics.setColor(255, 255, 255)
     end
+    
+    love.graphics.translate(xTranslationRequiredToCenter, yTranslationRequiredToCenter)
 --      love.graphics.print(love.report or "Please wait...")
 end
 
@@ -241,4 +244,25 @@ function popRoomStack()
         table.remove(room_stack) 
         current_room = room_stack[#room_stack]
     end
+end
+
+function scaleResolution()
+    -- our orig resolution is gw, gh aka 480, 270
+    -- our desired resolution is getWidth() and getHeight()
+    local desiredWidth = love.graphics.getWidth()
+    local desiredHeight = love.graphics.getHeight()
+
+    if desiredWidth < desiredHeight then
+        -- width is less, scale up to width
+        scaleRatio = desiredWidth / gw
+    else
+        -- height is less than or equal, scale up to height
+        scaleRatio = desiredHeight / gh
+    end
+    
+    scaleRatio = math.floor(scaleRatio) -- floor the result b/c we don't want any pixel stretching
+    local scaledWidth, scaledHeight = scaleRatio * gw, scaleRatio * gh
+    local widthDiff, heightDiff = desiredWidth - scaledWidth, desiredHeight - scaledHeight
+    xTranslationRequiredToCenter, yTranslationRequiredToCenter = widthDiff/2, heightDiff/2 -- translate the entire screen by half the difference so we have equal diff on both sides
+    resize(scaleRatio)
 end
