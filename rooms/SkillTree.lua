@@ -89,11 +89,11 @@ function SkillTree:update(dt)
 	if input:down('left_click') then
 		-- Holding down left click can immediately hit this case when entering the SkillTree. Alternative solution: update the previous_mx and previous_my first before running this.
 		if self.previous_mx == nil or self.previous_my == nil then return end
-		local mx, my = camera:getMousePosition(sx, sy, 0, 0, sx*gw, sy*gh)
+		local mx, my = camera:getMousePosition(sx, sy, xTranslationRequiredToCenter, yTranslationRequiredToCenter, sx*gw, sy*gh)
 		local dx, dy = mx - self.previous_mx, my - self.previous_my
 		camera:move(-dx, -dy)
 	end
-	self.previous_mx, self.previous_my = camera:getMousePosition(sx, sy, 0, 0, sx*gw, sy*gh)
+	self.previous_mx, self.previous_my = camera:getMousePosition(sx, sy, xTranslationRequiredToCenter, yTranslationRequiredToCenter, sx*gw, sy*gh)
 
 	-- Added some simple limits for the zooming in/out.
 	if input:pressed('zoom_in') then 
@@ -184,7 +184,7 @@ function SkillTree:draw()
 
 	love.graphics.setColor(255, 255, 255, 255)
 	love.graphics.setBlendMode('alpha', 'premultiplied')
-	love.graphics.draw(self.main_canvas, 0, 0, 0, sx, sy)
+    love.graphics.draw(self.main_canvas, xTranslationRequiredToCenter, yTranslationRequiredToCenter, 0, sx, sy)
 	love.graphics.setBlendMode('alpha')
 
 	love.graphics.setFont(self.font)

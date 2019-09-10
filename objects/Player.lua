@@ -393,11 +393,11 @@ function Player:treeToPlayer()
 		end
 	end
 
-	for _, attribute in ipairs(all_attributes) do
-		if type(self[attribute]) == 'number' or type(self[attribute]) == 'boolean' then
-			print(attribute, self[attribute], positives[attribute], negatives[attribute])
-		else print(attribute, self[attribute].value, positives[attribute], negatives[attribute]) end
-	end
+--	for _, attribute in ipairs(all_attributes) do
+--		if type(self[attribute]) == 'number' or type(self[attribute]) == 'boolean' then
+--			print(attribute, self[attribute], positives[attribute], negatives[attribute])
+--		else print(attribute, self[attribute].value, positives[attribute], negatives[attribute]) end
+--	end
 end
 
 function Player:setStats()
@@ -556,73 +556,7 @@ function Player:update(dt)
 	self.max_v = self.base_max_v
 	self.boosting = false
 
-	if input:pressed('left_click') then
-		local temp_x, temp_y = camera:getMousePosition(sx, sy, self.x*sx, self.y*sy, sx*gw, sy*gh)
-		local mouse_vector = Vector(temp_x, -temp_y)
-
-		if mouse_vector:len() <= self.distanceTillNoBoost - self.noBoostZoneThickness/2 and self.boost > 1 and self.can_boost then 
-			self:onBoostStart() 
-			self.movementMode = "slowDown"
-		elseif mouse_vector:len() >= self.distanceTillNoBoost + self.noBoostZoneThickness/2 and self.boost > 1 and self.can_boost then 
-			self:onBoostStart() 
-			self.movementMode = "speedUp"
-		else
-			self.movementMode = "neutral"
-		end
-
-		self.last_mouse_vector = mouse_vector
-		self.previous_x, self.previous_y = camera:getMousePosition(sx, sy, 0, 0, sx*gw, sy*gh)
-	end
-
-	if input:down('left_click') then
-		-- Step 1: Make ship vector
-		local ship_vector = Vector(math.cos(self.r), math.sin(self.r))
-		ship_vector.y = -ship_vector.y
-		print("ship vector: " .. ship_vector.x .. "," .. ship_vector.y)
-		-- Step 2: Take orthogonal of ship vector. Note that this method returns the CCW orthogonal vector
-		local orthogonal_ship_vector = ship_vector:perpendicular()
-		print("Orthogonal ship vector: " .. orthogonal_ship_vector.x .. "," .. orthogonal_ship_vector.y)
-		-- Step 3: Take mouse vector but we need to be in ship coordinate space. We do this by offsetting 0, 0 to the position of the ship (scaled ofc)
-		-- To get to a regular cartesian coordinate system but centered at ship coordinate space we also need to mirror Y since increasing Y goes down and increasing X goes right in games
-		-- We also need to rotate our vector appropriately as the ship coordinate space will be rotated as well
-		local temp_x, temp_y = camera:getMousePosition(sx, sy, self.x*sx, self.y*sy, sx*gw, sy*gh)
-		local mouse_vector = Vector(temp_x, -temp_y)
-		
-		if (mouse_vector:len() <= self.distanceTillNoBoost - self.noBoostZoneThickness/2) and self.boost > 1 and self.can_boost then 
-			if self.movementMode == "slowDown" then 
-				self:slowDown(dt) 
-			else
-				self.movementMode = "slowDown"
-				self:onBoostEnd()
-				self:onBoostStart()
-			end
-		end
-		if (mouse_vector:len() >= self.distanceTillNoBoost + self.noBoostZoneThickness/2) and self.boost > 1 and self.can_boost then 
-			if self.movementMode == "speedUp" then 
-				self:speedUp(dt) 
-			else
-				self.movementMode = "speedUp"
-				self:onBoostEnd()
-				self:onBoostStart()
-			end
-		end
-
-		local x, y = camera:getMousePosition(sx, sy, 0, 0, sx*gw, sy*gh)
-		if math.abs(x - self.previous_x) >= 2 or math.abs(y - self.previous_y) >= 2 then
-			self.previous_x, self.previous_y = x, y
-			self.last_mouse_vector = mouse_vector
-		end
-
-		-- Step 4: Take dot of orthogonal and our mouse vector. Divides the space into two half spaces, where the cut is along the ship vector
-		local dot = orthogonal_ship_vector * self.last_mouse_vector
-
-		if dot > 0 then
-			self.r = self.r - self.rv*self.turn_rate_multiplier*dt
-		else
-			self.r = self.r + self.rv*self.turn_rate_multiplier*dt
-		end
-
-	end
+	self:updateClickMovement(dt)
 
 	if input:pressed('up') and self.boost > 1 and self.can_boost then self:onBoostStart() end
 	if input:released('up') then self:onBoostEnd() end
@@ -656,10 +590,10 @@ end
 
 function Player:draw()
 	if self.invisible then return end
-	love.graphics.setColor(1, 1, 1)
-	love.graphics.circle('fill', self.x, self.y, self.distanceTillNoBoost + self.noBoostZoneThickness/2)
-	love.graphics.setColor(0, 0, 0)
-	love.graphics.circle('fill', self.x, self.y, self.distanceTillNoBoost - self.noBoostZoneThickness/2)
+--	love.graphics.setColor(1, 1, 1)
+--	love.graphics.circle('fill', self.x, self.y, self.distanceTillNoBoost + self.noBoostZoneThickness/2)
+--	love.graphics.setColor(0, 0, 0)
+--	love.graphics.circle('fill', self.x, self.y, self.distanceTillNoBoost - self.noBoostZoneThickness/2)
 
 	pushRotate(self.x, self.y, self.r)
 	love.graphics.setColor(self.color)
@@ -1311,5 +1245,71 @@ function Player:speedUp(dt)
 		self.can_boost = false
 		self.boost_timer = 0
 		self:onBoostEnd()
+	end
+end
+
+function Player:updateClickMovement(dt)
+	if input:pressed('left_click') then
+		local temp_x, temp_y = camera:getMousePosition(sx, sy, self.x*sx + xTranslationRequiredToCenter, self.y*sy + yTranslationRequiredToCenter, sx*gw, sy*gh)
+		local mouse_vector = Vector(temp_x, -temp_y)
+
+		if mouse_vector:len() <= self.distanceTillNoBoost - self.noBoostZoneThickness/2 and self.boost > 1 and self.can_boost then 
+			self:onBoostStart() 
+			self.movementMode = "slowDown"
+		elseif mouse_vector:len() >= self.distanceTillNoBoost + self.noBoostZoneThickness/2 and self.boost > 1 and self.can_boost then 
+			self:onBoostStart() 
+			self.movementMode = "speedUp"
+		else
+			self.movementMode = "neutral"
+		end
+
+		self.last_mouse_vector = mouse_vector
+		self.previous_x, self.previous_y = camera:getMousePosition(sx, sy, xTranslationRequiredToCenter, yTranslationRequiredToCenter, sx*gw, sy*gh)
+	end
+
+	if input:down('left_click') then
+		-- Step 1: Make ship vector, remember game's cartesian coordinate system is mirrored on the x-axis so we need to flip it to get to a regular coordinate system
+		local ship_vector = Vector(math.cos(self.r), math.sin(self.r))
+		ship_vector.y = -ship_vector.y
+		-- Step 2: Take orthogonal of ship vector. Note that this method returns the CCW orthogonal vector
+		local orthogonal_ship_vector = ship_vector:perpendicular()
+		-- Step 3: Take mouse vector but we need to be in "ship" coordinate space, kind of. We do this by offsetting 0, 0 to the position of the ship (scaled ofc)
+		local temp_x, temp_y = camera:getMousePosition(sx, sy, self.x*sx + xTranslationRequiredToCenter, self.y*sy + yTranslationRequiredToCenter, sx*gw, sy*gh)
+		local mouse_vector = Vector(temp_x, -temp_y)
+		
+		if (mouse_vector:len() <= self.distanceTillNoBoost - self.noBoostZoneThickness/2) and self.boost > 1 and self.can_boost then 
+			if self.movementMode == "slowDown" then 
+				self:slowDown(dt) 
+			else
+				self.movementMode = "slowDown"
+				self:onBoostEnd()
+				self:onBoostStart()
+			end
+		end
+		if (mouse_vector:len() >= self.distanceTillNoBoost + self.noBoostZoneThickness/2) and self.boost > 1 and self.can_boost then 
+			if self.movementMode == "speedUp" then 
+				self:speedUp(dt) 
+			else
+				self.movementMode = "speedUp"
+				self:onBoostEnd()
+				self:onBoostStart()
+			end
+		end
+
+		local x, y = camera:getMousePosition(sx, sy, xTranslationRequiredToCenter, yTranslationRequiredToCenter, sx*gw, sy*gh)
+		if not self.previous_x or (math.abs(x - self.previous_x) >= 2 or math.abs(y - self.previous_y) >= 2) then
+			self.previous_x, self.previous_y = x, y
+			self.last_mouse_vector = mouse_vector
+		end
+
+		-- Step 4: Take dot of orthogonal and our mouse vector. Divides the space into two half spaces, where the cut is along the ship vector
+		local dot = orthogonal_ship_vector * self.last_mouse_vector
+
+		if dot > 0 then
+			self.r = self.r - self.rv*self.turn_rate_multiplier*dt
+		else
+			self.r = self.r + self.rv*self.turn_rate_multiplier*dt
+		end
+
 	end
 end

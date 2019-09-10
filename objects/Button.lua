@@ -9,6 +9,8 @@ end
 function Button:update()
 	-- Note: love.mouse.getPosition() gets the actual world/transformed position of the mouse (while we're still calculating our coordinates based on our original resolution)
 	local mx, my = love.mouse.getPosition()
+	mx = mx - xTranslationRequiredToCenter
+	my = my - yTranslationRequiredToCenter
 	mx = mx / sx
 	my = my / sy
 	if mx >= self.x and mx <= self.x + self.w and my >= self.y and my <= self.y + self.h then

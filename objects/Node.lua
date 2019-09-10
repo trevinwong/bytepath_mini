@@ -37,7 +37,7 @@ function Node:update(dt)
 
 	if self.no_description then return end
 	-- TO-DO: Is our hump.camera modified from the original? We have different syntax than the call
-	local mx, my = camera:getMousePosition(sx*camera.scale, sy*camera.scale, 0, 0, sx*gw, sy*gh)
+	local mx, my = camera:getMousePosition(sx*camera.scale, sy*camera.scale, xTranslationRequiredToCenter, yTranslationRequiredToCenter, sx*gw, sy*gh)
 	if self.size == 1 then
 		if mx >= self.x - 8 and mx <= self.x + 8 and my >= self.y - 8 and my <= self.y + 8 then self.hot = true
 		else self.hot = false end

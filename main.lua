@@ -125,13 +125,12 @@ function love.load()
                 playMenuBack()
             end
         })
-    slow_amount = 0.2
     gotoRoom("Stage")
 end
 
 --love.frame = 0
 function love.update(dt)
- --   soundUpdate(dt)
+    soundUpdate(dt)
 --      love.frame = love.frame + 1
 --  if love.frame%100 == 0 then
 --    love.report = love.profiler.report('time', 20)
@@ -158,9 +157,8 @@ function love.draw()
 
         love.graphics.setColor(255, 255, 255, 255)
         love.graphics.setBlendMode('alpha', 'premultiplied')
-        love.graphics.draw(main_canvas, 0, 0, 0, sx, sy)
+        love.graphics.draw(main_canvas, xTranslationRequiredToCenter, yTranslationRequiredToCenter, 0, sx, sy)
         love.graphics.setBlendMode('alpha')
-
     end
 
     if flash_seconds then
@@ -168,8 +166,7 @@ function love.draw()
         love.graphics.rectangle('fill', 0, 0, sx*gw, sy*gh)
         love.graphics.setColor(255, 255, 255)
     end
-    
-    love.graphics.translate(xTranslationRequiredToCenter, yTranslationRequiredToCenter)
+
 --      love.graphics.print(love.report or "Please wait...")
 end
 
@@ -259,10 +256,11 @@ function scaleResolution()
         -- height is less than or equal, scale up to height
         scaleRatio = desiredHeight / gh
     end
-    
+
     scaleRatio = math.floor(scaleRatio) -- floor the result b/c we don't want any pixel stretching
     local scaledWidth, scaledHeight = scaleRatio * gw, scaleRatio * gh
     local widthDiff, heightDiff = desiredWidth - scaledWidth, desiredHeight - scaledHeight
     xTranslationRequiredToCenter, yTranslationRequiredToCenter = widthDiff/2, heightDiff/2 -- translate the entire screen by half the difference so we have equal diff on both sides
-    resize(scaleRatio)
+    sx, sy = scaleRatio, scaleRatio
+    --resize(scaleRatio)
 end

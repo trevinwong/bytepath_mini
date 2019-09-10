@@ -187,7 +187,7 @@ function Stage:draw()
 
     love.graphics.setColor(255, 255, 255, 255)
     love.graphics.setBlendMode('alpha', 'premultiplied')
-    love.graphics.draw(self.main_canvas, 0, 0, 0, sx, sy)
+    love.graphics.draw(self.main_canvas, xTranslationRequiredToCenter, yTranslationRequiredToCenter, 0, sx, sy)
     love.graphics.setBlendMode('alpha')
 
 end
