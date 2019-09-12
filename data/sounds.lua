@@ -39,16 +39,8 @@ function sound()
     register('game_engine', 'static', {'master', 'sfx', 'game'})
 
     songs = {
-        'AIRGLOW - AIRGLOW - Memory Bank - 01 Memory Bank',
-        'AIRGLOW - AIRGLOW - Memory Bank - 02 Cepheid Disk',
-        'AIRGLOW - AIRGLOW - Memory Bank - 03 Electrifying Landscape',
-        'AIRGLOW - AIRGLOW - Memory Bank - 04 Blueshift',
-        'AIRGLOW - AIRGLOW - Memory Bank - 05 Far Apart',
-        'AIRGLOW - AIRGLOW - Memory Bank - 06 Lisa',
         'AIRGLOW - AIRGLOW - Memory Bank - 07 New Touch',
-        'AIRGLOW - AIRGLOW - Memory Bank - 08 Spliff & Wesson',
         'AIRGLOW - AIRGLOW - Memory Bank - 09 Innermission',
-        'AIRGLOW - AIRGLOW - Memory Bank - 10 System Shutdown',
     }
     for _, song in ipairs(songs) do register(song, 'stream', {'master', 'music'}) end
 end

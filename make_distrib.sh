@@ -1,1 +1,2 @@
- zip -r ../${PWD##*/}.love *
+ zip -r ../${PWD##*/}.love * -x *.git*
+

@@ -125,13 +125,13 @@ function love.load()
                 playMenuBack()
             end
         })
-    gotoRoom("Stage")
+    gotoRoom("IntroSequence")
 end
 
 --love.frame = 0
 function love.update(dt)
     soundUpdate(dt)
---      love.frame = love.frame + 1
+--  love.frame = love.frame + 1
 --  if love.frame%100 == 0 then
 --    love.report = love.profiler.report('time', 20)
 --    love.profiler.reset()

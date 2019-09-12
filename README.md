@@ -10,7 +10,9 @@ Note: some of the commits aren't the cleanest, due to me occasionally fixing pre
 
 2. **To house the new code for the port.** 
 
-If you like BYTEPATH mini, I suggest you buy the [original version](https://store.steampowered.com/app/760330/BYTEPATH/), which has way more content and is way more polished.
+Please note that the code here is **not** the cleanest. This is due to the fact that I likely do not plan on supporting this game in the future, and the tutorial was more of a learning experience on programmatically generating cool effects rather than an exercise on how to write clean code :)
+
+If you like **BYTEPATH mini**, I suggest you buy the [original version](https://store.steampowered.com/app/760330/BYTEPATH/), which has way more content and is way more polished.
 
 # Tips and Tricks and Lessons Learned
 - If you're using ZeroBrane Studio, beware of enabling `mobdebug`, as this can kill the performance of your game (usually enabling any sort of debugging tool will hurt performance)
