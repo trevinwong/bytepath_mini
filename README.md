@@ -1,21 +1,12 @@
 # What is this?
 
-**BYTEPATH mini** is an Android port of adnzzzzZ's [BYTEPATH tutorial](https://github.com/adnzzzzZ/blog/issues/30). This repository serves two purposes:
-
-1. **To help people following the tutorial.** Since LOVE has updated to 11.0 and libraries have changed, some of the code in the tutorial has been rendered obsolete. If you find yourself stuck on parts of the tutorial that mysteriously do not seem to work, you can refer to the appropriate commit in my repository to see what I've done to make it work (I have labelled each commit with the appropriate section and exercise number.)
-
-As of *August 31, 2019*, all the exercises up to 227 have been completed successfully. I have chosen not to do the exercises past 227 since they are not applicable to the Android port.
-
-Note: some of the commits aren't the cleanest, due to me occasionally fixing previous blunders and randomly commenting on things. If you have any questions about the code, don't hesitate to email me at *trevinwong@gmail.com*.
-
-2. **To house the new code for the port.** 
-
-Please note that the code here is **not** the cleanest. This is due to the fact that I likely do not plan on supporting this game in the future, and the tutorial was more of a learning experience on programmatically generating cool effects rather than an exercise on how to write clean code :)
+**BYTEPATH mini** is an Android port and following of adnzzzzZ's [BYTEPATH tutorial](https://github.com/adnzzzzZ/blog/issues/30).
 
 If you like **BYTEPATH mini**, I suggest you buy the [original version](https://store.steampowered.com/app/760330/BYTEPATH/), which has way more content and is way more polished.
 
-# Tips and Tricks and Lessons Learned
-- If you're using ZeroBrane Studio, beware of enabling `mobdebug`, as this can kill the performance of your game (usually enabling any sort of debugging tool will hurt performance)
+# Lessons Learned
+
+- If you're using ZeroBrane Studio, beware of enabling `mobdebug`, as this can kill the performance of your game
 - Time manipulation commands are super useful for debugging. You can build them into your game simply by multiplying `dt` by a time factor.
 - On that same note, a "pause" and "resume" command is also helpful, which you can do by multiplying `dt` by `0`, or just wrapping your update calls in an `if` block.
 - What is `make_distrib.sh`? If you're running UNIX, this is an easy script that you can run to package your game into a `.love`. Useful when you want to distribute it. This script can be improved by excluding the actual script itself, but I find this works fine.
